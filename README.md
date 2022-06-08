@@ -20,20 +20,20 @@ Prerequisites
 Quick Build Instructions
 1. Windows
 ------------------------
-  `mkdir build`
-  `cd build`
-  `cmake ..`
-  `make`
+  `mkdir build`  
+  `cd build`  
+  `cmake ..`  
+  `make`  
 
 2. Ubuntu
 ------------------------
-  `mkdir build`
-  `cd build`
-  `cmake ..`
-  `make`
+  `mkdir build`  
+  `cd build`  
+  `cmake ..`  
+  `make`  
 
 Support
 ------------------------
-contact : jimmy.xie@ailiteam.com
+contact : jimmy@ailiteam.com
 
 
