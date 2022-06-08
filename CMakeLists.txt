@@ -1,0 +1,28 @@
+cmake_minimum_required(VERSION 3.5)
+
+project(pcie_sdk LANGUAGES C)
+set(PROJECT_LINK_DIR ${PROJECT_SOURCE_DIR}/lib)
+
+include_directories(
+    include
+)
+
+add_executable(${PROJECT_NAME}_demo_init demo/c/demo_init.c)
+target_link_libraries(${PROJECT_NAME}_demo_init     
+    ${PROJECT_LINK_DIR}/libpcie_sdk.so
+    pthread
+)
+
+add_executable(${PROJECT_NAME}_demo_client demo/c/demo_client.c)
+target_link_libraries(${PROJECT_NAME}_demo_client     
+    ${PROJECT_LINK_DIR}/libpcie_sdk.so
+    pthread
+)
+
+add_executable(${PROJECT_NAME}_demo_service demo/c/demo_service.c)
+target_link_libraries(${PROJECT_NAME}_demo_service     
+    ${PROJECT_LINK_DIR}/libpcie_sdk.so
+    pthread
+)
+
+
