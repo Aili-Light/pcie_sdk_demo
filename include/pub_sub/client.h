@@ -13,10 +13,18 @@
 #include "pub_sub/log.h"
 #include "pub_sub/basic_types.h"
 #include "pub_sub/util.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef void(*alg_sdk_callback_func)(void* p);
 
 int alg_sdk_subscribe (const char* topic, alg_sdk_callback_func consumer);
 int alg_sdk_stop_client();
 int alg_sdk_init_client();
 
+#ifdef __cplusplus
+}
+#endif
 #endif

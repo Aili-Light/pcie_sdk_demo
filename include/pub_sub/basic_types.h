@@ -33,6 +33,10 @@
 #define ALG_SDK_SERVICE_SEND_BUFF_MAX_SIZE 65536
 #define ALG_SDK_MAX_CHANNEL 32
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum
 {
     ALG_SDK_ITEM_MANAGER_DATA_TYPE_IMAGE = 1,
@@ -246,4 +250,7 @@ typedef struct alg_sdk_task {
     void *control;
 }alg_sdk_task_t;
 
+#ifdef __cplusplus
+}
+#endif
 #endif
