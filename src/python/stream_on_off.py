@@ -17,7 +17,7 @@ stream_on_cmd = b"/service/camera/stream_on"
 timeo = c_int(5000)
 
 if __name__ == '__main__':
-    pcie_sdk = ctypes.CDLL('../../lib/libpcie_sdk.so')
+    pcie_sdk = ctypes.CDLL('../../lib/linux/libpcie_sdk.so')
     pcie_sdk.alg_sdk_call_service.argtypes = [c_char_p, c_void_p, c_int]
     pcie_sdk.alg_sdk_call_service.restype = ctypes.c_int
 
@@ -33,9 +33,9 @@ if __name__ == '__main__':
     cfg.select[2] = 1
     cfg.control[2] = 1
     cfg.select[4] = 1
-    cfg.control[4] = 1
+    cfg.control[4] = 0
     cfg.select[6] = 1
-    cfg.control[6] = 1
+    cfg.control[6] = 0
 
     ret = pcie_sdk.alg_sdk_call_service(c_char_p(stream_on_cmd), pointer(cfg), timeo)
     print(' result = %d ' % ret)

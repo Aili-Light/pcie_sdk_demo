@@ -18,19 +18,21 @@ Prerequisites
    * gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04)
 
 Quick Build Instructions
-1. Windows
+# Windows
 ------------------------
-  `mkdir build`  
-  `cd build`  
-  `cmake ..`  
-  `make`  
+1.  `mkdir build`  
+2.  `cd build`  
+3.  `cmake ..`  
+4.  `make`  
+5.  `make install`  
 
-2. Ubuntu
+# Ubuntu
 ------------------------
-  `mkdir build`  
-  `cd build`  
-  `cmake ..`  
-  `make`  
+1.  `mkdir build`  
+2.  `cd build`  
+3.  `cmake ..`  
+4.  `make`  
+5.  `make install`  
 
 Support
 ------------------------

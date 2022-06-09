@@ -29,7 +29,7 @@ set_config_cmd = b"/service/camera/set_config"
 timeo = c_int(5000)
 
 if __name__ == '__main__':
-    pcie_sdk = ctypes.CDLL('../../lib/libpcie_sdk.so')
+    pcie_sdk = ctypes.CDLL('../../lib/linux/libpcie_sdk.so')
     pcie_sdk.alg_sdk_call_service.argtypes = [c_char_p, c_void_p, c_int]
     pcie_sdk.alg_sdk_call_service.restype = ctypes.c_int
 
