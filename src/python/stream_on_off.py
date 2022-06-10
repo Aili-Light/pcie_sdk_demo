@@ -31,7 +31,7 @@ if __name__ == '__main__':
     cfg.select[0] = 1
     cfg.control[0] = 1
     cfg.select[2] = 1
-    cfg.control[2] = 1
+    cfg.control[2] = 0
     cfg.select[4] = 1
     cfg.control[4] = 0
     cfg.select[6] = 1

@@ -35,6 +35,20 @@ Quick Build Instructions
 4.  `make`  
 5.  `make install`  
 
+Usuage
+------------------------------------
+# Init SDK
+   `cd instal`  
+   `sudo ./pcie_sdk_demo_init -s`   
+
+# Subscribe
+   `cd install`  
+   `sudo ./pcie_sdk_demo_client -c <topic_name>`  
+
+# Image Display
+   `cd install`  
+   `sudo ./pcie_sdk_demo_image_disp -c /image_data/stream/xx`   
+
 Support
 ------------------------------------
 contact : jimmy@ailiteam.com
