@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "pub_sub/alg_sdk.h"
+#include "alg_sdk/alg_sdk.h"
 
 int main (int argc, char **argv)
 {

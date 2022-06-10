@@ -1,18 +1,18 @@
-#ifndef __CLIENT_H__
-#define __CLIENT_H__
+#ifndef __SERVER_H__
+#define __SERVER_H__
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <pthread.h>
+#include <semaphore.h>
 
+#include <pthread.h>
 #include <nanomsg/nn.h>
 #include <nanomsg/pubsub.h>
-#include <nanomsg/reqrep.h>
 
-#include "pub_sub/log.h"
-#include "pub_sub/basic_types.h"
-#include "pub_sub/util.h"
+#include "alg_sdk/util.h"
+#include "alg_sdk/log.h"
+#include "alg_sdk/basic_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,11 +28,9 @@ extern "C" {
     #define ALG_SDK_API extern
 #endif // MINGW32
 
-typedef void(*alg_sdk_callback_func)(void* p);
-
-ALG_SDK_API int alg_sdk_subscribe (const char* topic, alg_sdk_callback_func consumer);
-ALG_SDK_API int alg_sdk_stop_client();
-ALG_SDK_API int alg_sdk_init_client();
+int alg_sdk_push2q(const void* msg);
+int alg_sdk_init_server(const char* url);
+int alg_sdk_stop_server(void);
 
 #ifdef __cplusplus
 }

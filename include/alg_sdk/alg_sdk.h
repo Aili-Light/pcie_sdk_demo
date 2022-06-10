@@ -5,9 +5,9 @@
 #include <string.h>
 
 #include <pthread.h>
-#include "pub_sub/util.h"
-#include "pub_sub/log.h"
-#include "pub_sub/basic_types.h"
+#include "alg_sdk/util.h"
+#include "alg_sdk/log.h"
+#include "alg_sdk/basic_types.h"
 
 #ifdef __cplusplus
 extern "C" {

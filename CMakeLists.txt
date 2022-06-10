@@ -1,12 +1,16 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(pcie_sdk LANGUAGES C)
+project(pcie_sdk)
 
-include_directories(
-    include
-)
+include_directories(include)
+
 set(PROJECT_LINK_DIR ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/install)
+
+if (BUILD_IMAGE_DISP)
+    find_package(OpenCV REQUIRED)
+    include_directories(${OpenCV_INCLUDE_DIRS})
+endif ()
 
 if (MINGW32)
     link_directories(${PROJECT_LINK_DIR})
@@ -53,7 +57,17 @@ else()
         pthread
         anl
     )
-
+    if (BUILD_IMAGE_DISP)
+        add_executable(${PROJECT_NAME}_demo_image_disp src/c/demo_image_display.cpp)
+        target_link_libraries(${PROJECT_NAME}_demo_image_disp
+            ${OpenCV_LIBS}     
+            ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
+            pthread
+            anl
+        )
+        set_target_properties(${PROJECT_NAME}_demo_image_disp PROPERTIES LINKER_LANGUAGE CXX)
+        install (TARGETS ${PROJECT_NAME}_demo_image_disp RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
+    endif ()
 endif()
 
 install (TARGETS ${PROJECT_NAME}_demo_init RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)

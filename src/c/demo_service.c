@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "pub_sub/service.h"
+#include "alg_sdk/service.h"
 
 
 int main (int argc, char **argv)
