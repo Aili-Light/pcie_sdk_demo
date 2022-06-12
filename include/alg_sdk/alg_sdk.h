@@ -37,7 +37,7 @@ SOFTWARE.
 extern "C" {
 #endif
 
-#ifdef __MINGW32__
+#if defined(MINGW32) && defined(BUILD_EXPORT)
     #ifdef ALG_SDK_EXPORT
         #define ALG_SDK_API __declspec(dllexport)
     #else
@@ -47,7 +47,7 @@ extern "C" {
     #define ALG_SDK_API extern
 #endif // MINGW32
 
-ALG_SDK_API int alg_sdk_init(const int frame_rate);
+ALG_SDK_API int alg_sdk_init(const int frq);
 ALG_SDK_API int alg_sdk_stop();
 int alg_sdk_append_task(alg_sdk_amp_msg_t* ptr, void* control);
 

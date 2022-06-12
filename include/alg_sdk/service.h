@@ -39,7 +39,7 @@ SOFTWARE.
 extern "C" {
 #endif
 
-#ifdef __MINGW32__
+#if defined(MINGW32) && defined(BUILD_EXPORT)
     #ifdef ALG_SDK_EXPORT
         #define ALG_SDK_API __declspec(dllexport)
     #else
