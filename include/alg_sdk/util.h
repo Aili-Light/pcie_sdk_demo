@@ -32,8 +32,8 @@ SOFTWARE.
 #include <time.h>
 #include <sys/time.h>
 
-#include "basic_types.h"
-#include "log.h"
+#include "alg_common/basic_types.h"
+#include "alg_common/log.h"
 
 typedef struct alg_sdk_pcie_item_manager{
     uint8_t                 msg_type;

@@ -32,8 +32,8 @@ SOFTWARE.
 #include <nanomsg/nn.h>
 #include <nanomsg/reqrep.h>
 #include "alg_sdk/util.h"
-#include "alg_sdk/log.h"
-#include "alg_sdk/basic_types.h"
+#include "alg_common/log.h"
+#include "alg_common/basic_types.h"
 
 #ifdef __cplusplus
 extern "C" {
