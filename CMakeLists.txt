@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.5)
 
 project(pcie_sdk)
 
-include_directories(include)
+include_directories(${CMAKE_SOURCE_DIR}/pcie_sdk/include)
 
-set(PROJECT_LINK_DIR ${PROJECT_SOURCE_DIR}/lib)
+set(PROJECT_LINK_DIR ${CMAKE_SOURCE_DIR}/pcie_sdk/lib)
 set(CMAKE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/install)
 
 if (BUILD_IMAGE_DISP)

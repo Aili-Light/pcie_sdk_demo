@@ -142,6 +142,12 @@ enum
 	ALG_SDK_MAX_SENSOR_NUM,
 };
 
+enum
+{
+    ALG_SDK_MAX_GMSL_3G_MODE = 0x00,
+    ALG_SDK_MAX_GMSL_6G_MODE = 0x01,
+};
+
 typedef struct alg_sdk_pcie_common_head
 {
     uint8_t     head;
@@ -210,6 +216,7 @@ typedef struct alg_sdk_service_camera_config {
     uint16_t module_type;
     uint16_t width;
     uint16_t height;
+    uint8_t  deser_mode;
     uint16_t line_len;
     uint8_t  payload[7*ALG_SDK_SERVICE_SENSOR_CONFIG_MAX_LINE];
 

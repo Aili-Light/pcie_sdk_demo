@@ -3,6 +3,59 @@
 
 #include "alg_sdk/service.h"
 
+int load_sensor_config(const char* filename, uint8_t* payload, uint16_t* len)
+{
+    int len_line=0;
+    FILE *fp = fopen(filename, "r");
+    if (fp != NULL)
+    {
+        int buf[65535];
+        int count;
+        int c;
+
+        c = fgetc(fp);
+
+        while (c != EOF && count < 65534)
+        {
+            c = fgetc(fp);
+            fscanf(fp, "%x", buf + count);
+            count++;
+
+            if (c == '\n')
+                len_line++;
+            // printf("%x|",c);
+        }
+        len_line++;
+        fclose(fp);
+
+        if(payload)
+        {
+            for (int i = 0; i < len_line; i++)
+            {
+                payload[7 * i] = buf[i * 4];
+                payload[7 * i + 1] = (buf[4 * i + 1] & 0xFF);
+                payload[7 * i + 2] = (buf[4 * i + 1] >> 8);
+                payload[7 * i + 3] = (buf[4 * i + 2] & 0xFF);
+                payload[7 * i + 4] = (buf[4 * i + 2] >> 8);
+                payload[7 * i + 5] = (buf[4 * i + 3] & 0xFF);
+                payload[7 * i + 6] = (buf[4 * i + 3] >> 8);
+            }
+            *len = len_line;
+            return 0;
+        }
+        else
+        {
+            alg_sdk_log(LOG_ERROR, "Failed to load sensor config : payload is NULL\n");
+            return -1;
+        }
+
+    }
+    else
+    {
+        alg_sdk_log(LOG_ERROR, "Failed to load sensor config %s\n", filename);
+        return -1;
+    }
+}
 
 int main (int argc, char **argv)
 {
@@ -11,226 +64,43 @@ int main (int argc, char **argv)
         int rc;
         int timeout = 5000;
 
-        if (1)
+        if(1)
         {
             const char *topic_name = "/service/camera/set_config";
+            const char* filename = "../config/alg_config_ov_0x8b.txt";
 
-            // service_camera_config_t t = {
-            //     .ack_mode = 0,
-            //     .ch_id = 2,
-            //     .module_type = 0xFFFF, // ISX021
-            //     .width = 3840,
-            //     .height = 2160,
-            //     .line_len = 21,
-            // };
-            // // t.payload = malloc(sizeof(uint8_t) * 7*t.length);
-
-            // uint8_t addr[21] = {0x00,
-            //     0xc0,
-            //     0xc0,
-            //     0xc0,
-            //     0xc0,
-            //     0xc0,
-            //     0x00,
-            //     0x90,
-            //     0x90,
-            //     0x90,
-            //     0x90,
-            //     0x90,
-            //     0x90,
-            //     0x00,
-            //     0xc0,
-            //     0xc0,
-            //     0xc0,
-            //     0xc0,
-            //     0xc0,
-            //     0x00,
-            //     0xc0};
-            // uint16_t reg[21] = {0x0000,
-            //     0x02d6,
-            //     0x02c1,
-            //     0x02be,
-            //     0x03f1,
-            //     0x03f0,
-            //     0x0000,
-            //     0x0330,
-            //     0x0002,
-            //     0x0051,
-            //     0x0052,
-            //     0x044a,
-            //     0x0320,
-            //     0x0000,
-            //     0x0383,
-            //     0x0318,
-            //     0x0570,
-            //     0x02c1,
-            //     0x02be,
-            //     0x0000,
-            //     0x02d6};
-            // uint16_t data[21] = {0xff,
-            //     0x80,
-            //     0x80,
-            //     0x90,
-            //     0x09,
-            //     0x59,
-            //     0x0f,
-            //     0x04,
-            //     0xf3,
-            //     0x02,
-            //     0x01,
-            //     0xd0,
-            //     0x2c,
-            //     0xff,
-            //     0x00,
-            //     0x5e,
-            //     0x0c,
-            //     0x90,
-            //     0x90,
-            //     0xff,
-            //     0x90};
-            // uint16_t fmt[21] = {0x0808
-            //     0x1608,
-            //     0x1608,
-            //     0x1608,
-            //     0x1608,
-            //     0x1608,
-            //     0x0808,
-            //     0x1608,
-            //     0x1608,
-            //     0x1608,
-            //     0x1608,
-            //     0x1608,
-            //     0x1608,
-            //     0x0808,
-            //     0x1608,
-            //     0x1608,
-            //     0x1608,
-            //     0x1608,
-            //     0x1608,
-            //     0x0808,
-            //     0x1608};
-
-            // for(int i=0;i<21;i++)
-            // {
-            //     t.payload[7*i] = addr[i];
-            //     t.payload[7*i+1] = reg[i] & 0xFF;
-            //     t.payload[7*i+2] = reg[i] >> 8;
-            //     t.payload[7*i+3] = data[i] & 0xFF;
-            //     t.payload[7*i+4] = data[i] >> 8;
-            //     t.payload[7*i+5] = fmt[i] & 0xFF;
-            //     t.payload[7*i+6] = fmt[i] >> 8;
-            // }
-            // printf("%d|%d|%d\n", t.payload[0], t.payload[1], t.payload[3]);
-
-            for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
             {
-            service_camera_config_t t = {
-                .ack_mode = 0,
-                .ch_id = 0,
-                .module_type = 0xFFFF, // ISX021
-                .width = 3840,
-                .height = 2160,
-                .line_len = 21,
-            };
-            // t.payload = malloc(sizeof(uint8_t) * 7*t.length);
+                service_camera_config_t t = {
+                    .ack_mode = 1,
+                    .module_type = 0xFFFF, // 0xFFFF means Not ALG Camera
+                    .width = 3840,
+                    .height = 2160,
+                    .deser_mode = ALG_SDK_MAX_GMSL_6G_MODE,
+                };
+                t.ch_id = j;
 
-            uint8_t addr[21] = {0x00,
-                0xc0,
-                0xc0,
-                0xc0,
-                0xc0,
-                0xc0,
-                0x00,
-                0x90,
-                0x90,
-                0x90,
-                0x90,
-                0x90,
-                0x90,
-                0x00,
-                0xc0,
-                0xc0,
-                0xc0,
-                0xc0,
-                0xc0,
-                0x00,
-                0xc0};
-            uint16_t reg[21] = {0x0000,
-                0x02d6,
-                0x02c1,
-                0x02be,
-                0x03f1,
-                0x03f0,
-                0x0000,
-                0x0330,
-                0x0002,
-                0x0051,
-                0x0052,
-                0x044a,
-                0x0320,
-                0x0000,
-                0x0383,
-                0x0318,
-                0x0570,
-                0x02c1,
-                0x02be,
-                0x0000,
-                0x02d6};
-            uint16_t data[21] = {0xff,
-                0x80,
-                0x80,
-                0x90,
-                0x09,
-                0x59,
-                0x0f,
-                0x04,
-                0xf3,
-                0x02,
-                0x01,
-                0xd0,
-                0x2c,
-                0xff,
-                0x00,
-                0x5e,
-                0x0c,
-                0x90,
-                0x90,
-                0xff,
-                0x90};
-            uint16_t fmt[21] = {0x0808,
-                0x1608,
-                0x1608,
-                0x1608,
-                0x1608,
-                0x1608,
-                0x0808,
-                0x1608,
-                0x1608,
-                0x1608,
-                0x1608,
-                0x1608,
-                0x1608,
-                0x0808,
-                0x1608,
-                0x1608,
-                0x1608,
-                0x1608,
-                0x1608,
-                0x0808,
-                0x1608};
+                int ret = load_sensor_config(filename, &t.payload[0], &(t.line_len));
 
-            for(int j=0;j<21;j++)
-            {
-                t.payload[7*j] = addr[j];
-                t.payload[7*j+1] = reg[j] & 0xFF;
-                t.payload[7*j+2] = reg[j] >> 8;
-                t.payload[7*j+3] = data[j] & 0xFF;
-                t.payload[7*j+4] = data[j] >> 8;
-                t.payload[7*j+5] = fmt[j] & 0xFF;
-                t.payload[7*j+6] = fmt[j] >> 8;
-            }
-                t.ch_id = i;
-                // printf("ch %d, type %d\n", t.ch_id, t.module_type);
+                if(ret < 0)
+                {
+                    return 1;
+                }
+
+                /* Debug Info */
+                // printf("line len %d\n", t.line_len);
+                // for(int i=0;i<t.line_len;i++)
+                // {
+                //     printf("0x%x|0x%x|0x%x|0x%x|0x%x|0x%x|0x%x",
+                //      t.payload[i*7], t.payload[i*7+1], t.payload[i*7+2],
+                //      t.payload[i*7+3], t.payload[i*7+4], t.payload[i*7+5],
+                //      t.payload[i*7+6]);
+
+                //     printf("\n");
+                // }
+                /* Debug Info End */
+
+                printf("ch %d, type %d\n", t.ch_id, t.module_type);
                 rc = alg_sdk_call_service(topic_name, &t, timeout);
                 if (rc < 0)
                 {
@@ -240,6 +110,8 @@ int main (int argc, char **argv)
 
                 printf("[ack : %d], [channel : %d]\n", t.ack_code, t.channel);
             }
+
+            return 0;
         }
         if (0)
         {

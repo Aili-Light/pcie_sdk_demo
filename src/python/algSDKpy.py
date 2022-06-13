@@ -26,7 +26,7 @@ class service_stream_control(Structure):
     ]
 
 def CallServices(topic_ptr, cfg_ptr, timeo):
-    pcie_sdk = ctypes.CDLL('../../lib/linux/libpcie_sdk.so')
+    pcie_sdk = ctypes.CDLL('../../pcie_sdk/lib/linux/libpcie_sdk.so')
     pcie_sdk.alg_sdk_call_service.argtypes = [c_char_p, c_void_p, c_int]
     pcie_sdk.alg_sdk_call_service.restype = ctypes.c_int
 
