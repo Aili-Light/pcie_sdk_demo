@@ -48,6 +48,7 @@ extern "C" {
 #endif // MINGW32
 
 ALG_SDK_API int alg_sdk_init(const int frq);
+ALG_SDK_API int alg_sdk_spin_on();
 ALG_SDK_API int alg_sdk_stop();
 int alg_sdk_append_task(alg_sdk_amp_msg_t* ptr, void* control);
 

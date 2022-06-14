@@ -53,6 +53,7 @@ int alg_sdk_init_service(const char* url);
 int alg_sdk_stop_service();
 ALG_SDK_API int alg_sdk_call_service (const char *topic_name, void* msg, int timeout);
 void alg_sdk_service_append_task(alg_sdk_amp_msg_t* ptr, void* control);
+int alg_sdk_service_spin_on();
 
 #ifdef __cplusplus
 }

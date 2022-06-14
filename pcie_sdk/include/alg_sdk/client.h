@@ -55,8 +55,9 @@ extern "C" {
 typedef void(*alg_sdk_callback_func)(void* p);
 
 ALG_SDK_API int alg_sdk_subscribe (const char* topic, alg_sdk_callback_func consumer);
-ALG_SDK_API int alg_sdk_stop_client();
+ALG_SDK_API int alg_sdk_client_spin_on(void);
 ALG_SDK_API int alg_sdk_init_client();
+ALG_SDK_API int alg_sdk_stop_client();
 
 #ifdef __cplusplus
 }

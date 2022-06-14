@@ -68,14 +68,15 @@ int main (int argc, char **argv)
         {
             const char *topic_name = "/service/camera/set_config";
             const char* filename = "../config/alg_config_ov_0x8b.txt";
+            const char* filename2 = "../config/sensing_config_onsemi_ar0233.txt";
 
             for (int j = 0; j < 4; j++)
             {
                 service_camera_config_t t = {
                     .ack_mode = 1,
                     .module_type = 0xFFFF, // 0xFFFF means Not ALG Camera
-                    .width = 3840,
-                    .height = 2160,
+                    .width = 1920,
+                    .height = 1080,
                     .deser_mode = ALG_SDK_MAX_GMSL_6G_MODE,
                 };
                 t.ch_id = j;

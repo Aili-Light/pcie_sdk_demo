@@ -1,10 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #include "alg_sdk/client.h"
 
 const char topic_image_head_d[ALG_SDK_HEAD_COMMON_TOPIC_NAME_LEN] = {ALG_SDK_TOPIC_NAME_IMAGE_DATA};
 const char topic_dev_poc_head_d[ALG_SDK_HEAD_COMMON_TOPIC_NAME_LEN] = {ALG_SDK_TOPIC_NAME_POC_INFO};
+
+
+void int_handler(int sig)
+{
+    // printf("Caught signal : %d\n", sig);
+    alg_sdk_stop_client();
+
+    /* terminate program */
+    exit(sig);
+}
 
 void callback_image_data(void *p)
 {
@@ -23,6 +34,8 @@ void callback_poc_info(void *p)
 
 int main (int argc, char **argv)
 {
+    signal(SIGINT, int_handler);
+
     if ((argc == 2) && (strcmp(argv[1], "-c") == 0))
     {
         int rc;
@@ -47,10 +60,8 @@ int main (int argc, char **argv)
             alg_sdk_log(LOG_ERROR, "Init Client Error!\n");
             exit(0);
         }
-        /* Do something here. */
-
-        alg_sdk_stop_client();
-        alg_sdk_log(LOG_DEBUG, "Stop Client.");
+        // alg_sdk_stop_client();
+        alg_sdk_client_spin_on();
     }
     else if ((argc == 4) && (strcmp (argv[1], "-c") == 0))
     {
@@ -82,9 +93,8 @@ int main (int argc, char **argv)
             alg_sdk_log(LOG_ERROR, "Init Client Error!\n");
             exit(0);
         }
-        /* Do something here. */
-        alg_sdk_stop_client();
-        alg_sdk_log(LOG_DEBUG, "Stop Client.");
+        // alg_sdk_stop_client();
+        alg_sdk_client_spin_on();
     }
 
     return 0;
