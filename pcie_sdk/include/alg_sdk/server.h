@@ -52,7 +52,7 @@ extern "C" {
     #define ALG_SDK_API extern
 #endif // MINGW32
 
-int alg_sdk_push2q(const void* msg);
+int alg_sdk_push2q(const void* msg, const int ch_id);
 int alg_sdk_init_server(const char* url);
 int alg_sdk_stop_server(void);
 int alg_sdk_server_spin_on(void);

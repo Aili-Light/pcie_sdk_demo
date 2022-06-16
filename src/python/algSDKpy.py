@@ -5,7 +5,7 @@ from ctypes import *
 ALG_SDK_SERVICE_SENSOR_CONFIG_MAX_LINE = 1024
 ALG_SDK_SERVICE_SENSOR_PAYLOAD_SIZE = 7*1024
 
-ALG_SDK_MAX_CHANNEL = 32
+ALG_SDK_MAX_CHANNEL = 16
 
 class service_camera_config(Structure):
     _fields_ = [("ack_mode",c_uint8),

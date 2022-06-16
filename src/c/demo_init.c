@@ -5,6 +5,11 @@
 
 #include "alg_sdk/alg_sdk.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 void int_handler(int sig)
 {
     // printf("Caught signal : %d\n", sig);
@@ -34,3 +39,6 @@ int main (int argc, char **argv)
 
     return 0;
 }
+#ifdef __cplusplus
+}
+#endif

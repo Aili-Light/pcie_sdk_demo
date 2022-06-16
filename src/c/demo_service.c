@@ -69,19 +69,20 @@ int main (int argc, char **argv)
             const char *topic_name = "/service/camera/set_config";
             const char* filename = "../config/alg_config_ov_0x8b.txt";
             const char* filename2 = "../config/sensing_config_onsemi_ar0233.txt";
+            const char* filename3 = "../config/alg_config_sony_isx019.txt";
 
-            for (int j = 0; j < 4; j++)
+            // for (int j = 0; j < 2; j++)
             {
                 service_camera_config_t t = {
                     .ack_mode = 1,
                     .module_type = 0xFFFF, // 0xFFFF means Not ALG Camera
-                    .width = 1920,
-                    .height = 1080,
+                    .width = 1280,
+                    .height = 960,
                     .deser_mode = ALG_SDK_MAX_GMSL_6G_MODE,
                 };
-                t.ch_id = j;
+                t.ch_id = 0;
 
-                int ret = load_sensor_config(filename, &t.payload[0], &(t.line_len));
+                int ret = load_sensor_config(filename3, &t.payload[0], &(t.line_len));
 
                 if(ret < 0)
                 {

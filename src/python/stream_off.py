@@ -8,17 +8,8 @@ if __name__ == '__main__':
     cam_ctl.ack_mode = 1
 
     for i in range(0, 8):
-        cam_ctl.select[i] = 0
+        cam_ctl.select[i] = 1
         cam_ctl.control[i] = 0
-
-    cam_ctl.select[0] = 1
-    cam_ctl.control[0] = 1
-    cam_ctl.select[2] = 1
-    cam_ctl.control[2] = 1
-    cam_ctl.select[4] = 1
-    cam_ctl.control[4] = 1
-    cam_ctl.select[6] = 1
-    cam_ctl.control[6] = 1
 
     ret = algSDKpy.CallServices(cmd_topic, cam_ctl, timeo)
     print(' result = %d ' % ret)

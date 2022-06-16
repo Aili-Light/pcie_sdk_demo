@@ -8,7 +8,7 @@ if __name__ == '__main__':
         cfg = algSDKpy.service_camera_config()
         cfg.ack_mode = 1
         cfg.ch_id = i
-        cfg.module_type = 1
+        cfg.module_type = 12
 
         ret = algSDKpy.CallServices(cmd_topic, cfg, timeo)
         print(' result = %d ' % ret)

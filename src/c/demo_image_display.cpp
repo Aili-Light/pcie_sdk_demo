@@ -138,16 +138,36 @@ int main (int argc, char **argv)
     else if ((argc == 2) && (strcmp (argv[1], "-i") == 0))
     {
         int rc;
-        const char* topic_name = "/image_data/stream";
-        alg_sdk_log(LOG_VERBOSE, "subscribe to topic [%s]\n", topic_name);
+        const char* topic_name_1 = "/image_data/stream/00";
+        const char* topic_name_2 = "/image_data/stream/02";
+        const char* topic_name_3 = "/image_data/stream/04";
+        const char* topic_name_4 = "/image_data/stream/06";
+        // alg_sdk_log(LOG_VERBOSE, "subscribe to topic [%s]\n", topic_name);
 
-        rc = alg_sdk_subscribe(topic_name, callback_image_data);
+        rc = alg_sdk_subscribe(topic_name_1, callback_image_data);
         if (rc < 0)
         {
-            alg_sdk_log(LOG_ERROR, "Subscribe to topic %s Error!\n", topic_name);
+            alg_sdk_log(LOG_ERROR, "Subscribe to topic %s Error!\n", topic_name_1);
             // return 0;
         }
-
+        rc = alg_sdk_subscribe(topic_name_2, callback_image_data);
+        if (rc < 0)
+        {
+            alg_sdk_log(LOG_ERROR, "Subscribe to topic %s Error!\n", topic_name_2);
+            // return 0;
+        }
+        rc = alg_sdk_subscribe(topic_name_3, callback_image_data);
+        if (rc < 0)
+        {
+            alg_sdk_log(LOG_ERROR, "Subscribe to topic %s Error!\n", topic_name_3);
+            // return 0;
+        }
+        rc = alg_sdk_subscribe(topic_name_4, callback_image_data);
+        if (rc < 0)
+        {
+            alg_sdk_log(LOG_ERROR, "Subscribe to topic %s Error!\n", topic_name_4);
+            // return 0;
+        }
         if(alg_sdk_init_client())
         {
             alg_sdk_log(LOG_ERROR, "Init Client Error!\n");
