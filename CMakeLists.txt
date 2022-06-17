@@ -5,7 +5,6 @@ project(pcie_sdk)
 include_directories(${CMAKE_SOURCE_DIR}/pcie_sdk/include)
 
 set(PROJECT_LINK_DIR ${CMAKE_SOURCE_DIR}/pcie_sdk/lib)
-set(CMAKE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/install)
 
 if (BUILD_IMAGE_DISP)
     find_package(OpenCV REQUIRED)
@@ -14,6 +13,7 @@ endif ()
 
 if (MINGW32)
     link_directories(${PROJECT_LINK_DIR})
+    set(CMAKE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/install/mingw32)
 
     add_executable(${PROJECT_NAME}_demo_init src/c/demo_init.c)
     target_link_libraries(${PROJECT_NAME}_demo_init     
@@ -36,6 +36,7 @@ else()
     set(CMAKE_BUILD_RPATH ${PROJECT_LINK_DIR}/linux)
     set(CMAKE_INSTALL_RPATH ${PROJECT_LINK_DIR}/linux)
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+    set(CMAKE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/install/linux)
 
     add_executable(${PROJECT_NAME}_demo_init src/c/demo_init.c)
     target_link_libraries(${PROJECT_NAME}_demo_init     

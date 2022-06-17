@@ -28,15 +28,6 @@ SOFTWARE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <pthread.h>
-
-#include <nanomsg/nn.h>
-#include <nanomsg/pubsub.h>
-#include <nanomsg/reqrep.h>
-
-#include "alg_common/log.h"
-#include "alg_common/basic_types.h"
-#include "alg_sdk/util.h"
 
 #ifdef __cplusplus
 extern "C" {

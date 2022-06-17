@@ -5,10 +5,11 @@ from algSDKpy import service_camera_config
 cmd_topic = b"/service/camera/set_config"
 timeo = 5000
 # config_file = b"../../config/alg_config_ov_0x8b.txt"
-config_file = b"../../config/alg_config_sony_isx019.txt"
+# config_file = b"../../config/alg_config_sony_isx019.txt"
+config_file = b"../../config/sensing_config_onsemi_ar0233.txt"
 channel = 0
-sensor_width = 1280
-sensor_height = 960
+sensor_width = 1920
+sensor_height = 1080
 
 if __name__ == '__main__':
 

@@ -33,7 +33,6 @@ int main (int argc, char **argv)
             exit(0);
         }
 
-        // alg_sdk_stop();
         alg_sdk_spin_on();
     }
 

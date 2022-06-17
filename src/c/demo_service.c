@@ -45,14 +45,14 @@ int load_sensor_config(const char* filename, uint8_t* payload, uint16_t* len)
         }
         else
         {
-            alg_sdk_log(LOG_ERROR, "Failed to load sensor config : payload is NULL\n");
+            printf("Failed to load sensor config : payload is NULL\n");
             return -1;
         }
 
     }
     else
     {
-        alg_sdk_log(LOG_ERROR, "Failed to load sensor config %s\n", filename);
+        printf("Failed to load sensor config %s\n", filename);
         return -1;
     }
 }
@@ -106,7 +106,7 @@ int main (int argc, char **argv)
                 rc = alg_sdk_call_service(topic_name, &t, timeout);
                 if (rc < 0)
                 {
-                    alg_sdk_log(LOG_ERROR, "Request Service : [%s] Error!\n", topic_name);
+                    printf("Request Service : [%s] Error!\n", topic_name);
                     return 0;
                 }
 
@@ -138,7 +138,7 @@ int main (int argc, char **argv)
             rc = alg_sdk_call_service(topic_name, &t1, timeout);
             if (rc < 0)
             {
-                alg_sdk_log(LOG_ERROR, "Request Service : [%s] Error!\n", topic_name);
+                printf( "Request Service : [%s] Error!\n", topic_name);
                 return 0;
             }
 
@@ -180,7 +180,7 @@ int main (int argc, char **argv)
             rc = alg_sdk_call_service(topic_name, &t1, timeout);
             if (rc < 0)
             {
-                alg_sdk_log(LOG_ERROR, "Request Service : [%s] Error!\n", topic_name);
+                printf("Request Service : [%s] Error!\n", topic_name);
                 return 0;
             }
 

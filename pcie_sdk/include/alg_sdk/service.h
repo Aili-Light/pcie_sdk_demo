@@ -26,13 +26,8 @@ SOFTWARE.
 #define __SERVICE_H__
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
-#include <pthread.h>
-
-#include <nanomsg/nn.h>
-#include <nanomsg/reqrep.h>
-#include "alg_sdk/util.h"
-#include "alg_common/log.h"
 #include "alg_common/basic_types.h"
 
 #ifdef __cplusplus

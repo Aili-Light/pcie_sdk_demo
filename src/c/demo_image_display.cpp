@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <stdint.h>
+#include <sys/time.h>
 
 #include "alg_sdk/client.h"
+#include "alg_common/basic_types.h"
 
 #include "opencv/cv.h"
 #include "opencv2/core.hpp"
@@ -98,7 +101,7 @@ void callback_image_data(void *p)
     /* for Image Display (by OpenCV)
         This may cause frame rate drop when CPU has run out of resources. 
     */
-    // array_2_mat((uchar*)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, CV_8UC2, msg->common_head.topic_name);  // YUV422 type is CV_8U2
+    array_2_mat((uchar*)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, CV_8UC2, msg->common_head.topic_name);  // YUV422 type is CV_8U2
 }
 
 int main (int argc, char **argv)
@@ -109,7 +112,7 @@ int main (int argc, char **argv)
     {
         int rc;
         const char* topic_name = argv[2];
-        alg_sdk_log(LOG_VERBOSE, "subscribe to topic [%s]\n", topic_name);
+        printf("subscribe to topic [%s]\n", topic_name);
 
         /* Check the head of topic name */
         if(strncmp(topic_name, topic_image_head_d, strlen(topic_image_head_d)) == 0)
@@ -117,19 +120,19 @@ int main (int argc, char **argv)
             rc = alg_sdk_subscribe(topic_name, callback_image_data);
             if (rc < 0)
             {
-                alg_sdk_log(LOG_ERROR, "Subscribe to topic %s Error!\n", topic_name);
+                printf("Subscribe to topic %s Error!\n", topic_name);
                 // return 0;
             }
         }
         else
         {
-            alg_sdk_log(LOG_ERROR, "Subscribe to topic %s Error!\n", topic_name);
+            printf("Subscribe to topic %s Error!\n", topic_name);
             exit(0);
         }
 
         if(alg_sdk_init_client())
         {
-            alg_sdk_log(LOG_ERROR, "Init Client Error!\n");
+            printf("Init Client Error!\n");
             exit(0);
         }
         // alg_sdk_stop_client();
@@ -142,39 +145,37 @@ int main (int argc, char **argv)
         const char* topic_name_2 = "/image_data/stream/02";
         const char* topic_name_3 = "/image_data/stream/04";
         const char* topic_name_4 = "/image_data/stream/06";
-        // alg_sdk_log(LOG_VERBOSE, "subscribe to topic [%s]\n", topic_name);
 
         rc = alg_sdk_subscribe(topic_name_1, callback_image_data);
         if (rc < 0)
         {
-            alg_sdk_log(LOG_ERROR, "Subscribe to topic %s Error!\n", topic_name_1);
-            // return 0;
+            printf("Subscribe to topic %s Error!\n", topic_name_1);
+            exit(0);
         }
         rc = alg_sdk_subscribe(topic_name_2, callback_image_data);
         if (rc < 0)
         {
-            alg_sdk_log(LOG_ERROR, "Subscribe to topic %s Error!\n", topic_name_2);
-            // return 0;
+            printf("Subscribe to topic %s Error!\n", topic_name_2);
+            exit(0);
         }
         rc = alg_sdk_subscribe(topic_name_3, callback_image_data);
         if (rc < 0)
         {
-            alg_sdk_log(LOG_ERROR, "Subscribe to topic %s Error!\n", topic_name_3);
-            // return 0;
+            printf("Subscribe to topic %s Error!\n", topic_name_3);
+            exit(0);
         }
         rc = alg_sdk_subscribe(topic_name_4, callback_image_data);
         if (rc < 0)
         {
-            alg_sdk_log(LOG_ERROR, "Subscribe to topic %s Error!\n", topic_name_4);
-            // return 0;
+            printf("Subscribe to topic %s Error!\n", topic_name_4);
+            exit(0);
         }
         if(alg_sdk_init_client())
         {
-            alg_sdk_log(LOG_ERROR, "Init Client Error!\n");
+            printf("Init Client Error!\n");
             exit(0);
         }
 
-        // alg_sdk_stop_client();
         alg_sdk_client_spin_on();
     }
     return 0;

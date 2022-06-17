@@ -27,10 +27,7 @@ SOFTWARE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <pthread.h>
-#include "alg_sdk/util.h"
-#include "alg_common/log.h"
+#include <stdint.h>
 #include "alg_common/basic_types.h"
 
 #ifdef __cplusplus
