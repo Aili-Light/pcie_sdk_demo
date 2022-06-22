@@ -70,7 +70,7 @@ void frame_rate_monitor(const int ch_id, const int frame_index)
     
     uint64_t t_now = milliseconds();
     g_f_count[ch_id]++;
-    int delta_t = t_now - g_t_last[ch_id];
+    uint64_t delta_t = t_now - g_t_last[ch_id];
     if (delta_t > 1000)  // for 1000 milliseconds
     {
         g_t_last[ch_id] = t_now;
@@ -138,38 +138,18 @@ int main (int argc, char **argv)
         // alg_sdk_stop_client();
         alg_sdk_client_spin_on();
     }
-    else if ((argc == 2) && (strcmp (argv[1], "-i") == 0))
+    else if ((argc == 2) && (strcmp (argv[1], "-all") == 0))
     {
         int rc;
-        const char* topic_name_1 = "/image_data/stream/00";
-        const char* topic_name_2 = "/image_data/stream/02";
-        const char* topic_name_3 = "/image_data/stream/04";
-        const char* topic_name_4 = "/image_data/stream/06";
+        const char* topic_name = "/image_data/stream";
 
-        rc = alg_sdk_subscribe(topic_name_1, callback_image_data);
+        rc = alg_sdk_subscribe(topic_name, callback_image_data);
         if (rc < 0)
         {
-            printf("Subscribe to topic %s Error!\n", topic_name_1);
+            printf("Subscribe to topic %s Error!\n", topic_name);
             exit(0);
         }
-        rc = alg_sdk_subscribe(topic_name_2, callback_image_data);
-        if (rc < 0)
-        {
-            printf("Subscribe to topic %s Error!\n", topic_name_2);
-            exit(0);
-        }
-        rc = alg_sdk_subscribe(topic_name_3, callback_image_data);
-        if (rc < 0)
-        {
-            printf("Subscribe to topic %s Error!\n", topic_name_3);
-            exit(0);
-        }
-        rc = alg_sdk_subscribe(topic_name_4, callback_image_data);
-        if (rc < 0)
-        {
-            printf("Subscribe to topic %s Error!\n", topic_name_4);
-            exit(0);
-        }
+
         if(alg_sdk_init_client())
         {
             printf("Init Client Error!\n");
