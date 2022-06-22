@@ -30,23 +30,38 @@ Quick Build Instructions
 1.  `mkdir build`  
 2.  `cd build`  
 3.  `cmake -DCMAKE_INSTALL_PREFIX=<install path> ..`  
-    to build image display add option `-DBUILD_IMAGE_DISP=ON`    
+    to build image display add option : `-DBUILD_IMAGE_DISP=ON`    
 4.  `make`  
 5.  `make install`  
 
 Usuage
 ------------------------------------
 # Init SDK
-   `cd instal`  
+   `cd <install path>`  
    `sudo ./pcie_sdk_demo_init -s`   
 
-# Subscribe to topic
-   `cd install`  
-   `sudo ./pcie_sdk_demo_client -c <topic_name>`  
+# Set Sensor Config
+   `cd <src/python>`  
+   set ALG sensor  
+   `python3 set_sensor_config.py`   
+   set non-ALG sensor (require config file)  
+   `python3 set_sensor_config_from_file.py`  
+
+# Stream On/Off
+   `cd <src/python>`  
+   `python3 stream_on.py`  
+   `python3 stream_off.py`  
+
+# Subscribe to image
+   `cd <install path>`  
+   `sudo ./pcie_sdk_demo_client -image <topic_name>`  
 
 # Image Display
-   `cd install`  
-   `sudo ./pcie_sdk_demo_image_disp -c /image_data/stream/xx`   
+   `cd <install path>`  
+   display all images :   
+   `sudo ./pcie_sdk_demo_image_disp -all`   
+   display image from 1 channel :   
+   `sudo ./pcie_sdk_demo_image_disp -c <topic_name>`   
 
 Support
 ------------------------------------
