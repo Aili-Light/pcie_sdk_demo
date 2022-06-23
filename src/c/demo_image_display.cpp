@@ -41,20 +41,21 @@ void int_handler(int sig)
 
 void array_2_mat(uchar* data, int w, int h, int type, const char* view_name)
 {
-    cv::Mat img = cv::Mat(h, w, type, data);
-    cv::Mat dst = cv::Mat(h,w, CV_8UC3);
-    cv::Mat rsz;
 
     if(type == ALG_IMG_TYPE_YUV)
     {
+        cv::Mat img = cv::Mat(h, w, CV_8UC2, data);
+        cv::Mat dst = cv::Mat(h,w, CV_8UC3);
+        cv::Mat rsz;
+//        printf("H=%d W=%d CH=%d\n", img.size().height, img.size().width, img.channels());
         cv::cvtColor(img, dst, cv::COLOR_YUV2BGR_YUYV);
         cv::resize(dst, rsz, cv::Size(640,360));
-        // printf("H=%d W=%d CH=%d\n", dst.size().height, dst.size().width, dst.channels());
         cv::imshow(view_name, rsz);
         cv::waitKey(1);
     }
     else if(type == ALG_IMG_TYPE_RAW10)
     {
+        cv::Mat rsz;
         uint32_t data_size = w * h;
 //         printf("H=%d W=%d size=%d\n", w, h, data_size);
         ushort* pdata = (ushort*)malloc(sizeof (ushort) * data_size);
@@ -115,8 +116,9 @@ int get_channel_id(const pcie_image_data_t* msg)
 void callback_image_data(void *p)
 {
     pcie_image_data_t* msg = (pcie_image_data_t*)p;
-    // printf("[frame = %d], [time %ld], [byte_0 = %d], [byte_end = %d]\n",
-        //    msg->image_info_meta.frame_index,  msg->image_info_meta.timestamp, ((uint8_t*)msg->payload)[0], ((uint8_t*)msg->payload)[msg->image_info_meta.img_size - 1]);
+    /* Debug message */
+//     printf("[frame = %d], [time %ld], [byte_0 = %d], [byte_end = %d]\n",
+//            msg->image_info_meta.frame_index,  msg->image_info_meta.timestamp, ((uint8_t*)msg->payload)[0], ((uint8_t*)msg->payload)[msg->image_info_meta.img_size - 1]);
 
     /* check frame rate (every 1 second) */
     frame_rate_monitor(get_channel_id(msg), msg->image_info_meta.frame_index);
@@ -124,7 +126,7 @@ void callback_image_data(void *p)
     /* for Image Display (by OpenCV)
         This may cause frame rate drop when CPU has run out of resources. 
     */
-    array_2_mat((uchar*)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, ALG_IMG_TYPE_RAW10, msg->common_head.topic_name);  // YUV422 type is CV_8U2
+    array_2_mat((uchar*)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, ALG_IMG_TYPE_YUV, msg->common_head.topic_name);  // YUV422 type is CV_8U2
 }
 
 int main (int argc, char **argv)

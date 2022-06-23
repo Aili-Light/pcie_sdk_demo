@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(pcie_sdk)
+project(pcie_sdk_demo)
 
 include_directories(${CMAKE_SOURCE_DIR}/pcie_sdk/include)
 
@@ -15,20 +15,20 @@ if (MINGW32)
     link_directories(${PROJECT_LINK_DIR})
     set(CMAKE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/install/mingw32)
 
-    add_executable(${PROJECT_NAME}_demo_init src/c/demo_init.c)
-    target_link_libraries(${PROJECT_NAME}_demo_init     
+    add_executable(${PROJECT_NAME}_init src/c/demo_init.c)
+    target_link_libraries(${PROJECT_NAME}_init
         ${PROJECT_LINK_DIR}/mingw32/libpcie_sdk.dll
         pthread
     )
 
-    add_executable(${PROJECT_NAME}_demo_client src/c/demo_client.c)
-    target_link_libraries(${PROJECT_NAME}_demo_client     
+    add_executable(${PROJECT_NAME}_client src/c/demo_client.c)
+    target_link_libraries(${PROJECT_NAME}_client
         ${PROJECT_LINK_DIR}/mingw32/libpcie_sdk.dll
         pthread
     )
 
-    add_executable(${PROJECT_NAME}_demo_service src/c/demo_service.c)
-    target_link_libraries(${PROJECT_NAME}_demo_service     
+    add_executable(${PROJECT_NAME}_service src/c/demo_service.c)
+    target_link_libraries(${PROJECT_NAME}_service
         ${PROJECT_LINK_DIR}/mingw32/libpcie_sdk.dll
         pthread
     )
@@ -38,39 +38,39 @@ else()
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
     set(CMAKE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/install/linux)
 
-    add_executable(${PROJECT_NAME}_demo_init src/c/demo_init.c)
-    target_link_libraries(${PROJECT_NAME}_demo_init     
+    add_executable(${PROJECT_NAME}_init src/c/demo_init.c)
+    target_link_libraries(${PROJECT_NAME}_init
         ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
         pthread
         anl
     )
 
-    add_executable(${PROJECT_NAME}_demo_client src/c/demo_client.c)
-    target_link_libraries(${PROJECT_NAME}_demo_client     
+    add_executable(${PROJECT_NAME}_client src/c/demo_client.c)
+    target_link_libraries(${PROJECT_NAME}_client
         ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
         pthread
         anl
     )
 
-    add_executable(${PROJECT_NAME}_demo_service src/c/demo_service.c)
-    target_link_libraries(${PROJECT_NAME}_demo_service     
+    add_executable(${PROJECT_NAME}_service src/c/demo_service.c)
+    target_link_libraries(${PROJECT_NAME}_service
         ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
         pthread
         anl
     )
     if (BUILD_IMAGE_DISP)
-        add_executable(${PROJECT_NAME}_demo_image_disp src/c/demo_image_display.cpp)
-        target_link_libraries(${PROJECT_NAME}_demo_image_disp
+        add_executable(${PROJECT_NAME}_image_disp src/c/demo_image_display.cpp)
+        target_link_libraries(${PROJECT_NAME}_image_disp
             ${OpenCV_LIBS}     
             ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
             pthread
             anl
         )
-        set_target_properties(${PROJECT_NAME}_demo_image_disp PROPERTIES LINKER_LANGUAGE CXX)
-        install (TARGETS ${PROJECT_NAME}_demo_image_disp RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
+        set_target_properties(${PROJECT_NAME}_image_disp PROPERTIES LINKER_LANGUAGE CXX)
+        install (TARGETS ${PROJECT_NAME}_image_disp RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
     endif ()
 endif()
 
-install (TARGETS ${PROJECT_NAME}_demo_init RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
-install (TARGETS ${PROJECT_NAME}_demo_client RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
-install (TARGETS ${PROJECT_NAME}_demo_service RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
+install (TARGETS ${PROJECT_NAME}_init RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
+install (TARGETS ${PROJECT_NAME}_client RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
+install (TARGETS ${PROJECT_NAME}_service RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
