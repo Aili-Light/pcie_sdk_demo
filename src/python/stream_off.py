@@ -1,10 +1,11 @@
 import algSDKpy
+from algSDKpy import service_stream_control
 
 cmd_topic = b"/service/camera/stream_on"
 timeo = 5000
 
 if __name__ == '__main__':
-    cam_ctl = algSDKpy.service_stream_control()
+    cam_ctl = service_stream_control()
     cam_ctl.ack_mode = 1
 
     for i in range(0, 8):
