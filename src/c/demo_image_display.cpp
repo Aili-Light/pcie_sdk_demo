@@ -19,6 +19,8 @@ static uint64_t g_t_last[ALG_SDK_MAX_CHANNEL] = {0};
 static int g_f_count[ALG_SDK_MAX_CHANNEL] = {0};
 static uint32_t g_f_last[ALG_SDK_MAX_CHANNEL] = {0};
 
+#define ALG_IMG_TYPE_YUV 0x01
+#define ALG_IMG_TYPE_RAW10 0x2B
 /*  Return the UNIX time in milliseconds.  You'll need a working
     gettimeofday(), so this won't work on Windows.  */
 uint64_t milliseconds (void)
@@ -43,13 +45,34 @@ void array_2_mat(uchar* data, int w, int h, int type, const char* view_name)
     cv::Mat dst = cv::Mat(h,w, CV_8UC3);
     cv::Mat rsz;
 
-    if(type == CV_8UC2)
+    if(type == ALG_IMG_TYPE_YUV)
     {
         cv::cvtColor(img, dst, cv::COLOR_YUV2BGR_YUYV);
         cv::resize(dst, rsz, cv::Size(640,360));
         // printf("H=%d W=%d CH=%d\n", dst.size().height, dst.size().width, dst.channels());
         cv::imshow(view_name, rsz);
         cv::waitKey(1);
+    }
+    else if(type == ALG_IMG_TYPE_RAW10)
+    {
+        uint32_t data_size = w * h;
+//         printf("H=%d W=%d size=%d\n", w, h, data_size);
+        ushort* pdata = (ushort*)malloc(sizeof (ushort) * data_size);
+        for(int i = 0; i < (data_size/4); i++)
+        {
+            pdata[4*i] = (((((ushort)data[5*i]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 0) & 0x0003));
+            pdata[4*i+1] = (((((ushort)data[5*i+1]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 2) & 0x0003));
+            pdata[4*i+2] = (((((ushort)data[5*i+2]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 4) & 0x0003));
+            pdata[4*i+3] = (((((ushort)data[5*i+3]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 6) & 0x0003));
+        }
+        cv::Mat img_byer = cv::Mat(w, h, CV_16U, pdata);
+        cv::Mat img_rgb8 = cv::Mat(w, h, CV_8U);
+        cv::cvtColor(img_byer, img_byer, cv::COLOR_BayerRG2BGR);
+        cv::convertScaleAbs(img_byer, img_rgb8, 0.25, 0);
+        cv::resize(img_rgb8, rsz, cv::Size(640,360));
+        cv::imshow("Bayer", rsz);
+        cv::waitKey(1);
+        free(pdata);
     }
 }
 
@@ -101,7 +124,7 @@ void callback_image_data(void *p)
     /* for Image Display (by OpenCV)
         This may cause frame rate drop when CPU has run out of resources. 
     */
-    array_2_mat((uchar*)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, CV_8UC2, msg->common_head.topic_name);  // YUV422 type is CV_8U2
+    array_2_mat((uchar*)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, ALG_IMG_TYPE_RAW10, msg->common_head.topic_name);  // YUV422 type is CV_8U2
 }
 
 int main (int argc, char **argv)
