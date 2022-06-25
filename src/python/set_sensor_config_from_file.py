@@ -4,11 +4,10 @@ from algSDKpy import service_camera_config
 
 cmd_topic = b"/service/camera/set_config"
 timeo = 5000
-# config_file = b"../../config/alg_config_ov_0x8b.txt"
 # config_file = b"../../config/alg_config_ov_0x8b_1920_1280.txt"
 # config_file = b"../../config/0x8b_RAW10_9296_9295A_REGISTER_TABLE.txt"
 config_file = b"../../config/2_CH_021.txt"
-channel = 1
+channel = 0
 sensor_width = 1920
 sensor_height = 1280
 
@@ -21,6 +20,8 @@ if __name__ == '__main__':
     cfg.width = sensor_width
     cfg.height = sensor_height
     cfg.deser_mode = 1
+    cfg.camera_num = 2
+    cfg.data_type = 0
 
     with open(config_file,"r") as filestream:
         line_num = 0

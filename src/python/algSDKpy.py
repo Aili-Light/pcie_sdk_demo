@@ -14,6 +14,8 @@ class service_camera_config(Structure):
     ("width", c_uint16),
     ("height", c_uint16),
     ("deser_mode", c_uint8),
+    ("camera_num", c_uint8),
+    ("data_type", c_uint8),
     ("line_len", c_uint16),
     ("payload", c_uint8*ALG_SDK_SERVICE_SENSOR_PAYLOAD_SIZE),
     ("ack_code", c_uint8),

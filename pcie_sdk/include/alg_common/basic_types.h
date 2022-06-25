@@ -217,6 +217,8 @@ typedef struct alg_sdk_service_camera_config {
     uint16_t width;
     uint16_t height;
     uint8_t  deser_mode;
+    uint8_t  camera_num;
+    uint8_t  data_type;
     uint16_t line_len;
     uint8_t  payload[7*ALG_SDK_SERVICE_SENSOR_CONFIG_MAX_LINE];
 
