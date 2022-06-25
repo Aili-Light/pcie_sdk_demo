@@ -43,14 +43,14 @@ Usuage
 # Set Sensor Config
    `cd <src/python>`  
    set ALG sensor  
-   `python3 set_sensor_config.py`   
+   `python set_sensor_config.py`   
    set non-ALG sensor (require config file)  
-   `python3 set_sensor_config_from_file.py`  
+   `python set_sensor_config_from_file.py`  
 
 # Stream On/Off
    `cd <src/python>`  
-   `python3 stream_on.py`  
-   `python3 stream_off.py`  
+   `python stream_on.py`  
+   `python stream_off.py`  
 
 # Subscribe to image
    `cd <install path>`  
