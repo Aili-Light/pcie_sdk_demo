@@ -43,7 +43,7 @@ void int_handler(int sig)
 
 void array_2_mat(uchar* data, int w, int h, int type, int ch_id, uint32_t frame_index, const char* image_name)
 {
-    int is_save = 1;
+    int is_save = 0;
 
     if(type == ALG_IMG_TYPE_YUV)
     {
@@ -60,7 +60,7 @@ void array_2_mat(uchar* data, int w, int h, int type, int ch_id, uint32_t frame_
         if(is_save)
         {
             char filename[128] = {};
-            sprintf(filename, "data/image_%02d_%08d.raw", ch_id, frame_index);
+            sprintf(filename, "data/image_%02d_%08d.jpg", ch_id, frame_index);
             cv::imwrite(filename, dst);
         }
 
@@ -153,7 +153,7 @@ void callback_image_data(void *p)
     /* for Image Display (by OpenCV)
         This may cause frame rate drop when CPU has run out of resources. 
     */
-    array_2_mat((uchar*)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, ALG_IMG_TYPE_RAW10, get_channel_id(msg), msg->image_info_meta.frame_index, msg->common_head.topic_name);  // YUV422 type is CV_8U2
+    array_2_mat((uchar*)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, ALG_IMG_TYPE_YUV, get_channel_id(msg), msg->image_info_meta.frame_index, msg->common_head.topic_name);  // YUV422 type is CV_8U2
 }
 
 int main (int argc, char **argv)
