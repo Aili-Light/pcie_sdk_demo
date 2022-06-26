@@ -12,7 +12,8 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui.hpp"
-
+#include <fstream>
+using namespace std;
 const char topic_image_head_d[ALG_SDK_HEAD_COMMON_TOPIC_NAME_LEN] = {ALG_SDK_TOPIC_NAME_IMAGE_DATA};
 
 static uint64_t g_t_last[ALG_SDK_MAX_CHANNEL] = {0};
@@ -21,6 +22,7 @@ static uint32_t g_f_last[ALG_SDK_MAX_CHANNEL] = {0};
 
 #define ALG_IMG_TYPE_YUV 0x01
 #define ALG_IMG_TYPE_RAW10 0x2B
+
 /*  Return the UNIX time in milliseconds.  You'll need a working
     gettimeofday(), so this won't work on Windows.  */
 uint64_t milliseconds (void)
@@ -39,39 +41,64 @@ void int_handler(int sig)
     exit(sig);
 }
 
-void array_2_mat(uchar* data, int w, int h, int type, const char* view_name)
+void array_2_mat(uchar* data, int w, int h, int type, int ch_id, uint32_t frame_index, const char* image_name)
 {
+    int is_save = 1;
 
     if(type == ALG_IMG_TYPE_YUV)
     {
+        /* Image Display */
         cv::Mat img = cv::Mat(h, w, CV_8UC2, data);
         cv::Mat dst = cv::Mat(h,w, CV_8UC3);
         cv::Mat rsz;
 //        printf("H=%d W=%d CH=%d\n", img.size().height, img.size().width, img.channels());
         cv::cvtColor(img, dst, cv::COLOR_YUV2BGR_YUYV);
         cv::resize(dst, rsz, cv::Size(640,360));
-        cv::imshow(view_name, rsz);
+        cv::imshow(image_name, rsz);
+
+        /* Image Write */
+        if(is_save)
+        {
+            char filename[128] = {};
+            sprintf(filename, "data/image_%02d_%08d.raw", ch_id, frame_index);
+            cv::imwrite(filename, dst);
+        }
+
         cv::waitKey(1);
     }
     else if(type == ALG_IMG_TYPE_RAW10)
     {
         cv::Mat rsz;
         uint32_t data_size = w * h;
-//         printf("H=%d W=%d size=%d\n", w, h, data_size);
-        ushort* pdata = (ushort*)malloc(sizeof (ushort) * data_size);
-        for(int i = 0; i < (data_size/4); i++)
+//        printf("H=%d W=%d size=%d,\n", w, h, data_size);
+
+        ushort* pdata = (ushort*)malloc( sizeof(ushort) * data_size);
+        for(int i = 0; i < (data_size / 4); i++)
         {
             pdata[4*i] = (((((ushort)data[5*i]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 0) & 0x0003));
             pdata[4*i+1] = (((((ushort)data[5*i+1]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 2) & 0x0003));
             pdata[4*i+2] = (((((ushort)data[5*i+2]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 4) & 0x0003));
             pdata[4*i+3] = (((((ushort)data[5*i+3]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 6) & 0x0003));
         }
-        cv::Mat img_byer = cv::Mat(w, h, CV_16U, pdata);
-        cv::Mat img_rgb8 = cv::Mat(w, h, CV_8U);
-        cv::cvtColor(img_byer, img_byer, cv::COLOR_BayerRG2BGR);
-        cv::convertScaleAbs(img_byer, img_rgb8, 0.25, 0);
-        cv::resize(img_rgb8, rsz, cv::Size(640,360));
-        cv::imshow("Bayer", rsz);
+
+        /* Image Display */
+//        cv::Mat img_byer = cv::Mat(w*2, h, CV_8UC1, pdata);
+//        cv::Mat img_rgb8;
+//        cv::cvtColor(img_byer, img_byer, cv::COLOR_BayerRG2BGR);
+//        cv::convertScaleAbs(img_byer, img_rgb8, 0.25, 0);
+//        cv::resize(img_rgb8, rsz, cv::Size(640,360));
+//        cv::imshow("Bayer", img_byer);
+
+        /* Image Write */
+        if(is_save)
+        {
+            char filename[128] = {};
+            sprintf(filename, "data/image_%02d_%08d.raw", ch_id, frame_index);
+            ofstream storage_file(filename,ios::out | ios::binary);
+            storage_file.write((char *)pdata, data_size*2);
+            storage_file.close();
+        }
+
         cv::waitKey(1);
         free(pdata);
     }
@@ -117,8 +144,8 @@ void callback_image_data(void *p)
 {
     pcie_image_data_t* msg = (pcie_image_data_t*)p;
     /* Debug message */
-//     printf("[frame = %d], [time %ld], [byte_0 = %d], [byte_end = %d]\n",
-//            msg->image_info_meta.frame_index,  msg->image_info_meta.timestamp, ((uint8_t*)msg->payload)[0], ((uint8_t*)msg->payload)[msg->image_info_meta.img_size - 1]);
+//     printf("[frame = %d], [len %ld], [byte_0 = %d], [byte_end = %d]\n",
+//            msg->image_info_meta.frame_index,  msg->image_info_meta.img_size, ((uint8_t*)msg->payload)[0], ((uint8_t*)msg->payload)[msg->image_info_meta.img_size - 1]);
 
     /* check frame rate (every 1 second) */
     frame_rate_monitor(get_channel_id(msg), msg->image_info_meta.frame_index);
@@ -126,7 +153,7 @@ void callback_image_data(void *p)
     /* for Image Display (by OpenCV)
         This may cause frame rate drop when CPU has run out of resources. 
     */
-    array_2_mat((uchar*)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, ALG_IMG_TYPE_YUV, msg->common_head.topic_name);  // YUV422 type is CV_8U2
+    array_2_mat((uchar*)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, ALG_IMG_TYPE_RAW10, get_channel_id(msg), msg->image_info_meta.frame_index, msg->common_head.topic_name);  // YUV422 type is CV_8U2
 }
 
 int main (int argc, char **argv)
