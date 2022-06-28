@@ -25,8 +25,8 @@ int main (int argc, char **argv)
     {
         signal(SIGINT, int_handler);
         int rc;
-        int frame_rate = 1000;
-        rc = alg_sdk_init(frame_rate);
+        int frq = 1000;
+        rc = alg_sdk_init(frq);
         if(rc < 0)
         {
             printf("Init SDK Failed\n");

@@ -1,4 +1,5 @@
 import os
+import signal
 import ctypes
 from ctypes import *
 
@@ -38,3 +39,21 @@ def CallServices(topic_ptr, cfg_ptr, timeo):
     ret = pcie_sdk.alg_sdk_call_service(c_char_p(topic_ptr), pointer(cfg_ptr), timeo)
 
     return ret
+
+class algSDKInit():
+    def __init__(self):
+        self.pcie_sdk = ctypes.CDLL('../../pcie_sdk/lib/linux/libpcie_sdk.so')
+
+    def sdkInit(self, frq):
+        self.pcie_sdk.alg_sdk_init.argtypes = [c_int]
+        self.pcie_sdk.alg_sdk_init.restype = ctypes.c_int
+        ret = self.pcie_sdk.alg_sdk_init(frq)
+
+        return ret
+
+    def sdkStop(self):
+        print("stop")
+        self.pcie_sdk.alg_sdk_stop()
+
+    def sdkSpin(self):
+        self.pcie_sdk.alg_sdk_spin_on()
