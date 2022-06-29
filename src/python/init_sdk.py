@@ -14,10 +14,10 @@ if __name__ == '__main__':
     signal.signal(signal.SIGINT, int_handler)
 
     frq = 1000
-    ret = sdkHandler.sdkInit(frq)
+    ret = sdkHandler.InitSDK(frq)
     if(ret < 0):
         print(' result = %d ' % ret)
 
-    sdkHandler.sdkSpin()
+    sdkHandler.Spin()
 
     print('---------finish-------------')
