@@ -31,12 +31,41 @@ class service_stream_control(Structure):
     ("ch_sel", c_uint8*ALG_SDK_MAX_CHANNEL)
     ]
 
-def CallServices(topic_ptr, cfg_ptr, timeo):
+class pcie_common_head_t(Structure):
+            _fields_ = [("head",c_uint8),
+    ("version", c_uint8),
+    ("topic_name",c_char*128),
+    ("crc8", c_uint8),
+    ("resv", c_uint8*125)
+    ]
+
+class pcie_image_info_meta_t(Structure):
+            _fields_ = [("frame_index",c_uint32),
+    ("width", c_uint16),
+    ("height",c_uint16),
+    ("data_type", c_uint16),
+    ("exposure", c_float),
+    ("again", c_float),
+    ("dgain", c_float),
+    ("temp", c_float),
+    ("img_size", c_size_t),
+    ("timestamp", c_uint64),
+    ]
+
+class pcie_image_data_t(Structure):
+        _fields_ = [("common_head",pcie_common_head_t),
+    ("image_info_meta",pcie_image_info_meta_t),
+    ("payload", c_void_p),
+    ]
+
+callbackFunc_t = ctypes.CFUNCTYPE(c_void_p, c_void_p)
+
+def CallServices(topic_ptr, cfg, timeo):
     pcie_sdk = ctypes.CDLL('../../pcie_sdk/lib/linux/libpcie_sdk.so')
     pcie_sdk.alg_sdk_call_service.argtypes = [c_char_p, c_void_p, c_int]
     pcie_sdk.alg_sdk_call_service.restype = ctypes.c_int
 
-    ret = pcie_sdk.alg_sdk_call_service(c_char_p(topic_ptr), pointer(cfg_ptr), timeo)
+    ret = pcie_sdk.alg_sdk_call_service(c_char_p(topic_ptr), pointer(cfg), timeo)
 
     return ret
 
@@ -44,16 +73,40 @@ class algSDKInit():
     def __init__(self):
         self.pcie_sdk = ctypes.CDLL('../../pcie_sdk/lib/linux/libpcie_sdk.so')
 
-    def sdkInit(self, frq):
+    def InitSDK(self, frq):
         self.pcie_sdk.alg_sdk_init.argtypes = [c_int]
         self.pcie_sdk.alg_sdk_init.restype = ctypes.c_int
         ret = self.pcie_sdk.alg_sdk_init(frq)
 
         return ret
 
-    def sdkStop(self):
+    def Stop(self):
         print("stop")
         self.pcie_sdk.alg_sdk_stop()
 
-    def sdkSpin(self):
+    def Spin(self):
         self.pcie_sdk.alg_sdk_spin_on()
+
+
+class algSDKClient():
+    def __init__(self):
+        self.pcie_sdk = ctypes.CDLL('../../pcie_sdk/lib/linux/libpcie_sdk.so')
+
+    def InitClient(self):
+        self.pcie_sdk.alg_sdk_init_client.restype = ctypes.c_int
+        ret = self.pcie_sdk.alg_sdk_init_client()
+
+        return ret
+
+    def Subscribe(self, topic_ptr, callback_func):
+        self.pcie_sdk.alg_sdk_subscribe.argtypes = [c_char_p, callbackFunc_t]
+        self.pcie_sdk.alg_sdk_subscribe.restype = ctypes.c_int
+        ret = self.pcie_sdk.alg_sdk_subscribe(topic_ptr, callback_func)
+
+        return ret
+
+    def Spin(self):
+        self.pcie_sdk.alg_sdk_client_spin_on.restype = ctypes.c_int
+        ret = self.pcie_sdk.alg_sdk_client_spin_on()
+
+        return ret
