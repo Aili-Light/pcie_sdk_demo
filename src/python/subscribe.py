@@ -18,7 +18,7 @@ def array2mat(w, h, payload, image_name):
     img_in = p_array.reshape((h, w, 2))
     img_out = cv2.cvtColor(img_in, cv2.COLOR_YUV2BGR_YUYV)
     img_disp = cv2.resize(img_out, (640, 360))
-    cv2.imshow(image_name, img_disp)
+    cv2.imshow(str(image_name), img_disp)
     cv2.waitKey(1)
     # print(image_name)
 
