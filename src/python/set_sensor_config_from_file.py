@@ -5,11 +5,14 @@ from algSDKpy import service_camera_config
 cmd_topic = b"/service/camera/set_config"
 timeo = 5000
 # config_file = b"../../config/alg_config_ov_0x8b_1920_1280.txt"
-config_file = b"../../config/0x8b_RAW10_9296_9295A_REGISTER_TABLE.txt"
-# config_file = b"../../config/2_CH_021.txt"
+# config_file = b"../../config/ALG_made_9296_ISX021_9295a_MIPI_4LANES_1_ch.txt"
+config_file = b"../../config/ALG_made_9296_ISX021_9295a_MIPI_4LANES_2_ch.txt"
+# config_file = b"../../config/ALG_made_9296_OX8B_OAX4000_9295a_MIPI_4LANES_1_ch.txt"
+# config_file = b"../../config/ALG_made_9296_ISX019_96701_MIPI_4LANES_1_ch.txt"
+# config_file = b"../../config/HKCZ_0X3C_Baylor10_BGGR_1920_1206_9296_96717F_MIPI_4LANES.txt"
 channel = 0
-sensor_width = 3840
-sensor_height = 2166
+sensor_width = 1920
+sensor_height = 1280
 
 if __name__ == '__main__':
 
@@ -20,8 +23,8 @@ if __name__ == '__main__':
     cfg.width = sensor_width
     cfg.height = sensor_height
     cfg.deser_mode = 1
-    cfg.camera_num = 1
-    cfg.data_type = 0x2B
+    cfg.camera_num = 2
+    cfg.data_type = 0
 
     with open(config_file,"r") as filestream:
         line_num = 0
