@@ -4,7 +4,6 @@ import argparse
 import json
 import algSDKpy
 from algSDKpy import service_camera_config
-from algSDKpy import ALG_SDK_MAX_DESERDES
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -14,6 +13,10 @@ if __name__ == '__main__':
                         type=str,
                         help="path to json file",
                         required=True
+    )
+    parser.add_argument('--channel_id',
+                        type=int,
+                        help="specify which channel the setting goes"
     )
     parser.add_argument('-all_channels',
                         action="store_true",
@@ -43,14 +46,19 @@ if __name__ == '__main__':
             channel_id = int(deserdes_cfg['channel_id'])
             des_mode = int(deserdes_cfg['des_mode'])
             camera_num = int(deserdes_cfg['camera_num'])
-            data_type = int(deserdes_cfg['data_type'])    
+            data_type = int(deserdes_cfg['data_type'])
             # print ("deserdes : channel=%d, mode=%d, cam_num=%d,data_type=%d" % (channel_id, des_mode, camera_num, data_type))
     except IOError:
         print("Failed to open json file [%s]!" % json_file)
     else:
         cfg = service_camera_config()
         cfg.ack_mode = 1
-        cfg.ch_id = channel_id
+        if args.channel_id is not None:
+            cfg.ch_id = args.channel_id
+            print("Set for channel %d" % cfg.ch_id)
+        else:
+            cfg.ch_id = channel_id
+        
         cfg.module_type = int(b"0xFFFF",16)
         cfg.width = sensor_width
         cfg.height = sensor_height
@@ -83,7 +91,7 @@ if __name__ == '__main__':
         else:
             cmd_topic = b"/service/camera/set_config"
             if is_set_all_ch is True:
-                for i in range(0, ALG_SDK_MAX_DESERDES):
+                for i in range(0, 4):
                     cfg.ch_id = i
                     ret = algSDKpy.CallServices(cmd_topic, cfg, timeo)
                     print(' result = %d ' % ret)
