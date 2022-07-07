@@ -43,8 +43,6 @@ void int_handler(int sig)
 
 void array_2_mat(uchar* data, int w, int h, int type, int ch_id, uint32_t frame_index, const char* image_name)
 {
-    int is_save = 0;
-
     if(type == ALG_IMG_TYPE_YUV)
     {
         /* Image Display */
@@ -57,23 +55,24 @@ void array_2_mat(uchar* data, int w, int h, int type, int ch_id, uint32_t frame_
         cv::imshow(image_name, rsz);
 
         /* Image Write */
-        if(is_save)
+        char c = cv::waitKey(1);
+        if(c == 32)
         {
+            /* save image */
             char filename[128] = {};
-            sprintf(filename, "data/image_%02d_%08d.jpg", ch_id, frame_index);
+            sprintf(filename, "image_%02d_%08d.bmp", ch_id, frame_index);
+//            printf("filename %s\n", filename);
             cv::imwrite(filename, dst);
         }
-
-        cv::waitKey(1);
     }
     else if(type == ALG_IMG_TYPE_RAW10)
     {
         cv::Mat rsz;
         uint32_t data_size = w * h;
-//        printf("H=%d W=%d size=%d,\n", w, h, data_size);
+//        printf("W=%d H=%d size=%d,\n", w, h, data_size);
 
-        ushort* pdata = (ushort*)malloc( sizeof(ushort) * data_size);
-        for(int i = 0; i < (data_size / 4); i++)
+        ushort* pdata = (ushort*)malloc(sizeof(ushort) * data_size);
+        for(int i = 0; i < int(data_size / 4); i++)
         {
             pdata[4*i] = (((((ushort)data[5*i]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 0) & 0x0003));
             pdata[4*i+1] = (((((ushort)data[5*i+1]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 2) & 0x0003));
@@ -82,24 +81,33 @@ void array_2_mat(uchar* data, int w, int h, int type, int ch_id, uint32_t frame_
         }
 
         /* Image Display */
-//        cv::Mat img_byer = cv::Mat(w*2, h, CV_8UC1, pdata);
-//        cv::Mat img_rgb8;
+        cv::Mat img_byer = cv::Mat(h, w, CV_16UC1, pdata);
+        cv::Mat img_rgb8, img_rsz;
 //        cv::cvtColor(img_byer, img_byer, cv::COLOR_BayerRG2BGR);
-//        cv::convertScaleAbs(img_byer, img_rgb8, 0.25, 0);
-//        cv::resize(img_rgb8, rsz, cv::Size(640,360));
-//        cv::imshow("Bayer", img_byer);
+        cv::convertScaleAbs(img_byer, img_rgb8, 0.25, 0);
+        cv::resize(img_rgb8, img_rsz, cv::Size(640,360));
+        cv::imshow("Bayer", img_rsz);
 
         /* Image Write */
-        if(is_save)
-        {
-            char filename[128] = {};
-            sprintf(filename, "data/image_%02d_%08d.raw", ch_id, frame_index);
-            ofstream storage_file(filename,ios::out | ios::binary);
-            storage_file.write((char *)pdata, data_size*2);
-            storage_file.close();
-        }
+//        if(is_save_raw)
+//        {
+//            /* save raw data */
+//            char filename[128] = {};
+//            sprintf(filename, "data/image_%02d_%08d.raw", ch_id, frame_index);
+//            ofstream storage_file(filename,ios::out | ios::binary);
+//            storage_file.write((char *)data, data_size*2);
+//            storage_file.close();
+//        }
 
-        cv::waitKey(1);
+        char c = cv::waitKey(1);
+        if(c == 32)
+        {
+            /* save image */
+            char filename[128] = {};
+            sprintf(filename, "image_%02d_%08d.bmp", ch_id, frame_index);
+//            printf("filename %s\n", filename);
+            cv::imwrite(filename, img_rgb8);
+        }
         free(pdata);
     }
 }

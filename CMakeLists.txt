@@ -15,10 +15,10 @@ if (MINGW32)
     link_directories(${PROJECT_LINK_DIR})
     set(CMAKE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/install/mingw32)
 
-    set(CMAKE_SKIP_BUILD_RPATH FALSE)
-    set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-    set(CMAKE_INSTALL_RPATH "\${ORIGIN}/../lib")
-    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+#    set(CMAKE_SKIP_BUILD_RPATH FALSE)
+#    set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+#    set(CMAKE_INSTALL_RPATH "\${ORIGIN}/../lib")
+#    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
     add_executable(${PROJECT_NAME}_init src/c/demo_init.c)
     target_link_libraries(${PROJECT_NAME}_init
@@ -37,6 +37,16 @@ if (MINGW32)
         ${PROJECT_LINK_DIR}/mingw32/libpcie_sdk.dll
         pthread
     )
+    if (BUILD_IMAGE_DISP)
+        add_executable(${PROJECT_NAME}_image_disp src/c/demo_image_display.cpp)
+        target_link_libraries(${PROJECT_NAME}_image_disp
+            ${OpenCV_LIBS}
+            ${PROJECT_LINK_DIR}/mingw32/libpcie_sdk.dll
+            pthread
+        )
+        set_target_properties(${PROJECT_NAME}_image_disp PROPERTIES LINKER_LANGUAGE CXX)
+        install (TARGETS ${PROJECT_NAME}_image_disp RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
+    endif ()
     FILE(GLOB PCIE_SDK_LIB "${CMAKE_SOURCE_DIR}/pcie_sdk/lib/mingw32/libpcie_sdk.dll")
 else()
     set(CMAKE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/install/linux)

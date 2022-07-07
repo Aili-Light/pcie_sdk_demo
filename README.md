@@ -7,26 +7,18 @@ For more information check the [website](https://aili-light.com)
 
 Prerequisites
 ------------------------------------
-
 1. Windows
    * CMake 3.5 or newer
-   * Mingw gcc version 7.3-win32 20180312 (GCC)
+   * Mingw64 gcc version 7.3-posix-seh-rev0
+   * Optional : opencv 3.4.9 (for image display)
 
 2. Linux (Ubuntu)
    * CMake 3.5 or newer
    * gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04)
-   * opencv 3.4.9 with gtk-2.0 (for image display)
+   * Optional : opencv 3.4.9 with gtk-2.0 (for image display)
 
 Quick Build Instructions
 ------------------------------------
-# Windows
-1.  `mkdir build`  
-2.  `cd build`  
-3.  `cmake -DMINGW32=ON -DCMAKE_INSTALL_PREFIX=<install path> ..`  
-4.  `make`  
-5.  `make install`  
-
-# Linux (Ubuntu)
 1.  `mkdir build`  
 2.  `cd build`  
 3.  `cmake -DCMAKE_INSTALL_PREFIX=<install path> ..`  
@@ -42,14 +34,20 @@ Usuage
 
 # Set Sensor Config
    `cd <src/python>`  
-   set ALG sensor  
+   for ALG sensor  
    `python set_sensor_config.py`   
-   set non-ALG sensor (require config file)  
+   for non-ALG sensor (require config table)  
    `python set_sensor_config_from_file.py`  
+   or use json file
+   `python set_sensor_from_json.py --json_file=<path to json file> --channel=xx`  
 
 # Stream On/Off
    `cd <src/python>`  
+   Stream on
    `python stream_on.py`  
+   or use
+   `python stream_on_by_channel.py --channel='x,y'`  
+   Stream off
    `python stream_off.py`  
 
 # Subscribe to image
@@ -60,7 +58,7 @@ Usuage
    `cd <install path>`  
    display all images :   
    `sudo ./pcie_sdk_demo_image_disp -all`   
-   display image from 1 channel :   
+   display image from select channel :   
    `sudo ./pcie_sdk_demo_image_disp -c <topic_name>`   
 
 Support
