@@ -26,6 +26,21 @@ Quick Build Instructions
 4.  `make`  
 5.  `make install`  
 
+Build With CUDA
+------------------------------------
+1. Install CUDA
+
+2. Install OpenGL
+
+3. Install GLFW
+   `sudo apt-get install libglfw3 libglfw3-dev`  
+
+4. Install GLEW
+  `sudo apt-get install fonts-glewlwyd glew-utils glewlwyd glewlwyd-common libglew-dev libglew2.0 libglewmx-dev libglewmx1.13`  
+
+4. Install GStreamer
+  `sudo apt-get install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-doc gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio`  
+
 Usuage
 ------------------------------------
 # Init SDK

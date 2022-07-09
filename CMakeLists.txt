@@ -11,6 +11,32 @@ if (BUILD_IMAGE_DISP)
     include_directories(${OpenCV_INCLUDE_DIRS})
 endif ()
 
+if (BUILD_WITH_CUDA)
+    set(CMAKE_CXX_FLAGS "-std=c++11")
+    find_package(CUDA REQUIRED)
+    if (CUDA_FOUND)
+        include_directories(${CUDA_INCLUDE_DIRS})
+        message("-- CUDA version: ${CUDA_VERSION}")
+        set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -O3)
+    endif ()
+
+    find_package(OpenGL REQUIRED)
+    find_package(glfw3 REQUIRED)
+    find_package(GLEW REQUIRED)
+    if (GLEW_FOUND)
+        include_directories(%{GLEW_INCLUDE_DIRS})
+        message("-- Found GLEW")
+    endif ()
+
+
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(GSTLIBS REQUIRED
+                    gstreamer-pbutils-1.0
+                    gstreamer-video-1.0
+                    gstreamer-app-1.0
+                    gstreamer-1.0)
+endif ()
+
 if (MINGW32)
     link_directories(${PROJECT_LINK_DIR})
     set(CMAKE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/install/mingw32)
@@ -77,18 +103,38 @@ else()
         anl
     )
     if (BUILD_IMAGE_DISP)
-        add_executable(${PROJECT_NAME}_image_disp src/c/demo_image_display.cpp)
-        target_link_libraries(${PROJECT_NAME}_image_disp
-            ${OpenCV_LIBS}
-            ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
-            pthread
-            anl
-        )
-        set_target_properties(${PROJECT_NAME}_image_disp PROPERTIES LINKER_LANGUAGE CXX)
-        install (TARGETS ${PROJECT_NAME}_image_disp RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
+        if (BUILD_WITH_CUDA)
+            add_executable(${PROJECT_NAME}_image_disp_cuda src/c/demo_image_display_cuda.cpp)
+            target_link_libraries(${PROJECT_NAME}_image_disp_cuda
+                ${OpenCV_LIBS}
+                ${CUDA_LIBRARIES}
+                ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
+                ${PROJECT_LINK_DIR}/linux/libjetson-utils.so
+                OpenGL::GL
+                OpenGL::GLU
+                glfw
+                ${GSTLIBS_LIBRARIES}
+                ${GLEW_LIBRARIES}
+                pthread
+                anl
+            )
+            set_target_properties(${PROJECT_NAME}_image_disp_cuda PROPERTIES LINKER_LANGUAGE CXX)
+            install (TARGETS ${PROJECT_NAME}_image_disp_cuda RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
+        else ()
+            add_executable(${PROJECT_NAME}_image_disp src/c/demo_image_display.cpp)
+            target_link_libraries(${PROJECT_NAME}_image_disp
+                ${OpenCV_LIBS}
+                ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
+                pthread
+                anl
+            )
+            set_target_properties(${PROJECT_NAME}_image_disp PROPERTIES LINKER_LANGUAGE CXX)
+            install (TARGETS ${PROJECT_NAME}_image_disp RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
+        endif ()
     endif ()
 
     FILE(GLOB PCIE_SDK_LIB "${CMAKE_SOURCE_DIR}/pcie_sdk/lib/linux/libpcie_sdk.so*")
+    FILE(GLOB PCIE_SDK_LIB "${CMAKE_SOURCE_DIR}/pcie_sdk/lib/linux/libjetson-utils.so")
 endif()
 
 install (TARGETS ${PROJECT_NAME}_init RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)

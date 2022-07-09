@@ -1,0 +1,237 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <stdint.h>
+#include <sys/time.h>
+#include <fstream>
+
+#include "alg_sdk/client.h"
+#include "alg_common/basic_types.h"
+
+#include "opencv/cv.h"
+#include "opencv2/core.hpp"
+#include "opencv2/imgproc.hpp"
+#include "opencv2/imgcodecs.hpp"
+#include "opencv2/highgui.hpp"
+
+#include "jetson-utils/cudaYUV.h"
+#include "jetson-utils/cudaResize.h"
+#include "jetson-utils/cudaColorspace.h"
+#include "jetson-utils/cudaMappedMemory.h"
+#include "opencv2/cudaimgproc.hpp"
+#include "opencv2/cudawarping.hpp"
+
+using namespace std;
+const char topic_image_head_d[ALG_SDK_HEAD_COMMON_TOPIC_NAME_LEN] = {ALG_SDK_TOPIC_NAME_IMAGE_DATA};
+
+static uint64_t g_t_last[ALG_SDK_MAX_CHANNEL] = {0};
+static int g_f_count[ALG_SDK_MAX_CHANNEL] = {0};
+static uint32_t g_f_last[ALG_SDK_MAX_CHANNEL] = {0};
+
+#define ALG_IMG_TYPE_YUV 0x01
+#define ALG_IMG_TYPE_RAW10 0x2B
+
+/*  Return the UNIX time in milliseconds.  You'll need a working
+    gettimeofday(), so this won't work on Windows.  */
+uint64_t milliseconds (void)
+{
+    struct timeval tv;
+    gettimeofday (&tv, NULL);
+    return (((uint64_t)tv.tv_sec * 1000) + ((uint64_t)tv.tv_usec / 1000));
+}
+
+void int_handler(int sig)
+{
+    // printf("Caught signal : %d\n", sig);
+    alg_sdk_stop_client();
+
+    /* terminate program */
+    exit(sig);
+}
+
+
+int image_color_convert(uchar* input, void** output, size_t width, size_t height, imageFormat format)
+{
+    if (format == IMAGE_RGBA32F)
+    {
+        const size_t img_size = imageFormatSize(format, width, height);
+
+        if( !cudaAllocMapped((void**)output, img_size) )
+        {
+            printf(" failed to allocate %zu bytes for image\n", img_size);
+            return 1;
+        }
+
+        if( CUDA_FAILED(cudaConvertColor(input, IMAGE_YUYV, *output, IMAGE_RGBA32F, width, height)) )
+        {
+            printf(" failed to convert image from %s to %s\n", imageFormatToStr(IMAGE_YUYV), imageFormatToStr(IMAGE_RGBA32F));
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void array_2_mat(uchar* data, int w, int h, int type, int ch_id, uint32_t frame_index, const char* image_name)
+{
+    if(type == ALG_IMG_TYPE_YUV)
+    {
+        /* Image Display */
+        uint32_t data_size = h * w;
+        cv::Mat img = cv::Mat(h, w, CV_8UC2, data);
+        cv::Mat rsz;
+
+//        cv::cuda::GpuMat cu_src(h, w, CV_8UC2);
+//        cv::cuda::GpuMat cu_dst(h, w, CV_8UC3);
+//        cv::cuda::GpuMat cu_rsz(h/4, w/4, CV_8UC3);
+
+//        int ret = cudaConvertColor((uchar*)data, IMAGE_YUYV, (uchar3*)cu_dst.data, IMAGE_RGB8, w, h);
+
+//        cu_src.upload(img);
+//        uchar* data_ptr = cu_src.data;
+//        int ret = cudaYUYVToRGB(data_ptr, (uchar3*)cu_dst.data, w, h);
+
+        void* img_ptr = NULL;
+
+        int ret = image_color_convert(data, &img_ptr, w, h, IMAGE_RGBA32F);
+        if(ret)
+        {
+            printf("Cuda Color Conversion Failed code : [%d]\n", ret);
+        }
+
+//        ret = cudaResize((uchar3*)cu_dst.data, w, h, (uchar3*)cu_rsz.data, w/4, h/4);
+//        if(ret)
+//        {
+//            printf("Cuda Resize Failed code : [%d]\n", ret);
+//        }
+//        cu_src.download(rsz);
+//        printf("H=%d W=%d CH=%d\n", rsz.size().height, rsz.size().width, rsz.channels());
+//        if(!img.data)
+//        uchar3* p = (uchar3*)cu_dst.data;
+//          printf("%f\n", ((float*)img_ptr)[0]);
+
+
+
+        /* Image Write */
+        char c = cv::waitKey(1);
+        if(c == 32)
+        {
+            /* save image */
+            char filename[128] = {};
+            sprintf(filename, "data/image_%02d_%08d.raw.1", ch_id, frame_index);
+            ofstream storage_file(filename,ios::out | ios::binary);
+            storage_file.write((char *)data, data_size * 2);
+            storage_file.close();
+//            printf("filename %s\n", filename);
+//            cv::imwrite(filename, dst);
+        }
+    }
+}
+
+void frame_rate_monitor(const int ch_id, const int frame_index)
+{
+    /* Current frame should be last frame +1, 
+        otherwise some frames may be lost.
+    */
+    if(( (frame_index - g_f_last[ch_id]) <= 1) || (g_f_last[ch_id] == 0) )
+    {
+        g_f_last[ch_id] = frame_index;
+    }
+    else
+    {
+        // printf("Frame Monitor : Frame drop ! [Current Frame %d] [Last Frame %d]\n", frame_index, g_f_last[ch_id]);
+        g_f_last[ch_id] = frame_index;
+    }
+    
+    uint64_t t_now = milliseconds();
+    g_f_count[ch_id]++;
+    uint64_t delta_t = t_now - g_t_last[ch_id];
+    if (delta_t > 1000)  // for 1000 milliseconds
+    {
+        g_t_last[ch_id] = t_now;
+        printf("Frame Monitor : [Channel %d] [Index %d] [Frame Rate = %f]\n", ch_id, frame_index, (float)g_f_count[ch_id] / delta_t * 1000.0f);
+        g_f_count[ch_id] = 0;
+    }
+}
+
+int get_channel_id(const pcie_image_data_t* msg)
+{
+    const char* ptr_topic =  &msg->common_head.topic_name[19];
+    char c_ch_id[2];
+    strcpy(c_ch_id, ptr_topic);
+    int ch_id = atoi(c_ch_id);
+
+    return ch_id;
+}
+
+void callback_image_data(void *p)
+{
+    pcie_image_data_t* msg = (pcie_image_data_t*)p;
+    /* Debug message */
+//     printf("[frame = %d], [len %ld], [byte_0 = %d], [byte_end = %d]\n",
+//            msg->image_info_meta.frame_index,  msg->image_info_meta.img_size, ((uint8_t*)msg->payload)[0], ((uint8_t*)msg->payload)[msg->image_info_meta.img_size - 1]);
+
+    /* check frame rate (every 1 second) */
+    frame_rate_monitor(get_channel_id(msg), msg->image_info_meta.frame_index);
+
+    /* for Image Display (by OpenCV)
+        This may cause frame rate drop when CPU has run out of resources. 
+    */
+    array_2_mat((uchar*)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, ALG_IMG_TYPE_YUV, get_channel_id(msg), msg->image_info_meta.frame_index, msg->common_head.topic_name);  // YUV422 type is CV_8U2
+}
+
+int main (int argc, char **argv)
+{
+    signal(SIGINT, int_handler);
+
+    if ((argc == 3) && (strcmp (argv[1], "-c") == 0))
+    {
+        int rc;
+        const char* topic_name = argv[2];
+        printf("subscribe to topic [%s]\n", topic_name);
+
+        /* Check the head of topic name */
+        if(strncmp(topic_name, topic_image_head_d, strlen(topic_image_head_d)) == 0)
+        {
+            rc = alg_sdk_subscribe(topic_name, callback_image_data);
+            if (rc < 0)
+            {
+                printf("Subscribe to topic %s Error!\n", topic_name);
+                // return 0;
+            }
+        }
+        else
+        {
+            printf("Subscribe to topic %s Error!\n", topic_name);
+            exit(0);
+        }
+
+        if(alg_sdk_init_client())
+        {
+            printf("Init Client Error!\n");
+            exit(0);
+        }
+        // alg_sdk_stop_client();
+        alg_sdk_client_spin_on();
+    }
+    else if ((argc == 2) && (strcmp (argv[1], "-all") == 0))
+    {
+        int rc;
+        const char* topic_name = "/image_data/stream";
+
+        rc = alg_sdk_subscribe(topic_name, callback_image_data);
+        if (rc < 0)
+        {
+            printf("Subscribe to topic %s Error!\n", topic_name);
+            exit(0);
+        }
+
+        if(alg_sdk_init_client())
+        {
+            printf("Init Client Error!\n");
+            exit(0);
+        }
+
+        alg_sdk_client_spin_on();
+    }
+    return 0;
+}
