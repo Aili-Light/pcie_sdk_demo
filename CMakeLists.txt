@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 project(pcie_sdk_demo)
 
-include_directories(${CMAKE_SOURCE_DIR}/pcie_sdk/include)
+include_directories(${CMAKE_SOURCE_DIR}/pcie_sdk/include ${CMAKE_SOURCE_DIR}/src)
 
 set(PROJECT_LINK_DIR ${CMAKE_SOURCE_DIR}/pcie_sdk/lib)
 
@@ -28,13 +28,21 @@ if (BUILD_WITH_CUDA)
         message("-- Found GLEW")
     endif ()
 
-
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(GSTLIBS REQUIRED
                     gstreamer-pbutils-1.0
                     gstreamer-video-1.0
                     gstreamer-app-1.0
-                    gstreamer-1.0)
+                    gstreamer-sdp-1.0
+                    gstreamer-webrtc-1.0
+                    gstreamer-1.0
+
+    )
+    include_directories(/usr/include/gstreamer-1.0
+                        /usr/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu/gstreamer-1.0/include
+                        /usr/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu/glib-2.0/include/
+                        /usr/include/glib-2.0
+    )
 endif ()
 
 if (MINGW32)
@@ -104,7 +112,8 @@ else()
     )
     if (BUILD_IMAGE_DISP)
         if (BUILD_WITH_CUDA)
-            add_executable(${PROJECT_NAME}_image_disp_cuda src/c/demo_image_display_cuda.cpp)
+            include_directories()
+            add_executable(${PROJECT_NAME}_image_disp_cuda src/c/demo_image_display_cuda.cpp src/c/host_memory_manager.cpp)
             target_link_libraries(${PROJECT_NAME}_image_disp_cuda
                 ${OpenCV_LIBS}
                 ${CUDA_LIBRARIES}

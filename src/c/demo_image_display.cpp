@@ -60,9 +60,16 @@ void array_2_mat(uchar* data, int w, int h, int type, int ch_id, uint32_t frame_
         {
             /* save image */
             char filename[128] = {};
-            sprintf(filename, "image_%02d_%08d.bmp", ch_id, frame_index);
+            sprintf(filename, "data/image_%02d_%08d.bmp", ch_id, frame_index);
 //            printf("filename %s\n", filename);
             cv::imwrite(filename, dst);
+
+            /* save raw data */
+            char filename_2[128] = {};
+            sprintf(filename_2, "data/image_%02d_%08d.raw", ch_id, frame_index);
+            ofstream storage_file(filename_2,ios::out | ios::binary);
+            storage_file.write((char *)data, h*w*2);
+            storage_file.close();
         }
     }
     else if(type == ALG_IMG_TYPE_RAW10)
