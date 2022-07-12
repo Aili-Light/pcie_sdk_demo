@@ -214,23 +214,9 @@ int main (int argc, char **argv)
                 output_stream->Render(mem_item_s->img_yuv2u, mem_item_s->width, mem_item_s->height, IMAGE_YUYV);
                 pthread_mutex_unlock(&mutex);
 
-                // update status bar
-    //            output_stream->SetStatus("Image Display");
-
                 // check if the user quit
                 if( !output_stream->IsStreaming() )
                     g_signal_recieved = true;
-
-    //            g_display->RenderOnce((float*)mem_item_s->img_rgba32f, mem_item_s->width, mem_item_s->height);
-
-    //            // update status bar
-    //            g_display->SetTitle("Image Display");
-
-    //            // check if the user quit
-    //            if( g_display->IsClosed() )
-    //            {
-    //                g_signal_recieved = true;
-    //            }
 
             }
             usleep(100);

@@ -113,8 +113,11 @@ else()
     if (BUILD_IMAGE_DISP)
         if (BUILD_WITH_CUDA)
             include_directories()
-            add_executable(${PROJECT_NAME}_image_disp_cuda src/c/demo_image_display_cuda.cpp src/c/host_memory_manager.cpp)
-            target_link_libraries(${PROJECT_NAME}_image_disp_cuda
+            add_executable(${PROJECT_NAME}_video_stream src/c/demo_video_stream.cpp
+                src/c/host_memory_manager.cpp
+                src/c/video_stream.cpp
+                )
+            target_link_libraries(${PROJECT_NAME}_video_stream
                 ${OpenCV_LIBS}
                 ${CUDA_LIBRARIES}
                 ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
@@ -127,8 +130,8 @@ else()
                 pthread
                 anl
             )
-            set_target_properties(${PROJECT_NAME}_image_disp_cuda PROPERTIES LINKER_LANGUAGE CXX)
-            install (TARGETS ${PROJECT_NAME}_image_disp_cuda RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
+            set_target_properties(${PROJECT_NAME}_video_stream PROPERTIES LINKER_LANGUAGE CXX)
+            install (TARGETS ${PROJECT_NAME}_video_stream RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
         else ()
             add_executable(${PROJECT_NAME}_image_disp src/c/demo_image_display.cpp)
             target_link_libraries(${PROJECT_NAME}_image_disp
