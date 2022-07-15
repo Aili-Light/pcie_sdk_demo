@@ -13,7 +13,7 @@ endif ()
 
 if (MINGW32)
     link_directories(${PROJECT_LINK_DIR})
-    set(CMAKE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/install/mingw32)
+    set(CMAKE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/release/mingw32)
 
 #    set(CMAKE_SKIP_BUILD_RPATH FALSE)
 #    set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
@@ -49,7 +49,7 @@ if (MINGW32)
     endif ()
     FILE(GLOB PCIE_SDK_LIB "${CMAKE_SOURCE_DIR}/pcie_sdk/lib/mingw32/libpcie_sdk.dll")
 else()
-    set(CMAKE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/install/linux)
+    set(CMAKE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/release/linux)
 
     set(CMAKE_SKIP_BUILD_RPATH FALSE)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
