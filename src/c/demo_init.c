@@ -4,6 +4,9 @@
 #include <signal.h>
 
 #include "alg_sdk/alg_sdk.h"
+#if defined (WITH_STREAM)
+#include "alg_sdk/stream.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,11 +22,23 @@ void int_handler(int sig)
     exit(sig);
 }
 
+#if defined (WITH_STREAM)
+void int_handler_stream(int sig)
+{
+    // printf("Caught signal : %d\n", sig);
+    alg_sdk_stop_streamer();
+
+    /* terminate program */
+    exit(sig);
+}
+#endif
+
 int main (int argc, char **argv)
 {
     if ((argc == 2) && (strcmp (argv[1], "-s") == 0))
     {
         signal(SIGINT, int_handler);
+
         int rc;
         int frq = 1000;
         rc = alg_sdk_init(frq);
@@ -35,7 +50,26 @@ int main (int argc, char **argv)
 
         alg_sdk_spin_on();
     }
-
+    else if ((argc == 2) && (strcmp (argv[1], "-v") == 0))
+    {
+#if defined (WITH_STREAM)
+        signal(SIGINT, int_handler_stream);
+        
+        int rc;
+        char *appsrc[] = {"--stream", "protocol=v4l2", "v4l2_device=/dev/video0", "codec_type=raw"};
+        rc = alg_sdk_init_v2(4, &appsrc[0]);
+        if(rc < 0)
+        {
+            printf("Init SDK Failed\n");
+            exit(0);
+        }
+        
+        alg_sdk_spin_on();
+#else
+        printf("Please add option -DWITH_GSTREAM=ON for cmake!\n");
+        exit(0);
+#endif
+    }
     return 0;
 }
 #ifdef __cplusplus

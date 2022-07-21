@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     for item in ch_split:
         ch_id = int(item)
-        if(ch_id < 8):
+        if(ch_id < 16):
             print("stream on channel [%d]" % ch_id)
             cam_ctl.select[ch_id] = 1
             cam_ctl.control[ch_id] = 1

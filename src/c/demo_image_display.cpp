@@ -50,7 +50,7 @@ void array_2_mat(uchar* data, int w, int h, int type, int ch_id, uint32_t frame_
         cv::Mat dst = cv::Mat(h,w, CV_8UC3);
         cv::Mat rsz;
 //        printf("H=%d W=%d CH=%d\n", img.size().height, img.size().width, img.channels());
-        cv::cvtColor(img, dst, cv::COLOR_YUV2BGR_YUYV);
+        cv::cvtColor(img, dst, cv::COLOR_YUV2BGR_YVYU);
         cv::resize(dst, rsz, cv::Size(640,360));
         cv::imshow(image_name, rsz);
 
@@ -161,7 +161,7 @@ void callback_image_data(void *p)
     /* for Image Display (by OpenCV)
         This may cause frame rate drop when CPU has run out of resources. 
     */
-    array_2_mat((uchar*)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, ALG_IMG_TYPE_YUV, get_channel_id(msg), msg->image_info_meta.frame_index, msg->common_head.topic_name);  // YUV422 type is CV_8U2
+//    array_2_mat((uchar*)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, ALG_IMG_TYPE_YUV, get_channel_id(msg), msg->image_info_meta.frame_index, msg->common_head.topic_name);  // YUV422 type is CV_8U2
 }
 
 int main (int argc, char **argv)

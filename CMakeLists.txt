@@ -11,6 +11,17 @@ if (BUILD_IMAGE_DISP)
     include_directories(${OpenCV_INCLUDE_DIRS})
 endif ()
 
+if (WITH_GSTREAM)
+    add_definitions(-DWITH_STREAM)
+    set(GST_INCLUDE_PATH /usr/local/gstreamer-1.0)
+    set(GST_LIBS ${GST_INCLUDE_PATH}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu)
+    include_directories(${GST_INCLUDE_PATH}/include/gstreamer-1.0
+                        ${GST_INCLUDE_PATH}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu/gstreamer-1.0/include
+                        ${GST_INCLUDE_PATH}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu/glib-2.0/include/
+                        ${GST_INCLUDE_PATH}/include/glib-2.0
+    )
+endif ()
+
 if (MINGW32)
     link_directories(${PROJECT_LINK_DIR})
     set(CMAKE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/release/mingw32)
@@ -56,12 +67,28 @@ else()
     set(CMAKE_INSTALL_RPATH "\${ORIGIN}/../lib")
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-    add_executable(${PROJECT_NAME}_init src/c/demo_init.c)
-    target_link_libraries(${PROJECT_NAME}_init
-        ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
-        pthread
-        anl
-    )
+    if (WITH_GSTREAM)
+        add_executable(${PROJECT_NAME}_init src/c/demo_init.c)
+        target_link_libraries(${PROJECT_NAME}_init
+            ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
+            pthread
+            anl
+            ${GST_LIBS}/libgstreamer-1.0.so
+            ${GST_LIBS}/libgstvideo-1.0.so
+            ${GST_LIBS}/libgstapp-1.0.so
+            ${GST_LIBS}/libgstwebrtc-1.0.so
+            ${GST_LIBS}/libgstbase-1.0.so
+            ${GST_LIBS}/libglib-2.0.so
+            ${GST_LIBS}/libgobject-2.0.so
+        )   
+    else ()
+        add_executable(${PROJECT_NAME}_init src/c/demo_init.c)
+        target_link_libraries(${PROJECT_NAME}_init
+            ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
+            pthread
+            anl
+        )
+    endif ()
 
     add_executable(${PROJECT_NAME}_client src/c/demo_client.c)
     target_link_libraries(${PROJECT_NAME}_client
