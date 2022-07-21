@@ -17,10 +17,10 @@ Prerequisites
    * gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04)
    * Optional : opencv 3.4.9 with gtk-2.0 (for image display)
 
-V4L2 Video Stream
+V4L2 Video Stream (Optional)
 ------------------------------------
 # GStreamer
-   Download GStrearmer-1.21 (https://gitlab.freedesktop.org/gstreamer/gstreamer.git) and follow the build instruction on README.
+   Download GStrearmer-1.21 (https://gitlab.freedesktop.org/gstreamer/gstreamer.git) and follow the build instruction on README.  
    ** IMPORTANT NOTE : Do not use ubuntu default GStreamer (1.14).  
    ** Version must be >1.20 because a bug fix is merged thereafter :  
    `https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/1970`  
@@ -41,7 +41,9 @@ V4L2 Video Stream
     gst-launch-1.0 version 1.21.0  
     GStreamer 1.21.0 (GIT)  
 
-# virtual v4l2 device
+   ** If you have problem buiding from source, please contact us for pre-build package.  
+
+# Virtual v4l2 device
    Download v4l2loopback from source (https://github.com/umlaeute/v4l2loopback) and follow the build instruction.
 1. `make & sudo make install`  
 2. `sudo depmod -a`  
