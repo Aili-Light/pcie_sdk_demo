@@ -30,13 +30,13 @@ V4L2 Video Stream (Optional)
 1. `vim ~/.bashrc`  
 2. append line : `export LD_LIBRARY_PATH=/usr/local/gstreamer-1.0/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH`  
 3. append line : `export GST_PLUGIN_PATH=/usr/local/gstreamer-1.0/lib/x86_64-linux-gnu/gstreamer-1.0/`  
-4. `alias sudo='sudo PATH="$PATH" LD_LIBRARY_PATH="$LD_LIBRARY_PATH" GST_PLUGIN_PATH="$GST_PLUGIN_PATH"'`  
-5. `source ~/.bashrc`  
+4. append line : `alias sudo='sudo PATH="$PATH" LD_LIBRARY_PATH="$LD_LIBRARY_PATH" GST_PLUGIN_PATH="$GST_PLUGIN_PATH"'`  
+5. save .bashrc and then `source ~/.bashrc`  
 6. `sudo vim /etc/ld.so.conf`  
 7. append line : `/usr/local/gstreamer-1.0/lib/x86_64-linux-gnu/`  
 8. `sudo ldconfig`  
    Check if GStreamer is perfectly install. 
-   Type `gst-launch-1.0 --version`  
+   Type : `gst-launch-1.0 --version`  
    You should be able to see :  
     gst-launch-1.0 version 1.21.0  
     GStreamer 1.21.0 (GIT)  
@@ -62,6 +62,7 @@ V4L2 Video Stream (Optional)
 8. `reboot`  
    After reboot, you should be able to see multiple virtual v4l2 devices by typing :
    `ls /dev/video*`  
+   `/dev/video0` `/dev/video1`  ....  
 
 Quick Build Instructions
 ------------------------------------
