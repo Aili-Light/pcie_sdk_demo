@@ -28,18 +28,25 @@ V4L2 Video Stream (Optional)
    `meson --prefix=/usr/local/gstreamer-1.0 builddir`  
    After GStreamer has installed, you have to add PATH to your system environment.
 1. `vim ~/.bashrc`  
-2. `export LD_LIBRARY_PATH=/usr/local/gstreamer-1.0/lib/x86_64-linux-gnu/$LD_LIBRARY_PATH`  
-3. `export GST_PLUGIN_PATH=/usr/local/gstreamer-1.0/lib/x86_64-linux-gnu/gstreamer-1.0/`  
+2. append line : `export LD_LIBRARY_PATH=/usr/local/gstreamer-1.0/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH`  
+3. append line : `export GST_PLUGIN_PATH=/usr/local/gstreamer-1.0/lib/x86_64-linux-gnu/gstreamer-1.0/`  
 4. `alias sudo='sudo PATH="$PATH" LD_LIBRARY_PATH="$LD_LIBRARY_PATH" GST_PLUGIN_PATH="$GST_PLUGIN_PATH"'`  
 5. `source ~/.bashrc`  
 6. `sudo vim /etc/ld.so.conf`  
-7. `/usr/local/gstreamer-1.0/lib/x86_64-linux-gnu/`  
+7. append line : `/usr/local/gstreamer-1.0/lib/x86_64-linux-gnu/`  
 8. `sudo ldconfig`  
    Check if GStreamer is perfectly install. 
    Type `gst-launch-1.0 --version`  
    You should be able to see :  
     gst-launch-1.0 version 1.21.0  
     GStreamer 1.21.0 (GIT)  
+    Unknown package origin  
+   
+   ** Important : One must check gst library path correctly installed in sudo envirionment.  
+      Type : `sudo su`  
+      `echo $LD_LIBRARY_PATH`  
+      `echo $GST_PLUGIN_PATH`  
+      If the path is not correct (or empty), you should check your sudo environment setting.
 
    ** If you have problem buiding from source, please contact us for pre-build package.  
 
