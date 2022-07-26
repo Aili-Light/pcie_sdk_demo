@@ -17,12 +17,60 @@ Prerequisites
    * gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04)
    * Optional : opencv 3.4.9 with gtk-2.0 (for image display)
 
+V4L2 Video Stream (Optional)
+------------------------------------
+# GStreamer
+   Download GStrearmer-1.21 (https://gitlab.freedesktop.org/gstreamer/gstreamer.git) and follow the build instruction on README.  
+   ** IMPORTANT NOTE : Do not use ubuntu default GStreamer (1.14).  
+   ** Version must be >1.20 because a bug fix is merged thereafter :  
+   `https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/1970`  
+   Please specify the prefix path while buding :  
+   `meson --prefix=/usr/local/gstreamer-1.0 builddir`  
+   After GStreamer has installed, you have to add PATH to your system environment.
+1. `vim ~/.bashrc`  
+2. append line : `export LD_LIBRARY_PATH=/usr/local/gstreamer-1.0/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH`  
+3. append line : `export GST_PLUGIN_PATH=/usr/local/gstreamer-1.0/lib/x86_64-linux-gnu/gstreamer-1.0/`  
+4. append line : `alias sudo='sudo PATH="$PATH" LD_LIBRARY_PATH="$LD_LIBRARY_PATH" GST_PLUGIN_PATH="$GST_PLUGIN_PATH"'`  
+5. save .bashrc and then `source ~/.bashrc`  
+6. `sudo vim /etc/ld.so.conf`  
+7. append line : `/usr/local/gstreamer-1.0/lib/x86_64-linux-gnu/`  
+8. `sudo ldconfig`  
+   Check if GStreamer is perfectly install. 
+   Type : `gst-launch-1.0 --version`  
+   You should be able to see :  
+    gst-launch-1.0 version 1.21.0  
+    GStreamer 1.21.0 (GIT)  
+    Unknown package origin  
+   
+   ** Important : One must check gst library path correctly installed in sudo envirionment.  
+      Type : `sudo su`  
+      `echo $LD_LIBRARY_PATH`  
+      `echo $GST_PLUGIN_PATH`  
+      If the path is not correct (or empty), you should check your sudo environment setting.
+
+   ** If you have problem buiding from source, please contact us for pre-build package.  
+
+# Virtual v4l2 device
+   Download v4l2loopback from source (https://github.com/umlaeute/v4l2loopback) and follow the build instruction.
+1. `make & sudo make install`  
+2. `sudo depmod -a`  
+3. `sudo modprobe v4l2loopback`  
+4. `sudo su`  
+5. `echo "v4l2loopback" | tee /etc/modules-load.d/modules.conf`  
+6. `echo "options v4l2loopback video_nr=0,1,2,3,4,5,6,7 card_label=\"gmsl camera\" exclusive_caps=1" | tee /etc/modprobe.d/v4l2loopback.conf`  
+7. `update-initramfs -c -k $(uname -r)`  
+8. `reboot`  
+   After reboot, you should be able to see multiple virtual v4l2 devices by typing :
+   `ls /dev/video*`  
+   `/dev/video0` `/dev/video1`  ....  
+
 Quick Build Instructions
 ------------------------------------
 1.  `mkdir build`  
 2.  `cd build`  
 3.  `cmake -DCMAKE_INSTALL_PREFIX=<install path> ..`  
-    to build image display add option : `-DBUILD_IMAGE_DISP=ON`    
+    to build image display add option : `-DBUILD_IMAGE_DISP=ON`   
+    to build GStreamer (rtp/v4l2) add option : `-DWITH_GSTREAM=ON`  
 4.  `make`  
 5.  `make install`  
 
@@ -46,6 +94,10 @@ Usuage
 # Init SDK
    `cd <install path>`  
    `sudo ./pcie_sdk_demo_init -s`   
+   or use  
+   `sudo python init_sdk.py`  
+   To use v4l2 video stream, init sdk as :  
+   `sudo ./pcie_sdk_demo_init -v`   
 
 # Set Sensor Config
    `cd <src/python>`  
@@ -75,6 +127,11 @@ Usuage
    `sudo ./pcie_sdk_demo_image_disp -all`   
    display image from select channel :   
    `sudo ./pcie_sdk_demo_image_disp -c <topic_name>`   
+
+# V4L2 Video Stream
+   To capture video stream :  
+   `gst-launch-1.0 v4l2src device=/dev/video0 ! rawvideoparse width=1920 height=1280 format=4 ! videoconvert ! autovideosink`  
+   (You may want to change the parameters : device#, with, height,.. for your case)  
 
 Support
 ------------------------------------

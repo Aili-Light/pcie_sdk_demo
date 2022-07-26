@@ -168,7 +168,7 @@ void callback_image_data(void *p)
     /* for Image Display (by OpenCV)
         This may cause frame rate drop when CPU has run out of resources. 
     */
-    array_2_mat((uchar*)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, ALG_IMG_TYPE_YUV, get_channel_id(msg), msg->image_info_meta.frame_index, msg->common_head.topic_name);  // YUV422 type is CV_8U2
+   array_2_mat((uchar*)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, ALG_IMG_TYPE_YUV, get_channel_id(msg), msg->image_info_meta.frame_index, msg->common_head.topic_name);  // YUV422 type is CV_8U2
 }
 
 int main (int argc, char **argv)
