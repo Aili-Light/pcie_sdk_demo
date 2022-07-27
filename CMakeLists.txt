@@ -11,24 +11,6 @@ if (BUILD_IMAGE_DISP)
     include_directories(${OpenCV_INCLUDE_DIRS})
 endif ()
 
-if (BUILD_WITH_CUDA)
-    set(CMAKE_CXX_FLAGS "-std=c++11")
-    find_package(CUDA REQUIRED)
-    if (CUDA_FOUND)
-        include_directories(${CUDA_INCLUDE_DIRS})
-        message("-- CUDA version: ${CUDA_VERSION}")
-        set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -O3)
-    endif ()
-
-    find_package(OpenGL REQUIRED)
-    find_package(glfw3 REQUIRED)
-    find_package(GLEW REQUIRED)
-    if (GLEW_FOUND)
-        include_directories(%{GLEW_INCLUDE_DIRS})
-        message("-- Found GLEW")
-    endif ()
-endif()
-
 if (WITH_GSTREAM)
     add_definitions(-DWITH_STREAM)
     set(GST_INCLUDE_PATH /usr/local/gstreamer-1.0)
@@ -38,6 +20,24 @@ if (WITH_GSTREAM)
                         ${GST_INCLUDE_PATH}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu/glib-2.0/include/
                         ${GST_INCLUDE_PATH}/include/glib-2.0
     )
+
+    set (GSTREAM_LIBS   ${GST_LIBS}/libgstreamer-1.0.so
+                        ${GST_LIBS}/libgstvideo-1.0.so
+                        ${GST_LIBS}/libgstapp-1.0.so
+                        ${GST_LIBS}/libgstwebrtc-1.0.so
+                        ${GST_LIBS}/libgstbase-1.0.so
+                        ${GST_LIBS}/libglib-2.0.so
+                        ${GST_LIBS}/libgobject-2.0.so
+    )
+
+    if (WITH_CUDA)
+        add_definitions(-DWITH_CUDA)
+        set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cuda")
+        find_package(CUDA)
+            message("-- CUDA version: ${CUDA_VERSION}")
+
+        set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -O3)
+    endif()
 endif ()
 
 if (MINGW32)
@@ -91,14 +91,8 @@ else()
             ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
             pthread
             anl
-            ${GST_LIBS}/libgstreamer-1.0.so
-            ${GST_LIBS}/libgstvideo-1.0.so
-            ${GST_LIBS}/libgstapp-1.0.so
-            ${GST_LIBS}/libgstwebrtc-1.0.so
-            ${GST_LIBS}/libgstbase-1.0.so
-            ${GST_LIBS}/libglib-2.0.so
-            ${GST_LIBS}/libgobject-2.0.so
-        )   
+            ${GSTREAM_LIBS}
+        )
     else ()
         add_executable(${PROJECT_NAME}_init src/c/demo_init.c)
         target_link_libraries(${PROJECT_NAME}_init
@@ -122,42 +116,41 @@ else()
         anl
     )
     if (BUILD_IMAGE_DISP)
-        if (BUILD_WITH_CUDA)
-            include_directories()
-            add_executable(${PROJECT_NAME}_video_stream src/c/demo_video_stream.cpp
-                src/c/host_memory_manager.cpp
-                src/c/video_stream.cpp
-                )
-            target_link_libraries(${PROJECT_NAME}_video_stream
-                ${OpenCV_LIBS}
-                ${CUDA_LIBRARIES}
-                ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
-                ${PROJECT_LINK_DIR}/linux/libjetson-utils.so
-                OpenGL::GL
-                OpenGL::GLU
-                glfw
-                ${GSTLIBS_LIBRARIES}
-                ${GLEW_LIBRARIES}
-                pthread
-                anl
-            )
-            set_target_properties(${PROJECT_NAME}_video_stream PROPERTIES LINKER_LANGUAGE CXX)
-            install (TARGETS ${PROJECT_NAME}_video_stream RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
-        else ()
-            add_executable(${PROJECT_NAME}_image_disp src/c/demo_image_display.cpp)
-            target_link_libraries(${PROJECT_NAME}_image_disp
-                ${OpenCV_LIBS}
-                ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
-                pthread
-                anl
-            )
-            set_target_properties(${PROJECT_NAME}_image_disp PROPERTIES LINKER_LANGUAGE CXX)
-            install (TARGETS ${PROJECT_NAME}_image_disp RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
-        endif ()
+        add_executable(${PROJECT_NAME}_image_disp src/c/demo_image_display.cpp)
+        target_link_libraries(${PROJECT_NAME}_image_disp
+            ${OpenCV_LIBS}
+            ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
+            pthread
+            anl
+        )
+        set_target_properties(${PROJECT_NAME}_image_disp PROPERTIES LINKER_LANGUAGE CXX)
+        install (TARGETS ${PROJECT_NAME}_image_disp RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
     endif ()
 
+#    if (WITH_CUDA)
+#        include_directories()
+#        add_executable(${PROJECT_NAME}_video_stream src/c/demo_video_stream.cpp
+#            src/c/render.cpp
+#            )
+#        target_link_libraries(${PROJECT_NAME}_video_stream
+#            ${OpenCV_LIBS}
+#            ${CUDA_LIBRARIES}
+#            ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
+#            ${PROJECT_LINK_DIR}/linux/libjetson-utils.so
+#            OpenGL::GL
+#            OpenGL::GLU
+##            glfw
+#            ${GSTLIBS_LIBRARIES}
+#            ${GLEW_LIBRARIES}
+#            pthread
+#            anl
+#            )
+#        set_target_properties(${PROJECT_NAME}_video_stream PROPERTIES LINKER_LANGUAGE CXX)
+#        install (TARGETS ${PROJECT_NAME}_video_stream RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
+#    endif ()
+
     FILE(GLOB PCIE_SDK_LIB "${CMAKE_SOURCE_DIR}/pcie_sdk/lib/linux/libpcie_sdk.so*")
-    FILE(GLOB PCIE_SDK_LIB "${CMAKE_SOURCE_DIR}/pcie_sdk/lib/linux/libjetson-utils.so")
+#    FILE(GLOB PCIE_SDK_LIB "${CMAKE_SOURCE_DIR}/pcie_sdk/lib/linux/libjetson-utils.so")
 endif()
 
 install (TARGETS ${PROJECT_NAME}_init RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)

@@ -10,8 +10,6 @@
 #include "alg_sdk/client.h"
 #include "alg_common/basic_types.h"
 
-#include "jetson-utils/videoOutput.h"
-
 #include "video_stream.h"
 
 using namespace std;

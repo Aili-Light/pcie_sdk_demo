@@ -53,6 +53,24 @@ int main (int argc, char **argv)
         exit(0);
 #endif
     }
+    else if ((argc == 2) && (strcmp (argv[1], "-r") == 0))
+    {
+#if defined (WITH_STREAM) && defined (WITH_CUDA)
+        int rc;
+        char *appsrc[] = {"--stream", "protocol=v4l2", "v4l2_device=/dev/video0", "codec_type=h265"};
+        rc = alg_sdk_init_v2(4, &appsrc[0]);
+        if(rc < 0)
+        {
+            printf("Init SDK Failed\n");
+            exit(0);
+        }
+
+        alg_sdk_spin_on();
+#else
+        printf("Please add option -DWITH_GSTREAM=ON and -DWITH_CUDA=ON for cmake!\n");
+        exit(0);
+#endif
+    }
     return 0;
 }
 #ifdef __cplusplus
