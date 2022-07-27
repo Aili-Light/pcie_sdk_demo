@@ -127,30 +127,7 @@ else()
         install (TARGETS ${PROJECT_NAME}_image_disp RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
     endif ()
 
-#    if (WITH_CUDA)
-#        include_directories()
-#        add_executable(${PROJECT_NAME}_video_stream src/c/demo_video_stream.cpp
-#            src/c/render.cpp
-#            )
-#        target_link_libraries(${PROJECT_NAME}_video_stream
-#            ${OpenCV_LIBS}
-#            ${CUDA_LIBRARIES}
-#            ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
-#            ${PROJECT_LINK_DIR}/linux/libjetson-utils.so
-#            OpenGL::GL
-#            OpenGL::GLU
-##            glfw
-#            ${GSTLIBS_LIBRARIES}
-#            ${GLEW_LIBRARIES}
-#            pthread
-#            anl
-#            )
-#        set_target_properties(${PROJECT_NAME}_video_stream PROPERTIES LINKER_LANGUAGE CXX)
-#        install (TARGETS ${PROJECT_NAME}_video_stream RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
-#    endif ()
-
     FILE(GLOB PCIE_SDK_LIB "${CMAKE_SOURCE_DIR}/pcie_sdk/lib/linux/libpcie_sdk.so*")
-#    FILE(GLOB PCIE_SDK_LIB "${CMAKE_SOURCE_DIR}/pcie_sdk/lib/linux/libjetson-utils.so")
 endif()
 
 install (TARGETS ${PROJECT_NAME}_init RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
