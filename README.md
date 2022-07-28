@@ -17,9 +17,20 @@ Prerequisites
    * gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04)
    * Optional : opencv 3.4.9 with gtk-2.0 (for image display)
 
+Quick Build Instructions
+------------------------------------
+1.  `mkdir build`  
+2.  `cd build`  
+3.  `cmake -DCMAKE_INSTALL_PREFIX=<install path> ..`  
+    to build image display add option : `-DBUILD_IMAGE_DISP=ON`   
+    to build GStreamer (rtp/v4l2) add option : `-DWITH_GSTREAM=ON`  
+    to build h264/265 codec add option : `-DWITH_GSTREAM=ON` and `-DWITH_CUDA=ON`  
+4.  `make`  
+5.  `make install`  
+
 V4L2 Video Stream (Optional)
 ------------------------------------
-# GStreamer
+# GStreamer  (Ubuntu)
    Download GStrearmer-1.21 (https://gitlab.freedesktop.org/gstreamer/gstreamer.git) and follow the build instruction on README.  
    ** IMPORTANT NOTE : Do not use ubuntu default GStreamer (1.14).  
    ** Version must be >1.20 because a bug fix is merged thereafter :  
@@ -50,7 +61,7 @@ V4L2 Video Stream (Optional)
 
    ** If you have problem buiding from source, please contact us for pre-build package.  
 
-# Virtual v4l2 device
+# Virtual v4l2 device  (Ubuntu)
    Download v4l2loopback from source (https://github.com/umlaeute/v4l2loopback) and follow the build instruction.
 1. `make & sudo make install`  
 2. `sudo depmod -a`  
@@ -64,19 +75,12 @@ V4L2 Video Stream (Optional)
    `ls /dev/video*`  
    `/dev/video0` `/dev/video1`  ....  
 
-Quick Build Instructions
+Build With CUDA (Ubuntu)
 ------------------------------------
-1.  `mkdir build`  
-2.  `cd build`  
-3.  `cmake -DCMAKE_INSTALL_PREFIX=<install path> ..`  
-    to build image display add option : `-DBUILD_IMAGE_DISP=ON`   
-    to build GStreamer (rtp/v4l2) add option : `-DWITH_GSTREAM=ON`  
-4.  `make`  
-5.  `make install`  
-
-Build With CUDA
-------------------------------------
-1. Install CUDA Toolkit  
+1. Install nvidia driver :  
+   `sudo apt-get install nvidia-driver`  
+   After installation finished, use command `nvidia-smi` to check your GPU is correctly installed.  
+2. Install CUDA Toolkit  
    Download cuda : https://developer.nvidia.com/cuda-10.1-download-archive-base  
    `sudo dpkg -i cuda-repo-xxxx.deb`  
    `sudo apt-key add /var/cuda/repo-xxx`  
@@ -87,7 +91,7 @@ Build With CUDA
    `export CPATH=/usr/local/cuda/targets/x86_64-linux/include:/$CPATH`  
    `export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH`  
 
-2. add options -DWITH_CUDA=ON and -DWITH_GSTREAM=ON in cmake  
+3. add options `-DWITH_CUDA=ON` and `-DWITH_GSTREAM=ON` in cmake  
 
 Usuage
 ------------------------------------
