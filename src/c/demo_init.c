@@ -71,6 +71,42 @@ int main (int argc, char **argv)
         exit(0);
 #endif
     }
+    else if ((argc == 2) && (strcmp (argv[1], "-d") == 0))
+    {
+#if defined (WITH_STREAM) && defined (WITH_CUDA)
+        int rc;
+        char *appsrc[] = {"--stream", "protocol=display", "codec_type=h264"};
+        rc = alg_sdk_init_v2(3, &appsrc[0]);
+        if(rc < 0)
+        {
+            printf("Init SDK Failed\n");
+            exit(0);
+        }
+
+        alg_sdk_spin_on();
+#else
+        printf("Please add option -DWITH_GSTREAM=ON and -DWITH_CUDA=ON for cmake!\n");
+        exit(0);
+#endif
+    }
+    else if ((argc == 2) && (strcmp (argv[1], "-f") == 0))
+    {
+#if defined (WITH_STREAM) && defined (WITH_CUDA)
+        int rc;
+        char *appsrc[] = {"--stream", "protocol=file", "codec_type=h265", "encoder_h265=nvcudah265enc", "file_location=."};
+        rc = alg_sdk_init_v2(5, &appsrc[0]);
+        if(rc < 0)
+        {
+            printf("Init SDK Failed\n");
+            exit(0);
+        }
+
+        alg_sdk_spin_on();
+#else
+        printf("Please add option -DWITH_GSTREAM=ON and -DWITH_CUDA=ON for cmake!\n");
+        exit(0);
+#endif
+    }
     return 0;
 }
 #ifdef __cplusplus

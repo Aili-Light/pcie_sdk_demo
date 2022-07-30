@@ -93,22 +93,20 @@ void array_2_mat(uchar* data, int w, int h, int type, int ch_id, uint32_t frame_
 //        cv::cvtColor(img_byer, img_byer, cv::COLOR_BayerRG2BGR);
         cv::convertScaleAbs(img_byer, img_rgb8, 0.25, 0);
         cv::resize(img_rgb8, img_rsz, cv::Size(640,360));
-        cv::imshow("Bayer", img_rsz);
+        cv::imshow(image_name, img_rsz);
 
         /* Image Write */
-//        if(is_save_raw)
-//        {
-//            /* save raw data */
-//            char filename[128] = {};
-//            sprintf(filename, "data/image_%02d_%08d.raw", ch_id, frame_index);
-//            ofstream storage_file(filename,ios::out | ios::binary);
-//            storage_file.write((char *)data, data_size*2);
-//            storage_file.close();
-//        }
 
         char c = cv::waitKey(1);
         if(c == 32)
         {
+            /* save raw data */
+            char filename_r[128] = {};
+            sprintf(filename_r, "image_%02d_%08d.raw", ch_id, frame_index);
+            ofstream storage_file(filename_r,ios::out | ios::binary);
+            storage_file.write((char *)data, data_size*2);
+            storage_file.close();
+
             /* save image */
             char filename[128] = {};
             sprintf(filename, "image_%02d_%08d.bmp", ch_id, frame_index);
@@ -168,7 +166,7 @@ void callback_image_data(void *p)
     /* for Image Display (by OpenCV)
         This may cause frame rate drop when CPU has run out of resources. 
     */
-   array_2_mat((uchar*)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, ALG_IMG_TYPE_YUV, get_channel_id(msg), msg->image_info_meta.frame_index, msg->common_head.topic_name);  // YUV422 type is CV_8U2
+   array_2_mat((uchar*)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, ALG_IMG_TYPE_RAW10, get_channel_id(msg), msg->image_info_meta.frame_index, msg->common_head.topic_name);  // YUV422 type is CV_8U2
 }
 
 int main (int argc, char **argv)
