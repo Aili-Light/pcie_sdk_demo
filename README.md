@@ -75,33 +75,40 @@ V4L2 Video Stream (Optional)
    `ls /dev/video*`  
    `/dev/video0` `/dev/video1`  ....  
 
-Build With CUDA (Ubuntu)
+Video Codec With CUDA (Ubuntu)
 ------------------------------------
 1. Install nvidia driver :  
-   `sudo apt-get install nvidia-driver`  
-   After installation finished, use command `nvidia-smi` to check your GPU is correctly installed.  
+   `sudo apt-get install nvidia-driver-xxx`  
+   xxx is the suiteble driver version for your GPU (for example 470)  
+   After installation finished, use command `nvidia-smi` to check your GPU is correctly recognized.  
 2. Install CUDA Toolkit  
-   Download cuda : https://developer.nvidia.com/cuda-10.1-download-archive-base  
+   Download cuda : https://developer.nvidia.com/cuda-downloads and follow the instruction.  
    `sudo dpkg -i cuda-repo-xxxx.deb`  
    `sudo apt-key add /var/cuda/repo-xxx`  
    `sudo apt-get update`  
-   `sudo apt-get install cuda-toolkit-10-1`  
+   `sudo apt-get install cuda`  
    After installation, add CUDA to PATH :   
    `export PATH=/usr/local/cuda/bin:$PATH`  
-   `export CPATH=/usr/local/cuda/targets/x86_64-linux/include:/$CPATH`  
    `export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH`  
 
 3. add options `-DWITH_CUDA=ON` and `-DWITH_GSTREAM=ON` in cmake  
+
+# Important Note : 
+   Nvidia's commercial GPU only allow maximum 3 concurrent video codec sesssions. If you want more than 3 channel video codec, you have to add the patch for CUDA. See the link below :  
+   https://github.com/keylase/nvidia-patch/  
 
 Usuage
 ------------------------------------
 # Init SDK
    `cd <install path>`  
    `sudo ./pcie_sdk_demo_init -s`   
-   or use  
+   or use Python :  
    `sudo python init_sdk.py`  
    To use v4l2 video stream, init sdk as :  
    `sudo ./pcie_sdk_demo_init -v`   
+   For video codec (with CUDA), init sdk as :  
+   `sudo ./pcie_sdk_demo_init -d` (for display Only)  
+   `sudo ./pcie_sdk_demo_init -r` (both display and save video file)     
 
 # Set Sensor Config
    `cd <src/python>`  
@@ -136,13 +143,6 @@ Usuage
    To capture video stream :  
    `gst-launch-1.0 v4l2src device=/dev/video0 ! rawvideoparse width=1920 height=1280 format=4 ! videoconvert ! autovideosink`  
    (You may want to change the parameters : device#, with, height,.. for your case)  
-
-# h264/265 codec (with CUDA)
-   Init SDK :  
-   `sudo ./pcie_sdk_demo_init -r`   
-   Capture video stream :  
-   `gst-launch-1.0 v4l2src device=/dev/video0 ! 'video/x-h265,width=1920,height=1280' ! h265parse ! nvh265dec ! videoconvert ! autovideosink sync=false`  
-   (You may want to change the parameters : device#, with, height, decoder.. for your case)  
 
 Support
 ------------------------------------
