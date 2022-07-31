@@ -5,8 +5,7 @@ This is demostration codes for developer who work on ALG's PCIE Card utilization
 
 For more information check the [website](https://aili-light.com)
 
-Prerequisites
-------------------------------------
+# Prerequisites
 1. Windows
    * CMake 3.5 or newer
    * Mingw64 gcc version 7.3-posix-seh-rev0
@@ -17,8 +16,7 @@ Prerequisites
    * gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04)
    * Optional : opencv 3.4.9 with gtk-2.0 (for image display)
 
-Quick Build Instructions
-------------------------------------
+# Quick Build Instructions
 1.  `mkdir build`  
 2.  `cd build`  
 3.  `cmake -DCMAKE_INSTALL_PREFIX=<install path> ..`  
@@ -28,9 +26,9 @@ Quick Build Instructions
 4.  `make`  
 5.  `make install`  
 
-V4L2 Video Stream (Optional)
+# V4L2 Video Stream (Optional)
+GStreamer  (Ubuntu)
 ------------------------------------
-# GStreamer  (Ubuntu)
    Download GStrearmer-1.21 (https://gitlab.freedesktop.org/gstreamer/gstreamer.git) and follow the build instruction on README.  
    ** IMPORTANT NOTE : Do not use ubuntu default GStreamer (1.14).  
    ** Version must be >1.20 because a bug fix is merged thereafter :  
@@ -61,7 +59,8 @@ V4L2 Video Stream (Optional)
 
    ** If you have problem buiding from source, please contact us for pre-build package.  
 
-# Virtual v4l2 device  (Ubuntu)
+Virtual v4l2 device  (Ubuntu)
+------------------------------------
    Download v4l2loopback from source (https://github.com/umlaeute/v4l2loopback) and follow the build instruction.
 1. `make & sudo make install`  
 2. `sudo depmod -a`  
@@ -75,8 +74,7 @@ V4L2 Video Stream (Optional)
    `ls /dev/video*`  
    `/dev/video0` `/dev/video1`  ....  
 
-Video Codec With CUDA (Ubuntu)
-------------------------------------
+# Video Codec With CUDA (Ubuntu)
 1. Install nvidia driver :  
    `sudo apt-get install nvidia-driver-xxx`  
    xxx is the suiteble driver version for your GPU (for example 470)  
@@ -93,13 +91,14 @@ Video Codec With CUDA (Ubuntu)
 
 3. add options `-DWITH_CUDA=ON` and `-DWITH_GSTREAM=ON` in cmake  
 
-# Important Note : 
+Important Note : 
+------------------------------------
    Nvidia's commercial GPU only allow maximum 3 concurrent video codec sesssions. If you want more than 3 channel video codec, you have to add the patch for CUDA. See the link below :  
    https://github.com/keylase/nvidia-patch/  
 
-Usuage
+# Usuage
+Init SDK
 ------------------------------------
-# Init SDK
    `cd <install path>`  
    `sudo ./pcie_sdk_demo_init -s`   
    or use Python :  
@@ -108,9 +107,11 @@ Usuage
    `sudo ./pcie_sdk_demo_init -v`   
    For video codec (with CUDA), init sdk as :  
    `sudo ./pcie_sdk_demo_init -d` (for display Only)  
-   `sudo ./pcie_sdk_demo_init -r` (both display and save video file)     
+   `sudo ./pcie_sdk_demo_init -r` (both display and save video file)   
+   `sudo ./pcie_sdk_demo_init -w` (rtp protocol)   
 
-# Set Sensor Config
+Set Sensor Config
+------------------------------------
    `cd <src/python>`  
    for ALG sensor  
    `python set_sensor_config.py`   
@@ -119,7 +120,8 @@ Usuage
    or use json file
    `python set_sensor_from_json.py --json_file=<path to json file> --channel=xx`  
 
-# Stream On/Off
+Stream On/Off
+------------------------------------
    `cd <src/python>`  
    Stream on
    `python stream_on.py`  
@@ -128,22 +130,30 @@ Usuage
    Stream off
    `python stream_off.py`  
 
-# Subscribe to image
+Subscribe to image
+------------------------------------
    `cd <install path>`  
    `sudo ./pcie_sdk_demo_client -image <topic_name>`  
 
-# Image Display
+Image Display
+------------------------------------
    `cd <install path>`  
    display all images :   
    `sudo ./pcie_sdk_demo_image_disp -all`   
    display image from select channel :   
    `sudo ./pcie_sdk_demo_image_disp -c <topic_name>`   
 
-# V4L2 Video Stream
+V4L2 Video Stream
+------------------------------------
    To capture video stream :  
    `gst-launch-1.0 v4l2src device=/dev/video0 ! rawvideoparse width=1920 height=1280 format=4 ! videoconvert ! autovideosink`  
    (You may want to change the parameters : device#, with, height,.. for your case)  
 
-Support
+RTP Video Stream
 ------------------------------------
+   To capture video stream :  
+   `gst-launch-1.0 udpsrc port=5000 caps="application/x-rtp,media=(string)video,clock-rate=(int)90000,encoding-name=(string)H265,payload=(int)96" ! rtph265depay ! avdec_h265 ! videoconvert ! autovideosink`  
+   (You may want to change the parameters : port, codec,.. for your case)  
+
+# Support
 contact : jimmy@ailiteam.com
