@@ -75,8 +75,8 @@ int main (int argc, char **argv)
     {
 #if defined (WITH_STREAM) && defined (WITH_CUDA)
         int rc;
-        char *appsrc[] = {"--stream", "protocol=display", "codec_type=h264", "encoder_h264=nvh264enc"};
-        rc = alg_sdk_init_v2(4, &appsrc[0]);
+        char *appsrc[] = {"--stream", "protocol=display", "codec_type=raw"};
+        rc = alg_sdk_init_v2(3, &appsrc[0]);
         if(rc < 0)
         {
             printf("Init SDK Failed\n");
@@ -93,7 +93,7 @@ int main (int argc, char **argv)
     {
 #if defined (WITH_STREAM) && defined (WITH_CUDA)
         int rc;
-        char *appsrc[] = {"--stream", "protocol=rtp", "host_ip=127.0.0.1", "port_num=5000", "codec_type=h265"};
+        char *appsrc[] = {"--stream", "protocol=rtp", "host_ip=127.0.0.1", "port_num=5000", "codec_type=h264"};
         rc = alg_sdk_init_v2(5, &appsrc[0]);
         if(rc < 0)
         {
@@ -106,6 +106,18 @@ int main (int argc, char **argv)
         printf("Please add option -DWITH_GSTREAM=ON and -DWITH_CUDA=ON for cmake!\n");
         exit(0);
 #endif
+    }
+    else
+    {
+        int rc;
+        rc = alg_sdk_init_v2(argc, argv);
+        if(rc < 0)
+        {
+            printf("Init SDK Failed\n");
+            exit(0);
+        }
+
+        alg_sdk_spin_on();
     }
     return 0;
 }
