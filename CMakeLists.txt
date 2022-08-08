@@ -13,31 +13,52 @@ endif ()
 
 if (WITH_GSTREAM)
     add_definitions(-DWITH_STREAM)
-    set(GST_INCLUDE_PATH /usr/local/gstreamer-1.0)
-    set(GST_LIBS ${GST_INCLUDE_PATH}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu)
-    include_directories(${GST_INCLUDE_PATH}/include/gstreamer-1.0
-                        ${GST_INCLUDE_PATH}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu/gstreamer-1.0/include
-                        ${GST_INCLUDE_PATH}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu/glib-2.0/include/
-                        ${GST_INCLUDE_PATH}/include/glib-2.0
-    )
+    include_directories(stream/include)
+    if (MINGW32)
+            set(GST_INCLUDE_PATH D:/gstreamer/1.0/mingw_x86_64)
+            set(GST_LIBS ${GST_INCLUDE_PATH}/lib)
+            message(STATUS "GST_LIBS is ${GST_LIBS}")
+            include_directories(${GST_INCLUDE_PATH}/include/gstreamer-1.0
+                            ${GST_INCLUDE_PATH}/lib/gstreamer-1.0/include
+                            ${GST_INCLUDE_PATH}/lib/glib-2.0/include/
+                            ${GST_INCLUDE_PATH}/include/glib-2.0
+            )
+            set (GSTREAM_LIBS   ${GST_LIBS}/gstreamer-1.0.lib
+                            ${GST_LIBS}/gstvideo-1.0.lib
+                            ${GST_LIBS}/gstapp-1.0.lib
+                            ${GST_LIBS}/gstwebrtc-1.0.lib
+                            ${GST_LIBS}/gstbase-1.0.lib
+                            ${GST_LIBS}/glib-2.0.lib
+                            ${GST_LIBS}/gobject-2.0.lib
+            )
+    else ()
+        set(GST_INCLUDE_PATH /usr/local/gstreamer-1.0)
+        set(GST_LIBS ${GST_INCLUDE_PATH}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu)
+        include_directories(${GST_INCLUDE_PATH}/include/gstreamer-1.0
+                            ${GST_INCLUDE_PATH}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu/gstreamer-1.0/include
+                            ${GST_INCLUDE_PATH}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu/glib-2.0/include/
+                            ${GST_INCLUDE_PATH}/include/glib-2.0
+        )
 
-    set (GSTREAM_LIBS   ${GST_LIBS}/libgstreamer-1.0.so
-                        ${GST_LIBS}/libgstvideo-1.0.so
-                        ${GST_LIBS}/libgstapp-1.0.so
-                        ${GST_LIBS}/libgstwebrtc-1.0.so
-                        ${GST_LIBS}/libgstbase-1.0.so
-                        ${GST_LIBS}/libglib-2.0.so
-                        ${GST_LIBS}/libgobject-2.0.so
-    )
+        set (GSTREAM_LIBS   ${GST_LIBS}/libgstreamer-1.0.so
+                            ${GST_LIBS}/libgstvideo-1.0.so
+                            ${GST_LIBS}/libgstapp-1.0.so
+                            ${GST_LIBS}/libgstwebrtc-1.0.so
+                            ${GST_LIBS}/libgstbase-1.0.so
+                            ${GST_LIBS}/libglib-2.0.so
+                            ${GST_LIBS}/libgobject-2.0.so
+        )
 
-    if (WITH_CUDA)
-        add_definitions(-DWITH_CUDA)
-        set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cuda")
-        find_package(CUDA)
-            message("-- CUDA version: ${CUDA_VERSION}")
+        if (WITH_CUDA)
+            add_definitions(-DWITH_CUDA)
+            set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cuda")
+            find_package(CUDA)
+                message("-- CUDA version: ${CUDA_VERSION}")
 
-        set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -O3)
-    endif()
+            set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -O3)
+        endif()
+
+    endif ()
 endif ()
 
 if (MINGW32)
