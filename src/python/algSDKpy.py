@@ -62,7 +62,10 @@ class pcie_image_data_t(Structure):
 callbackFunc_t = ctypes.CFUNCTYPE(c_void_p, c_void_p)
 
 def CallServices(topic_ptr, cfg, timeo):
-    pcie_sdk = ctypes.CDLL('../../pcie_sdk/lib/linux/libpcie_sdk.so')
+    if os.name == 'nt' :
+        pcie_sdk = ctypes.CDLL('../../pcie_sdk/lib/mingw32/libpcie_sdk.dll', winmode=0)
+    elif os.name == 'posix' :
+        pcie_sdk = ctypes.CDLL('../../pcie_sdk/lib/linux/libpcie_sdk.so')
     pcie_sdk.alg_sdk_call_service.argtypes = [c_char_p, c_void_p, c_int]
     pcie_sdk.alg_sdk_call_service.restype = ctypes.c_int
 
@@ -72,8 +75,11 @@ def CallServices(topic_ptr, cfg, timeo):
 
 class algSDKInit():
     def __init__(self):
-        self.pcie_sdk = ctypes.CDLL('../../pcie_sdk/lib/linux/libpcie_sdk.so')
-
+        if os.name == 'nt' :
+            self.pcie_sdk = ctypes.CDLL('../../pcie_sdk/lib/mingw32/libpcie_sdk.dll', winmode=0)
+        elif os.name == 'posix' :
+            self.pcie_sdk = ctypes.CDLL('../../pcie_sdk/lib/linux/libpcie_sdk.so')
+            
     def InitSDK(self, frq):
         self.pcie_sdk.alg_sdk_init.argtypes = [c_int]
         self.pcie_sdk.alg_sdk_init.restype = ctypes.c_int
@@ -91,7 +97,10 @@ class algSDKInit():
 
 class algSDKClient():
     def __init__(self):
-        self.pcie_sdk = ctypes.CDLL('../../pcie_sdk/lib/linux/libpcie_sdk.so')
+        if os.name == 'nt' :
+            self.pcie_sdk = ctypes.CDLL('../../pcie_sdk/lib/mingw32/libpcie_sdk.dll', winmode=0)
+        elif os.name == 'posix' :
+            self.pcie_sdk = ctypes.CDLL('../../pcie_sdk/lib/linux/libpcie_sdk.so')
 
     def InitClient(self):
         self.pcie_sdk.alg_sdk_init_client.restype = ctypes.c_int
