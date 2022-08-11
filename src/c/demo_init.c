@@ -93,8 +93,8 @@ int main (int argc, char **argv)
     {
 #if defined (WITH_STREAM) && defined (WITH_CUDA)
         int rc;
-        char *appsrc[] = {"--stream", "protocol=rtmp", "host_ip=127.0.0.1", "rtmp_port=1935", "rtmp_addr=live", "codec_type=h264"};
-        rc = alg_sdk_init_v2(6, &appsrc[0]);
+        char *appsrc[] = {"--stream", "protocol=rtmp", "rtmp_addr=rtmp://127.0.0.1:1935/live/", "codec_type=h264"};
+        rc = alg_sdk_init_v2(4, &appsrc[0]);
         if(rc < 0)
         {
             printf("Init SDK Failed\n");
