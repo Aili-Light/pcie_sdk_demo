@@ -109,7 +109,7 @@ else()
     if (WITH_GSTREAM)
         add_executable(${PROJECT_NAME}_init src/c/demo_init.c)
         target_link_libraries(${PROJECT_NAME}_init
-            ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
+            ${PROJECT_LINK_DIR}/linux/libpcie_sdk_stream.so
             pthread
             anl
             ${GSTREAM_LIBS}
@@ -148,7 +148,7 @@ else()
         install (TARGETS ${PROJECT_NAME}_image_disp RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
     endif ()
 
-    FILE(GLOB PCIE_SDK_LIB "${CMAKE_SOURCE_DIR}/pcie_sdk/lib/linux/libpcie_sdk.so*")
+    FILE(GLOB PCIE_SDK_LIB "${CMAKE_SOURCE_DIR}/pcie_sdk/lib/linux/libpcie_sdk*")
 endif()
 
 install (TARGETS ${PROJECT_NAME}_init RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
