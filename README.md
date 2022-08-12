@@ -20,14 +20,14 @@ For more information check the [website](https://aili-light.com)
 1.  `mkdir build`  
 2.  `cd build`  
 3.  `cmake -DCMAKE_INSTALL_PREFIX=<install path> ..`  
-    to build image display add option : `-DBUILD_IMAGE_DISP=ON`   
-    to build GStreamer (rtp/v4l2) add option : `-DWITH_GSTREAM=ON`  
-    to build h264/265 codec add option : `-DWITH_GSTREAM=ON` and `-DWITH_CUDA=ON`  
+    to build with image display add option : `-DBUILD_IMAGE_DISP=ON`   
+    to build with v4l2/rtp add option : `-DWITH_GSTREAM=ON`  
+    to build with codec/rtmp add option : `-DWITH_GSTREAM=ON` and `-DWITH_CUDA=ON`  
 4.  `make`  
 5.  `make install`  
 
-# V4L2 Video Stream (Optional)
-GStreamer  (Ubuntu)
+# GStreamer Support
+Install GStreamer (Ubuntu)
 ------------------------------------
    Download GStrearmer-1.21 (https://gitlab.freedesktop.org/gstreamer/gstreamer.git) and follow the build instruction on README.  
    ** IMPORTANT NOTE : Do not use ubuntu default GStreamer (1.14).  
@@ -51,7 +51,7 @@ GStreamer  (Ubuntu)
     GStreamer 1.21.0 (GIT)  
     Unknown package origin  
    
-   ** Important : One must check gst library path correctly installed in sudo envirionment.  
+   ** Important : Remember to check gst library paths are correctly configured in sudo envirionment.  
       Type : `sudo su`  
       `echo $LD_LIBRARY_PATH`  
       `echo $GST_PLUGIN_PATH`  
@@ -59,7 +59,12 @@ GStreamer  (Ubuntu)
 
    ** If you have problem buiding from source, please contact us for pre-build package.  
 
-Virtual v4l2 device  (Ubuntu)
+Install GStreamer (Windows)
+------------------------------------
+GStreamer can be built from source on Windows (follow instructions from GStreamer's github page). But for convenience we also provide pre-built package for users. Please contact us for the package.  
+
+
+# Virtual v4l2 device  (Ubuntu)
 ------------------------------------
    Download v4l2loopback from source (https://github.com/umlaeute/v4l2loopback) and follow the build instruction.
 1. `make & sudo make install`  
@@ -96,6 +101,38 @@ Important Note :
    Nvidia's commercial GPU only allow maximum 3 concurrent video codec sesssions. If you want more than 3 channel video codec, you have to add the patch for CUDA. See the link below :  
    https://github.com/keylase/nvidia-patch/  
 
+# Stream Over RTMP
+Install Nginx  (Ubuntu)
+------------------------------------
+1. Build from source (with rtmp module)  
+`git clone https://github.com/arut/nginx-rtmp-module.git`  
+`wget http://nginx.org/download/nginx-1.21.5.tar.gz`  
+`tar -zvxf nginx-1.21.5.tar.gz`  
+`cd nginx-1.21.5`  
+`./configure --prefix=/usr/local/nginx  --add-module=../nginx-rtmp-module  --with-http_ssl_module`  
+`make -j8`  
+`sudo make install`  
+2. Open configuration file `/usr/local/nginx/conf/nginx.conf`, add rtmp decription in the end :  
+   rtmp {  
+      server {  
+         listen 1935;   
+         chunk_size 4000;  
+         application live {   
+               live on;  
+         }  
+      }  
+   }  
+3. Start nginx :  `sudo /usr/local/nginx/sbin/nginx`  
+
+Install Nginx  (Windows)
+------------------------------------
+1. Download pre-built nginx with rtmp module from :  
+`http://nginx-win.ecsds.eu/download`  
+select `nginx 1.7.11.3 Gryphon.zip`  to download.  
+2. Extract zip and open the folder.  
+3. Open the file conf/nginx-win.conf, add rtmp decription in the end.
+4. Start nginx : `nginx.exe -c conf/nginx-win.conf`  
+
 # Usuage
 Init SDK
 ------------------------------------
@@ -108,7 +145,7 @@ Init SDK
    For video codec (with CUDA), init sdk as :  
    `sudo ./pcie_sdk_demo_init -d` (for display Only)  
    `sudo ./pcie_sdk_demo_init -r` (both display and save video file)   
-   `sudo ./pcie_sdk_demo_init -w` (rtp protocol)   
+   `sudo ./pcie_sdk_demo_init -w` (rtmp protocol)   
 
 Set Sensor Config
 ------------------------------------
@@ -143,17 +180,16 @@ Image Display
    display image from select channel :   
    `sudo ./pcie_sdk_demo_image_disp -c <topic_name>`   
 
-V4L2 Video Stream
+V4L2 Device
 ------------------------------------
    To capture video stream :  
    `gst-launch-1.0 v4l2src device=/dev/video0 ! rawvideoparse width=1920 height=1280 format=4 ! videoconvert ! autovideosink`  
    (You may want to change the parameters : device#, with, height,.. for your case)  
 
-RTP Video Stream
+Stream Over RTMP
 ------------------------------------
    To capture video stream :  
-   `gst-launch-1.0 udpsrc port=5000 caps="application/x-rtp,media=(string)video,clock-rate=(int)90000,encoding-name=(string)H265,payload=(int)96" ! rtph265depay ! avdec_h265 ! videoconvert ! autovideosink`  
-   (You may want to change the parameters : port, codec,.. for your case)  
+   `gst-launch-1.0 rtmp2src location=rtmp://127.0.0.1:1935/live/ch00 ! decodebin ! queue ! videoconvert ! autovideosink sync=false`  
 
 # Support
 contact : jimmy@ailiteam.com
