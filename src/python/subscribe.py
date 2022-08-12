@@ -11,7 +11,8 @@ from algSDKpy import pcie_image_data_t
 from algSDKpy import callbackFunc_t
 
 ALG_SDK_MIPI_DATA_TYPE_DEFAULT = 0
-ALG_SDK_MIPI_DATA_TYPE_UYVY = 0x1D
+ALG_SDK_MIPI_DATA_TYPE_UYVY = 0x1C
+ALG_SDK_MIPI_DATA_TYPE_VYUY = 0x1D
 ALG_SDK_MIPI_DATA_TYPE_YUYV = 0x1E
 ALG_SDK_MIPI_DATA_TYPE_YVYU = 0x1F
 ALG_SDK_MIPI_DATA_TYPE_RAW10 = 0x2B
@@ -24,13 +25,16 @@ def array2mat(payload, w, h, data_type, ch_id, frame_index, image_name):
     p_array = np.frombuffer(np.ctypeslib.as_array(payload, shape=((h*w*2, 1, 1))), dtype=np.uint8)
     
     if (data_type == ALG_SDK_MIPI_DATA_TYPE_DEFAULT or data_type == ALG_SDK_MIPI_DATA_TYPE_YVYU 
-    or data_type == ALG_SDK_MIPI_DATA_TYPE_YUYV or data_type == ALG_SDK_MIPI_DATA_TYPE_UYVY):
+    or data_type == ALG_SDK_MIPI_DATA_TYPE_YUYV or data_type == ALG_SDK_MIPI_DATA_TYPE_UYVY
+    or data_type == ALG_SDK_MIPI_DATA_TYPE_VYUY):
         img_in = p_array.reshape((h, w, 2))
         if (data_type == ALG_SDK_MIPI_DATA_TYPE_DEFAULT or data_type == ALG_SDK_MIPI_DATA_TYPE_YVYU):
             img_out = cv2.cvtColor(img_in, cv2.COLOR_YUV2BGR_YVYU)
         elif (data_type == ALG_SDK_MIPI_DATA_TYPE_YUYV):
             img_out = cv2.cvtColor(img_in, cv2.COLOR_YUV2BGR_YUYV)
         elif (data_type == ALG_SDK_MIPI_DATA_TYPE_UYVY):
+            img_out = cv2.cvtColor(img_in, cv2.COLOR_YUV2BGR_UYVY)
+        elif (data_type == ALG_SDK_MIPI_DATA_TYPE_VYUY):
             img_out = cv2.cvtColor(img_in, cv2.COLOR_YUV2RGB_UYVY)
         img_disp = cv2.resize(img_out, (640, 360))
         cv2.imshow(bytes(image_name).decode("utf-8"), img_disp)

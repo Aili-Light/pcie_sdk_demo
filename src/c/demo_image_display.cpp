@@ -44,7 +44,8 @@ void int_handler(int sig)
 void array_2_mat(uchar* data, int w, int h, int data_type, int ch_id, uint32_t frame_index, const char* image_name)
 {
     if(data_type == ALG_SDK_MIPI_DATA_TYPE_YUYV || data_type == ALG_SDK_MIPI_DATA_TYPE_YVYU
-            || data_type == ALG_SDK_MIPI_DATA_TYPE_UYVY || data_type == ALG_SDK_MIPI_DATA_TYPE_DEFAULT )
+            || data_type == ALG_SDK_MIPI_DATA_TYPE_UYVY || data_type == ALG_SDK_MIPI_DATA_TYPE_DEFAULT
+            || data_type == ALG_SDK_MIPI_DATA_TYPE_VYUY)
     {
         /* Image Display */
         cv::Mat img = cv::Mat(h, w, CV_8UC2, data);
@@ -61,9 +62,12 @@ void array_2_mat(uchar* data, int w, int h, int data_type, int ch_id, uint32_t f
         }
         else if (data_type == ALG_SDK_MIPI_DATA_TYPE_UYVY)
         {
+            cv::cvtColor(img, dst, cv::COLOR_YUV2BGR_UYVY);
+        }
+        else if (data_type == ALG_SDK_MIPI_DATA_TYPE_VYUY)
+        {
             cv::cvtColor(img, dst, cv::COLOR_YUV2RGB_UYVY);
         }
-
         cv::resize(dst, rsz, cv::Size(640,360));
         cv::imshow(image_name, rsz);
 
