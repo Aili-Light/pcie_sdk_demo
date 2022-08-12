@@ -8,7 +8,7 @@ if __name__ == '__main__':
     cam_ctl = service_stream_control()
     cam_ctl.ack_mode = 1
 
-    for i in range(0, 8):
+    for i in range(0, 16):
         cam_ctl.select[i] = 1
         cam_ctl.control[i] = 0
 

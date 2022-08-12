@@ -153,12 +153,23 @@ enum
 {
     ALG_SDK_VIDEO_FORMAT_UNKOWN = 0,
     ALG_SDK_VIDEO_FORMAT_I420 = 2,       /* Planar YUY-420 format  */
-    ALG_SDK_VIDEO_FORMAT_YV12,           /* Planar YUY-422 format  */
+    ALG_SDK_VIDEO_FORMAT_YV12,           /* Planar YUY-420 format (like I420 but u-v swapped) */
     ALG_SDK_VIDEO_FORMAT_YUY2 = 4,       /* Packed YUY-422 format (Y-U-Y-V-Y-U-Y-V) */
     ALG_SDK_VIDEO_FORMAT_YUYV = ALG_SDK_VIDEO_FORMAT_YUY2,
-    ALG_SDK_VIDEO_FORMAT_YVYU = 5,       /* Packed YUY-422 format (Y-U-Y-V-Y-U-Y-V) */
+    ALG_SDK_VIDEO_FORMAT_UYVY = 5,       /* Packed YUY-422 format (U-Y-V-Y-U-Y-V-Y) */
+    ALG_SDK_VIDEO_FORMAT_YVYU = 19,      /* Packed YUY-422 format (Y-V-Y-U-Y-V-Y-U) */
     ALG_SDK_VIDEO_FORMAT_RGB = 15,       /* RGB packed into 24 bits without padding (R-G-B-R-G-B) */
-    ALG_SDK_VIDEO_FORMAT_RAW10 = 90,       /* Packed YUY-422 format (Y-U-Y-V-Y-U-Y-V) */
+    ALG_SDK_VIDEO_FORMAT_RAW10 = 90,       /* RAW 10-bit */
+};
+
+enum
+{
+    ALG_SDK_MIPI_DATA_TYPE_DEFAULT = 0x00,  /* Default data type (2-bytes) */
+    ALG_SDK_MIPI_DATA_TYPE_UYVY = 0x1D,   /* Type UYVY (2-bytes) */
+    ALG_SDK_MIPI_DATA_TYPE_YUYV = 0x1E,   /* Type YUYV (2-bytes) */
+    ALG_SDK_MIPI_DATA_TYPE_YVYU = 0x1F,   /* Type YVYU (2-bytes) */
+    ALG_SDK_MIPI_DATA_TYPE_RAW10 = 0x2B,  /* Type RAW10 (1.25-bytes) */
+    ALG_SDK_MIPI_DATA_TYPE_RAW12 = 0x2C,  /* Type RAW12 (1.5-bytes) */
 };
 
 typedef struct alg_sdk_pcie_common_head
