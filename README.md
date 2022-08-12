@@ -113,15 +113,15 @@ Install Nginx  (Ubuntu)
 `make -j8`  
 `sudo make install`  
 2. Open configuration file `/usr/local/nginx/conf/nginx.conf`, add rtmp decription in the end :  
-   rtmp {  
-      server {  
-         listen 1935;   
-         chunk_size 4000;  
-         application live {   
-               live on;  
-         }  
-      }  
-   }  
+   `rtmp {`  
+   `   server {`  
+   `      listen 1935;`   
+   `      chunk_size 4000;`  
+   `      application live {`   
+   `            live on;`  
+   `      }`  
+   `   }`  
+   `}`  
 3. Start nginx :  `sudo /usr/local/nginx/sbin/nginx`  
 
 Install Nginx  (Windows)
