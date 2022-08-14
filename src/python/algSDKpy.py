@@ -24,12 +24,31 @@ class service_camera_config(Structure):
     ("channel", c_uint8)
     ]
 
+class service_utc_time(Structure):
+    _fields_ = [("year_month",c_uint16),
+    ("day_wkday", c_uint8),
+    ("hour", c_uint8),
+    ("minute", c_uint8),
+    ("second", c_uint8),
+    ("us", c_uint32)
+    ]
+
 class service_stream_control(Structure):
     _fields_ = [("ack_mode",c_uint8),
-    ("select",c_uint8*ALG_SDK_MAX_CHANNEL),
-    ("control", c_uint8*ALG_SDK_MAX_CHANNEL),
-    ("ack_code", c_uint8),
+    ("time_mode",c_uint8),
+    ("unix_time", c_uint64),
+    ("relative_time", c_uint64),
     ("ch_sel", c_uint8*ALG_SDK_MAX_CHANNEL)
+    ]
+
+class service_set_time(Structure):
+    _fields_ = [("ack_mode",c_uint8),
+    ("dev_index",c_uint8),
+    ("time_mode",c_uint8),
+    ("unix_time", c_uint64),
+    ("relative_time", c_uint64),
+    ("utc_time", service_utc_time),
+    ("ack_code", c_uint8)
     ]
 
 class pcie_common_head_t(Structure):

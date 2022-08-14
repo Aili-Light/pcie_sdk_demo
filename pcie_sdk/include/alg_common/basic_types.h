@@ -112,6 +112,18 @@ enum
 
 enum
 {
+    ALG_SDK_SERVICE_COMM_CMD_GET_ID = 0x0,
+    ALG_SDK_SERVICE_COMM_CMD_SET_SEQ = 0x01,
+    ALG_SDK_SERVICE_COMM_CMD_GET_HW_VERSION = 0x02,
+    ALG_SDK_SERVICE_COMM_CMD_GET_SW_VERSION = 0x03,
+    ALG_SDK_SERVICE_COMM_CMD_UPDATE_FIRMWARE = 0x04,
+    ALG_SDK_SERVICE_COMM_CMD_READ_FILE = 0x05,
+    ALG_SDK_SERVICE_COMM_CMD_GET_STATUS = 0x06,
+    ALG_SDK_SERVICE_COMM_CMD_SET_TIME = 0x07,
+};
+
+enum
+{
     ALG_SDK_SERVICE_PCIE_CMD_WRITE_REG = 0x02,
     ALG_SDK_SERVICE_PCIE_CMD_REAG_REG = 0x03,    
     ALG_SDK_SERVICE_PCIE_CMD_STREAM_CTL = 0x0e,
@@ -152,26 +164,34 @@ enum
 enum
 {
     ALG_SDK_VIDEO_FORMAT_UNKOWN = 0,
-    ALG_SDK_VIDEO_FORMAT_I420 = 2,       /* Planar YUY-420 format  */
-    ALG_SDK_VIDEO_FORMAT_YV12,           /* Planar YUY-420 format (like I420 but u-v swapped) */
-    ALG_SDK_VIDEO_FORMAT_YUY2 = 4,       /* Packed YUY-422 format (Y-U-Y-V-Y-U-Y-V) */
+    ALG_SDK_VIDEO_FORMAT_I420 = 2,          /* Planar YUY-420 format (YYYYYYYY-UU-VV) */
+    ALG_SDK_VIDEO_FORMAT_YV12,              /* Planar YUY-420 format (like I420 but u-v swapped) */
+    ALG_SDK_VIDEO_FORMAT_YUY2 = 4,          /* Packed YUY-422 format (Y-U-Y-V-Y-U-Y-V) */
     ALG_SDK_VIDEO_FORMAT_YUYV = ALG_SDK_VIDEO_FORMAT_YUY2,
-    ALG_SDK_VIDEO_FORMAT_UYVY = 5,       /* Packed YUY-422 format (U-Y-V-Y-U-Y-V-Y) */
-    ALG_SDK_VIDEO_FORMAT_VYUY = 64,       /* Packed YUY-422 format (V-Y-U-Y-V-Y-U-Y) */
-    ALG_SDK_VIDEO_FORMAT_YVYU = 19,      /* Packed YUY-422 format (Y-V-Y-U-Y-V-Y-U) */
-    ALG_SDK_VIDEO_FORMAT_RGB = 15,       /* RGB packed into 24 bits without padding (R-G-B-R-G-B) */
-    ALG_SDK_VIDEO_FORMAT_RAW10 = 90,       /* RAW 10-bit */
+    ALG_SDK_VIDEO_FORMAT_UYVY = 5,          /* Packed YUY-422 format (U-Y-V-Y-U-Y-V-Y) */
+    ALG_SDK_VIDEO_FORMAT_VYUY = 64,         /* Packed YUY-422 format (V-Y-U-Y-V-Y-U-Y) */
+    ALG_SDK_VIDEO_FORMAT_YVYU = 19,         /* Packed YUY-422 format (Y-V-Y-U-Y-V-Y-U) */
+    ALG_SDK_VIDEO_FORMAT_RGB = 15,          /* RGB packed into 24 bits without padding (R-G-B-R-G-B) */
+    ALG_SDK_VIDEO_FORMAT_RAW10 = 90,        /* RAW 10-bit */
 };
 
 enum
 {
     ALG_SDK_MIPI_DATA_TYPE_DEFAULT = 0x00,  /* Default data type (2-bytes) */
-    ALG_SDK_MIPI_DATA_TYPE_UYVY = 0x1C,   /* Type UYVY (2-bytes) */
-    ALG_SDK_MIPI_DATA_TYPE_VYUY = 0x1D,   /* Type UYVY (2-bytes) */
-    ALG_SDK_MIPI_DATA_TYPE_YUYV = 0x1E,   /* Type YUYV (2-bytes) */
-    ALG_SDK_MIPI_DATA_TYPE_YVYU = 0x1F,   /* Type YVYU (2-bytes) */
-    ALG_SDK_MIPI_DATA_TYPE_RAW10 = 0x2B,  /* Type RAW10 (1.25-bytes) */
-    ALG_SDK_MIPI_DATA_TYPE_RAW12 = 0x2C,  /* Type RAW12 (1.5-bytes) */
+    ALG_SDK_MIPI_DATA_TYPE_UYVY = 0x1C,     /* Type UYVY (2-bytes) */
+    ALG_SDK_MIPI_DATA_TYPE_VYUY = 0x1D,     /* Type UYVY (2-bytes) */
+    ALG_SDK_MIPI_DATA_TYPE_YUYV = 0x1E,     /* Type YUYV (2-bytes) */
+    ALG_SDK_MIPI_DATA_TYPE_YVYU = 0x1F,     /* Type YVYU (2-bytes) */
+    ALG_SDK_MIPI_DATA_TYPE_RAW10 = 0x2B,    /* Type RAW10 (1.25-bytes) */
+    ALG_SDK_MIPI_DATA_TYPE_RAW12 = 0x2C,    /* Type RAW12 (1.5-bytes) */
+};
+
+enum
+{
+    ALG_SDK_TIME_MODE_UTC = 1 << 0,            /* use UTC Time */
+    ALG_SDK_TIME_MODE_UNIX = 1 << 1,           /* use UNIX Time */
+    ALG_SDK_TIME_MODE_RELATIVE_TIME = 1 << 2,  /* use Relative Time */
+    ALG_SDK_TIME_MODE_ALL = 0x07,
 };
 
 typedef struct alg_sdk_pcie_common_head
@@ -317,6 +337,38 @@ typedef struct alg_sdk_task {
     struct alg_sdk_task* next;
     void *control;
 }alg_sdk_task_t;
+
+typedef struct alg_sdk_utc_time {
+    uint16_t year : 12,      // max 4095
+             month : 4;      // max 15
+    uint8_t  day : 5,        // max 31
+             weekday : 3;    // max 7
+    uint8_t  hour;
+    uint8_t  minute;
+    uint8_t  second;
+    uint32_t us;
+}aili_utc_time_t;
+
+typedef struct alg_sdk_service_set_time{
+    /* Request Field */
+    uint8_t  ack_mode;
+    uint8_t  dev_index;
+    uint8_t  time_mode;
+    uint64_t unix_time;
+    uint64_t relative_time;
+    aili_utc_time_t utc_time;
+
+    /* Reply Field */
+    uint8_t  ack_code;
+}service_set_time_t;
+
+typedef struct
+{
+    uint8_t using_time_mode;
+    aili_utc_time_t utc_time;
+    uint64_t unix_time;
+    uint64_t relative_time;
+}aili_timestamp_ctl_t __attribute__ ((aligned(1)));
 
 #ifdef __cplusplus
 }
