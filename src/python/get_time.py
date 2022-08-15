@@ -7,8 +7,8 @@ timeo = 5000
 
 if __name__ == '__main__':
     cfg = service_set_time()
-    cfg.ack_mode = 0
-    cfg.dev_index = 1
+    cfg.ack_mode = 1
+    cfg.dev_index = 0
 
     ret = algSDKpy.CallServices(cmd_topic, cfg, timeo)
     print(' result = %d, ack code [%d] '  % (ret, cfg.ack_code))
