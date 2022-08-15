@@ -7,11 +7,11 @@ timeo = 5000
 
 if __name__ == '__main__':
     cfg = service_set_time()
-    cfg.ack_mode = 1
+    cfg.ack_mode = 0
     cfg.dev_index = 1
 
     ret = algSDKpy.CallServices(cmd_topic, cfg, timeo)
-    print(' result = %d ' % ret)
+    print(' result = %d, ack code [%d] '  % (ret, cfg.ack_code))
     print('---------Get Time-------------')
     print(' dev : %d, mode : %d, unix time : %ld, rel time : %ld' % (cfg.dev_index, cfg.time_mode, cfg.unix_time, cfg.relative_time))
     utc = cfg.utc_time
