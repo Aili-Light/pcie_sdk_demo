@@ -35,9 +35,9 @@ class service_utc_time(Structure):
 
 class service_stream_control(Structure):
     _fields_ = [("ack_mode",c_uint8),
-    ("time_mode",c_uint8),
-    ("unix_time", c_uint64),
-    ("relative_time", c_uint64),
+    ("select",c_uint8*ALG_SDK_MAX_CHANNEL),
+    ("control", c_uint8*ALG_SDK_MAX_CHANNEL),
+    ("ack_code", c_uint8),
     ("ch_sel", c_uint8*ALG_SDK_MAX_CHANNEL)
     ]
 

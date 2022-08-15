@@ -27,6 +27,6 @@ if __name__ == '__main__':
     cfg.utc_time = utc
 
     ret = algSDKpy.CallServices(cmd_topic, cfg, timeo)
-    print(' result = %d ' % cfg.ack_code)
+    print(' result = %d, ack code [%d]' % (ret, cfg.ack_code))
 
     print('---------finish-------------')
