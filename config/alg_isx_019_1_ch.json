@@ -1,0 +1,15 @@
+{
+    "sensor_cfg": {
+        "sensor_name": "isx_019",
+        "sensor_width": "1280",
+        "sensor_height": "960",
+        "config_table": "../../config/table/ALG_made_9296_ISX019_96701_MIPI_4LANES_1_ch.txt"
+    },
+
+    "deserdes_cfg": {
+        "channel_id": "0",
+        "des_mode": "1",
+        "camera_num": "1",
+        "data_type": "31"
+    }
+}
