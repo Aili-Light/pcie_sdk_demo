@@ -348,7 +348,7 @@ typedef struct alg_sdk_utc_time {
     uint8_t  minute;
     uint8_t  second;
     uint32_t us;
-}aili_utc_time_t;
+}aili_utc_time_t __attribute__ ((aligned(1))); 
 
 typedef struct alg_sdk_service_set_time{
     /* Request Field */

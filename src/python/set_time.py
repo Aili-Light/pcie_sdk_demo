@@ -22,7 +22,7 @@ if __name__ == '__main__':
     cfg.ack_mode = 1
     cfg.dev_index = 1
     cfg.time_mode = 1  # 1=utc 2=unix 4=relative
-    cfg.unix_time = 16586335333000000
+    cfg.unix_time = 0  # 1660972543000000
     cfg.relative_time = 0
     cfg.utc_time = utc
 
