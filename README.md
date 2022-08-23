@@ -187,5 +187,13 @@ Stream Over RTMP
    To capture video stream :  
    `gst-launch-1.0 rtmp2src location=rtmp://127.0.0.1:1935/live/ch00 ! decodebin ! queue ! videoconvert ! autovideosink sync=false`  
 
+Set/Get System Time
+------------------------------------
+   `cd <src/python>`  
+   Set Time:  
+   `python set_time.py --device=0 --time_mode=1 --utc_time=2022:08:23:15:25:30 --unix_time=1660972543000000 --relative_time=0`  
+   Get Time:  
+   `python get_time.py --device=0`  
+
 # Support
 contact : jimmy@ailiteam.com
