@@ -9,20 +9,20 @@ For more information check the [website](https://aili-light.com)
 1. Windows
    * CMake 3.5 or newer
    * Mingw64 gcc version 7.3-posix-seh-rev0
-   * Optional : opencv 3.4.9 (for image display)
+   * Optional : Opencv 3.4.9 (for image display), GStreamer V1.21 (for V4L2/RTP), CUDA Toolkit V11.6 (for Video Codec)  
 
 2. Linux (Ubuntu)
    * CMake 3.5 or newer
    * gcc version 7.5.0 (Ubuntu 7.5.0-3ubuntu1~18.04)
-   * Optional : opencv 3.4.9 with gtk-2.0 (for image display)
+   * Optional : Opencv 3.4.9 (for Image Display), GStreamer V1.21 (for V4L2/RTP), CUDA Toolkit V11.6 (for Video Codec)  
 
 # Quick Build Instructions
 1.  `mkdir build`  
 2.  `cd build`  
 3.  `cmake -DCMAKE_INSTALL_PREFIX=<install path> ..`  
     to build with image display add option : `-DBUILD_IMAGE_DISP=ON`   
-    to build with v4l2/rtp add option : `-DWITH_GSTREAM=ON`  
-    to build with codec/rtmp add option : `-DWITH_GSTREAM=ON` and `-DWITH_CUDA=ON`  
+    to build with v4l2/rtp add option : `-DWITH_GSTREAMER=ON`  
+    to build with codec/rtmp add option : `-DWITH_GSTREAMER=ON` and `-DWITH_CUDA=ON`  
 4.  `make`  
 5.  `make install`  
 
@@ -94,7 +94,7 @@ GStreamer can be built from source on Windows (follow instructions from GStreame
    `export PATH=/usr/local/cuda/bin:$PATH`  
    `export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH`  
 
-3. add options `-DWITH_CUDA=ON` and `-DWITH_GSTREAM=ON` in cmake  
+3. add options `-DWITH_CUDA=ON` and `-DWITH_GSTREAMER=ON` in cmake  
 
 Important Note : 
 ------------------------------------
@@ -143,26 +143,22 @@ Init SDK
    To use v4l2 video stream, init sdk as :  
    `sudo ./pcie_sdk_demo_init -v`   
    For video codec (with CUDA), init sdk as :  
-   `sudo ./pcie_sdk_demo_init -d` (for display Only)  
+   `sudo ./pcie_sdk_demo_init -d` (display only)  
    `sudo ./pcie_sdk_demo_init -r` (both display and save video file)   
-   `sudo ./pcie_sdk_demo_init -w` (rtmp protocol)   
+   `sudo ./pcie_sdk_demo_init -w` (stream over rtmp)   
 
 Set Sensor Config
 ------------------------------------
    `cd <src/python>`  
    for ALG sensor  
    `python set_sensor_config.py`   
-   for non-ALG sensor (require config table)  
-   `python set_sensor_config_from_file.py`  
-   or use json file
+   for non-ALG sensor (use json file)  
    `python set_sensor_from_json.py --json_file=<path to json file> --channel=xx`  
 
 Stream On/Off
 ------------------------------------
    `cd <src/python>`  
    Stream on
-   `python stream_on.py`  
-   or use
    `python stream_on_by_channel.py --channel='x,y'`  
    Stream off
    `python stream_off.py`  
