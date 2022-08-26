@@ -66,6 +66,7 @@ SOFTWARE.
 #define ALG_SDK_SERVICE_SEND_BUFF_MAX_SIZE 65536
 #define ALG_SDK_MAX_CHANNEL 16
 #define ALG_SDK_MAX_DESERDES 8
+#define ALG_SDK_CHANNEL_PER_DEV 8
 
 #ifdef __cplusplus
 extern "C" {
@@ -129,6 +130,7 @@ enum
     ALG_SDK_SERVICE_PCIE_CMD_REAG_REG = 0x03,    
     ALG_SDK_SERVICE_PCIE_CMD_STREAM_CTL = 0x0e,
     ALG_SDK_SERVICE_PCIE_CMD_SENSOR_CONFIG = 0x10,
+    ALG_SDK_SERVICE_PCIE_CMD_SET_TRIGGER = 0x0f,
 };
 
 enum
@@ -370,6 +372,75 @@ typedef struct
     uint64_t unix_time;
     uint64_t relative_time;
 }aili_timestamp_ctl_t __attribute__ ((aligned(1)));
+
+enum
+{
+    AILI_TRIGGER_SET_MODE = 0,  //设置工作模式模式
+    AILI_TRIGGER_SET_CHANNEL_PARAM, //设置通道参数
+    AILI_TRIGGER_SET_MASTER_TRIGGER_PARAM,//设置主trigger 参数
+    AILI_TRIGGER_MAX_CMD_NUM,
+}aili_slave_mode_private_cmd;
+ 
+typedef enum
+{
+    AILI_MASTER_TRIGGER_DISABLE_MODE = 0,//不输出
+    AILI_MASTER_TRIGGER_EXT_TRG_MODE = 1,// 外部触发模式
+    AILI_MASTER_TRIGGER_INTER_TRG_MODE = 2,//内部触发模式
+    AILI_MASTER_TRIGGER_MAX_MODE,
+} aili_master_trigger_mode_e;
+ 
+enum
+{
+    AILI_SLAVE_TRIGGER_POSITIVE = 0, //脉冲正极性
+    AILI_SLAVE_TRIGGER_NAGTIVE,      //脉冲负极性
+    AILI_SLAVE_TRIGGER_MAX,
+};
+typedef struct
+{
+    uint32_t trigger_delay_time_us; //触发延时
+    uint32_t trigger_valid_time_us;//脉宽时间
+    uint8_t  trigger_polarity;     //脉冲极性
+}aili_slave_trigger_control_param_t;
+typedef struct
+{
+    uint8_t private_cmd_id;    //私有command
+    uint8_t trigger_mode;      //trigger模式，参考aili_master_trigger_mode_e
+}aili_tirgger_set_mode_t __attribute__ ((aligned(1)));
+ 
+typedef struct
+{
+    uint8_t private_cmd_id;
+    aili_slave_trigger_control_param_t control_param; //参考aili_slave_trigger_control_param_t
+    uint8_t is_complete;                               //是否设置完所有通道
+}aili_tirgger_set_channel_param_t __attribute__ ((aligned(1)));
+ 
+typedef struct
+{
+    uint8_t private_cmd_id;   
+    uint8_t trigger_mode;       //trigger模式，参考aili_master_trigger_mode_e
+    uint32_t master_trigger_freq;  //如果为内触发模式，设置触发频率，外触发忽略这个参数
+}aili_tirgger_set_master_param_t __attribute__ ((aligned(1)));
+ 
+typedef union
+{
+    uint8_t private_cmd_id;
+    aili_tirgger_set_mode_t set_mode;
+    aili_tirgger_set_channel_param_t set_channel_param;
+    aili_tirgger_set_master_param_t set_master_param;
+}aili_trigger_set_cmd_data_t __attribute__ ((aligned(1)));
+ 
+typedef struct alg_sdk_service_set_trigger{
+    /* Request Field */
+    uint8_t  ack_mode;     
+    uint8_t  select[ALG_SDK_MAX_CHANNEL];
+    uint8_t  set_mode;      
+    uint8_t  trigger_mode;
+    uint32_t master_trigger_freq;
+    aili_slave_trigger_control_param_t control_param;
+ 
+    /* Reply Field */
+    uint8_t  ack_code;
+}service_set_trigger_t;
 
 #ifdef __cplusplus
 }

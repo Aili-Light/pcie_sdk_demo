@@ -51,6 +51,22 @@ class service_set_time(Structure):
     ("ack_code", c_uint8)
     ]
 
+class service_trigger_slvcmd(Structure):
+    _fields_ = [("trigger_delay_time_us",c_uint32),
+    ("trigger_valid_time_us",c_uint32),
+    ("trigger_polarity",c_uint8)
+    ]
+
+class service_set_trigger(Structure):
+    _fields_ = [("ack_mode",c_uint8),
+    ("select",c_uint8*ALG_SDK_MAX_CHANNEL),
+    ("set_mode",c_uint8),
+    ("trigger_mode",c_uint8),
+    ("master_trigger_freq", c_uint32),
+    ("control_param", service_trigger_slvcmd),
+    ("ack_code", c_uint8)
+    ]
+
 class pcie_common_head_t(Structure):
             _fields_ = [("head",c_uint8),
     ("version", c_uint8),
