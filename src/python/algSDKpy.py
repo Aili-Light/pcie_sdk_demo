@@ -8,6 +8,7 @@ ALG_SDK_SERVICE_SENSOR_PAYLOAD_SIZE = 7*ALG_SDK_SERVICE_SENSOR_CONFIG_MAX_LINE
 
 ALG_SDK_MAX_CHANNEL = 16
 ALG_SDK_MAX_DESERDES = 8
+ALG_SDK_CHANNEL_PER_DEV = 8
 
 class service_camera_config(Structure):
     _fields_ = [("ack_mode",c_uint8),

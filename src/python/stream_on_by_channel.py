@@ -1,6 +1,7 @@
 import argparse
 import algSDKpy
 from algSDKpy import service_stream_control
+from algSDKpy import ALG_SDK_MAX_CHANNEL
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -8,7 +9,7 @@ if __name__ == '__main__':
     )
     parser.add_argument('--channel',
                         type=str,
-                        help="channel id to stream on, seperated with coma (e.g. --channel='0.2.4.6')",
+                        help="channel id to stream on, seperated with coma (e.g. --channel=0,2,8,10)",
                         required=True
     )
     parser.add_argument('-time_out',
@@ -28,7 +29,7 @@ if __name__ == '__main__':
 
     for item in ch_split:
         ch_id = int(item)
-        if(ch_id < 16):
+        if(ch_id < ALG_SDK_MAX_CHANNEL):
             print("stream on channel [%d]" % ch_id)
             cam_ctl.select[ch_id] = 1
             cam_ctl.control[ch_id] = 1
