@@ -138,10 +138,13 @@ Init SDK
 ------------------------------------
    `cd <install path>`  
    `sudo ./pcie_sdk_demo_init -s`   
+   
    or use Python :  
    `sudo python init_sdk.py`  
+   
    To use v4l2 video stream, init sdk as :  
    `sudo ./pcie_sdk_demo_init -v`   
+   
    For video codec (with CUDA), init sdk as :  
    `sudo ./pcie_sdk_demo_init -d` (display only)  
    `sudo ./pcie_sdk_demo_init -r` (both display and save video file)   
@@ -152,6 +155,7 @@ Set Sensor Config
    `cd <src/python>`  
    for ALG sensor  
    `python set_sensor_config.py`   
+   
    for non-ALG sensor (use json file)  
    `python set_sensor_from_json.py --json_file=<path to json file> --channel=xx`  
 
@@ -160,6 +164,7 @@ Stream On/Off
    `cd <src/python>`  
    Stream on
    `python stream_on_by_channel.py --channel='x,y'`  
+   
    Stream off
    `python stream_off.py`  
 
@@ -173,27 +178,46 @@ Image Display
    `cd <install path>`  
    display all images :   
    `sudo ./pcie_sdk_demo_image_disp -all`   
-   display image from select channel :   
+   
+   display image from select channel :  
    `sudo ./pcie_sdk_demo_image_disp -c <topic_name>`   
 
 V4L2 Device
 ------------------------------------
-   To capture video stream :  
+   To capture video stream (You can change parameters : device, width, height..) :  
    `gst-launch-1.0 v4l2src device=/dev/video0 ! rawvideoparse width=1920 height=1280 format=4 ! videoconvert ! autovideosink`  
-   (You may want to change the parameters : device#, with, height,.. for your case)  
+    
+   Or Use VLC Player -> Open Capture Device :  
+   `/dev/video0`  
 
 Stream Over RTMP
 ------------------------------------
    To capture video stream :  
    `gst-launch-1.0 rtmp2src location=rtmp://127.0.0.1:1935/live/ch00 ! decodebin ! queue ! videoconvert ! autovideosink sync=false`  
+   
+   Or Use VLC Player -> Open Network Stream :  
+   `rtmp://127.0.0.1:1935/live/ch00`  
 
 Set/Get System Time
 ------------------------------------
    `cd <src/python>`  
-   Set Time:  
-   `python set_time.py --device=0 --time_mode=1 --utc_time=2022:08:23:15:25:30 --unix_time=1660972543000000 --relative_time=0`  
-   Get Time:  
-   `python get_time.py --device=0`  
+   Set System Time:  
+   `python set_time.py --device=xx --time_mode=1 --utc_time=2022:08:23:15:25:30 --unix_time=1660972543000000 --relative_time=0`  
+   
+   Get System Time:  
+   `python get_time.py --device=xx`  
+
+Set Trigger
+------------------------------------
+   `cd <src/python>`  
+   Set Trigger Mode (Int Trigger) :  
+   `python set_trigger_mode.py --device=xx --mode=2`  
+   
+   Set Trigger Mode (Ext Trigger) :  
+   `python set_trigger_mode.py --device=xx --mode=1`  
+   
+   Set Trigger Parameters :  
+   `python set_trigger_mode.py --channel=xx,yy --mode=2 --delay_time=0 --valid_time=1000 --polarity=0 --freq=30`  
 
 # Support
 contact : jimmy@ailiteam.com
