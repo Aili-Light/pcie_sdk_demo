@@ -197,6 +197,29 @@ enum
     ALG_SDK_TIME_MODE_ALL = 0x07,
 };
 
+enum
+{
+    AILI_TRIGGER_SET_MODE = 0,  //设置工作模式模式
+    AILI_TRIGGER_SET_CHANNEL_PARAM, //设置通道参数
+    AILI_TRIGGER_SET_MASTER_TRIGGER_PARAM,//设置主trigger 参数
+    AILI_TRIGGER_MAX_CMD_NUM,
+};
+ 
+enum
+{
+    AILI_MASTER_TRIGGER_DISABLE_MODE = 0,//不输出
+    AILI_MASTER_TRIGGER_EXT_TRG_MODE = 1,// 外部触发模式
+    AILI_MASTER_TRIGGER_INTER_TRG_MODE = 2,//内部触发模式
+    AILI_MASTER_TRIGGER_MAX_MODE,
+};
+ 
+enum
+{
+    AILI_SLAVE_TRIGGER_POSITIVE = 0, //脉冲正极性
+    AILI_SLAVE_TRIGGER_NAGTIVE,      //脉冲负极性
+    AILI_SLAVE_TRIGGER_MAX,
+};
+
 typedef struct alg_sdk_pcie_common_head
 {
     uint8_t     head;
@@ -373,34 +396,13 @@ typedef struct
     uint64_t relative_time;
 }aili_timestamp_ctl_t __attribute__ ((aligned(1)));
 
-enum
-{
-    AILI_TRIGGER_SET_MODE = 0,  //设置工作模式模式
-    AILI_TRIGGER_SET_CHANNEL_PARAM, //设置通道参数
-    AILI_TRIGGER_SET_MASTER_TRIGGER_PARAM,//设置主trigger 参数
-    AILI_TRIGGER_MAX_CMD_NUM,
-}aili_slave_mode_private_cmd;
- 
-typedef enum
-{
-    AILI_MASTER_TRIGGER_DISABLE_MODE = 0,//不输出
-    AILI_MASTER_TRIGGER_EXT_TRG_MODE = 1,// 外部触发模式
-    AILI_MASTER_TRIGGER_INTER_TRG_MODE = 2,//内部触发模式
-    AILI_MASTER_TRIGGER_MAX_MODE,
-} aili_master_trigger_mode_e;
- 
-enum
-{
-    AILI_SLAVE_TRIGGER_POSITIVE = 0, //脉冲正极性
-    AILI_SLAVE_TRIGGER_NAGTIVE,      //脉冲负极性
-    AILI_SLAVE_TRIGGER_MAX,
-};
 typedef struct
 {
     uint32_t trigger_delay_time_us; //触发延时
     uint32_t trigger_valid_time_us;//脉宽时间
     uint8_t  trigger_polarity;     //脉冲极性
 }aili_slave_trigger_control_param_t;
+
 typedef struct
 {
     uint8_t private_cmd_id;    //私有command
