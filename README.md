@@ -133,6 +133,28 @@ select `nginx 1.7.11.3 Gryphon.zip`  to download.
 3. Open the file conf/nginx-win.conf, add rtmp decription in the end.
 4. Start nginx : `nginx.exe -c conf/nginx-win.conf`  
 
+# ROS Publish (Ubuntu)
+Build With ROS (Melodic)
+------------------------------------
+1.   Install ROS Melodic.   
+2.   After installation, add ROS libraries to PATH:  
+     `source /opt/ros/melodic/setup.bash`  
+3. add option `-DWITH_ROS=ON` in cmake.  
+
+Run ROS Publish
+------------------------------------
+1.   Start roscore, open Terminal and type :  
+     `roscore &`  
+2.   Init SDK with ROS : `sudo ./pcie_sdk_demo_init --rospub`  
+3.   Set Sensor config and stream on for each channel.  
+
+Subscribe to Image Topic 
+------------------------------------
+ROS Topic Name : `/image_data/stream/xx`  
+(xx is channel id starting from 00)  
+To display image, use image_view :   
+`rosrun image_view image_view image:=/image_data/stream/00`  
+
 # Usuage
 Init SDK
 ------------------------------------
