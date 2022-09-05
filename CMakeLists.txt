@@ -11,6 +11,19 @@ if (BUILD_IMAGE_DISP)
     include_directories(${OpenCV_INCLUDE_DIRS})
 endif ()
 
+if (WITH_ROS)
+    add_definitions(-DWITH_ROS)
+    find_package(catkin REQUIRED COMPONENTS
+        roscpp
+        rospy
+        std_msgs
+        sensor_msgs
+    )
+    include_directories(
+        ${catkin_INCLUDE_DIRS}
+    )
+endif ()
+
 if (WITH_GSTREAMER)
     add_definitions(-DWITH_STREAM)
     include_directories(stream/include)
@@ -97,6 +110,19 @@ else()
             pthread
             anl
             ${GSTREAM_LIBS}
+        )
+    elseif (WITH_ROS)
+        message("-- Build with ROS")
+        add_executable(${PROJECT_NAME}_init src/c/demo_init.c)
+        add_dependencies(${PROJECT_NAME}_init 
+                        ${${PROJECT_NAME}_EXPORTED_TARGETS} 
+                        ${catkin_EXPORTED_TARGETS}
+        )
+        target_link_libraries(${PROJECT_NAME}_init
+            ${PROJECT_LINK_DIR}/linux/libpcie_sdk_ros.so
+            pthread
+            anl
+            ${catkin_LIBRARIES}
         )
     else ()
         add_executable(${PROJECT_NAME}_init src/c/demo_init.c)
