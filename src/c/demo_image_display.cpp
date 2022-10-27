@@ -68,8 +68,8 @@ void array_2_mat(uchar* data, int w, int h, int data_type, int ch_id, uint32_t f
         {
             cv::cvtColor(img, dst, cv::COLOR_YUV2RGB_UYVY);
         }
-        cv::resize(dst, rsz, cv::Size(640,360));
-        cv::imshow(image_name, rsz);
+        // cv::resize(dst, rsz, cv::Size(640,360));
+        cv::imshow(image_name, dst);
 
         /* Image Write */
         char c = cv::waitKey(1);

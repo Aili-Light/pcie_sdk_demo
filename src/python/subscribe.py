@@ -36,7 +36,7 @@ def array2mat(payload, w, h, data_type, ch_id, frame_index, image_name):
             img_out = cv2.cvtColor(img_in, cv2.COLOR_YUV2BGR_UYVY)
         elif (data_type == ALG_SDK_MIPI_DATA_TYPE_VYUY):
             img_out = cv2.cvtColor(img_in, cv2.COLOR_YUV2RGB_UYVY)
-        img_disp = cv2.resize(img_out, (640, 360))
+        img_disp = img_out #cv2.resize(img_out, (640, 360))
         cv2.imshow(bytes(image_name).decode("utf-8"), img_disp)
         
         filename = str("image_")+str("%02d_" % ch_id)+str("%08d_" % frame_index)+str(".bmp")
