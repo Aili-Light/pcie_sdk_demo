@@ -84,7 +84,10 @@ if (MINGW32)
         pthread
     )
     if (BUILD_IMAGE_DISP)
-        add_executable(${PROJECT_NAME}_image_disp src/c/demo_image_display.cpp)
+        add_executable(${PROJECT_NAME}_image_disp
+            src/c/demo_image_display.cpp
+            src/c/alg_cvtColor.cpp
+            )
         target_link_libraries(${PROJECT_NAME}_image_disp
             ${OpenCV_LIBS}
             ${PROJECT_LINK_DIR}/mingw32/libpcie_sdk.dll
@@ -147,7 +150,10 @@ else()
         anl
     )
     if (BUILD_IMAGE_DISP)
-        add_executable(${PROJECT_NAME}_image_disp src/c/demo_image_display.cpp)
+        add_executable(${PROJECT_NAME}_image_disp
+            src/c/demo_image_display.cpp
+            src/c/alg_cvtColor.cpp
+            )
         target_link_libraries(${PROJECT_NAME}_image_disp
             ${OpenCV_LIBS}
             ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so

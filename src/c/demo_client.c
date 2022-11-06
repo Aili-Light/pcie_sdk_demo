@@ -132,6 +132,7 @@ int main (int argc, char **argv)
     {
         int rc;
         const char* topic_name_0 = "/image_data/stream";
+        printf("Subscribe to topic %s\n", topic_name_0);
 
         rc = alg_sdk_subscribe(topic_name_0, callback_image_data);
         if (rc < 0)

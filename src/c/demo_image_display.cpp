@@ -13,6 +13,8 @@
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui.hpp"
 #include <fstream>
+#include "alg_cvtColor.h"
+
 using namespace std;
 const char topic_image_head_d[ALG_SDK_HEAD_COMMON_TOPIC_NAME_LEN] = {ALG_SDK_TOPIC_NAME_IMAGE_DATA};
 
@@ -43,94 +45,42 @@ void int_handler(int sig)
 
 void array_2_mat(uchar* data, int w, int h, int data_type, int ch_id, uint32_t frame_index, const char* image_name)
 {
-    if(data_type == ALG_SDK_MIPI_DATA_TYPE_YUYV || data_type == ALG_SDK_MIPI_DATA_TYPE_YVYU
-            || data_type == ALG_SDK_MIPI_DATA_TYPE_UYVY || data_type == ALG_SDK_MIPI_DATA_TYPE_DEFAULT
-            || data_type == ALG_SDK_MIPI_DATA_TYPE_VYUY)
+    const uint32_t data_size = w * h;
+    cv::Mat img_rgb8 = cv::Mat(h, w, CV_8UC3);
+
+    if(data_type <= ALG_SDK_MIPI_DATA_TYPE_YVYU)
     {
         /* Image Display */
-        cv::Mat img = cv::Mat(h, w, CV_8UC2, data);
-        cv::Mat dst = cv::Mat(h,w, CV_8UC3);
-        cv::Mat rsz;
-//        printf("H=%d W=%d CH=%d\n", img.size().height, img.size().width, img.channels());
-        if (data_type == ALG_SDK_MIPI_DATA_TYPE_DEFAULT || data_type == ALG_SDK_MIPI_DATA_TYPE_YVYU)
-        {
-            cv::cvtColor(img, dst, cv::COLOR_YUV2BGR_YVYU);
-        }
-        else if (data_type == ALG_SDK_MIPI_DATA_TYPE_YUYV)
-        {
-            cv::cvtColor(img, dst, cv::COLOR_YUV2BGR_YUYV);
-        }
-        else if (data_type == ALG_SDK_MIPI_DATA_TYPE_UYVY)
-        {
-            cv::cvtColor(img, dst, cv::COLOR_YUV2BGR_UYVY);
-        }
-        else if (data_type == ALG_SDK_MIPI_DATA_TYPE_VYUY)
-        {
-            cv::cvtColor(img, dst, cv::COLOR_YUV2RGB_UYVY);
-        }
-        // cv::resize(dst, rsz, cv::Size(640,360));
-        cv::imshow(image_name, dst);
-
-        /* Image Write */
-        char c = cv::waitKey(1);
-        if(c == 32)
-        {
-            /* save image */
-            char filename[128] = {};
-            sprintf(filename, "data/image_%02d_%08d.bmp", ch_id, frame_index);
-//            printf("filename %s\n", filename);
-            cv::imwrite(filename, dst);
-
-            /* save raw data */
-            char filename_2[128] = {};
-            sprintf(filename_2, "data/image_%02d_%08d.raw", ch_id, frame_index);
-            ofstream storage_file(filename_2,ios::out | ios::binary);
-            storage_file.write((char *)data, h*w*2);
-            storage_file.close();
-        }
+        uchar* buf_rgb = img_rgb8.data;
+        /* yuv to rgb conversion */
+        alg_cv::alg_sdk_cvtColor((uchar*)data, (uchar*)buf_rgb, w, h, alg_cv::image_format(data_type));
     }
     else if(data_type == ALG_SDK_MIPI_DATA_TYPE_RAW10)
     {
-        cv::Mat rsz;
-        uint32_t data_size = w * h;
-//        printf("W=%d H=%d size=%d,\n", w, h, data_size);
+        cv::Mat img_bayer16 = cv::Mat(h, w, CV_16UC1);
+        uchar* buf_bayer = img_bayer16.data;
+        /* raw to rgb conversion */
+        alg_cv::alg_sdk_cvtColor((uchar*)data, (ushort*)buf_bayer, h, w, alg_cv::image_format(data_type));
+        cv::convertScaleAbs(img_bayer16, img_rgb8, 0.25, 0);
+    }
 
-        ushort* pdata = (ushort*)malloc(sizeof(ushort) * data_size);
-        for(int i = 0; i < int(data_size / 4); i++)
-        {
-            pdata[4*i] = (((((ushort)data[5*i]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 0) & 0x0003));
-            pdata[4*i+1] = (((((ushort)data[5*i+1]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 2) & 0x0003));
-            pdata[4*i+2] = (((((ushort)data[5*i+2]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 4) & 0x0003));
-            pdata[4*i+3] = (((((ushort)data[5*i+3]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 6) & 0x0003));
-        }
+    /* Image Display & Write */
+//    cv::resize(img_rgb8, img_rgb8, cv::Size(640,360));
+    cv::imshow(image_name, img_rgb8);
+    char c = cv::waitKey(1);
+    if(c == 32)
+    {
+        /* save raw data */
+        char filename_2[128] = {};
+        sprintf(filename_2, "data/image_%02d_%08d.raw", ch_id, frame_index);
+        ofstream storage_file(filename_2,ios::out | ios::binary);
+        storage_file.write((char *)data, data_size*2);
+        storage_file.close();
 
-        /* Image Display */
-        cv::Mat img_byer = cv::Mat(h, w, CV_16UC1, pdata);
-        cv::Mat img_rgb8, img_rsz;
-//        cv::cvtColor(img_byer, img_byer, cv::COLOR_BayerRG2BGR);
-        cv::convertScaleAbs(img_byer, img_rgb8, 0.25, 0);
-        cv::resize(img_rgb8, img_rsz, cv::Size(640,360));
-        cv::imshow(image_name, img_rsz);
-
-        /* Image Write */
-
-        char c = cv::waitKey(1);
-        if(c == 32)
-        {
-            /* save raw data */
-            char filename_r[128] = {};
-            sprintf(filename_r, "image_%02d_%08d.raw", ch_id, frame_index);
-            ofstream storage_file(filename_r,ios::out | ios::binary);
-            storage_file.write((char *)data, data_size*2);
-            storage_file.close();
-
-            /* save image */
-            char filename[128] = {};
-            sprintf(filename, "image_%02d_%08d.bmp", ch_id, frame_index);
-//            printf("filename %s\n", filename);
-            cv::imwrite(filename, img_rgb8);
-        }
-        free(pdata);
+        /* save image */
+        char filename[128] = {};
+        sprintf(filename, "data/image_%02d_%08d.bmp", ch_id, frame_index);
+        cv::imwrite(filename, img_rgb8);
     }
 }
 
