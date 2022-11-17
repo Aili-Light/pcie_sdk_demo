@@ -21,7 +21,7 @@ int load_sensor_config(const char* filename, uint8_t* payload, uint16_t* len)
             fscanf(fp, "%x", buf + count);
             count++;
 
-            if (c == '\n')
+            if (c == '\r')
                 len_line++;
             // printf("%x|",c);
         }
