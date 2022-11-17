@@ -24,6 +24,10 @@ SOFTWARE.
 #ifndef _ALG_CVTCOLOR_H_
 #define _ALG_CVTCOLOR_H_
 
+#if defined(WITH_OPENMP)
+#include "omp.h"
+#endif
+
 namespace alg_cv {
     enum color_space_e {
         ALG_CV_YUV2RGBCVT_ERR = 0xFF,

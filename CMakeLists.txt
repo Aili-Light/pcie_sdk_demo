@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.5)
 
 project(pcie_sdk_demo)
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+    add_definitions(-DWITH_OPENMP)
+endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/pcie_sdk/include ${CMAKE_SOURCE_DIR}/src)
 
@@ -160,6 +164,11 @@ else()
             pthread
             anl
         )
+        if(OpenMP_CXX_FOUND)
+            target_link_libraries(${PROJECT_NAME}_image_disp
+                OpenMP::OpenMP_CXX
+            )
+        endif()
         set_target_properties(${PROJECT_NAME}_image_disp PROPERTIES LINKER_LANGUAGE CXX)
         install (TARGETS ${PROJECT_NAME}_image_disp RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
     endif ()
