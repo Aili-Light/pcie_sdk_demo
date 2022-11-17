@@ -54,19 +54,35 @@ void array_2_mat(uchar* data, int w, int h, int data_type, int ch_id, uint32_t f
         uchar* buf_rgb = img_rgb8.data;
         /* yuv to rgb conversion */
         alg_cv::alg_sdk_cvtColor((uchar*)data, (uchar*)buf_rgb, w, h, alg_cv::image_format(data_type));
+        /* Image Display */
+//        cv::resize(img_rgb8, img_rgb8, cv::Size(1280,720));
+        cv::imshow(image_name, img_rgb8);
+
     }
     else if(data_type == ALG_SDK_MIPI_DATA_TYPE_RAW10)
     {
-        cv::Mat img_bayer16 = cv::Mat(h, w, CV_16UC1);
-        uchar* buf_bayer = img_bayer16.data;
         /* raw to rgb conversion */
-        alg_cv::alg_sdk_cvtColor((uchar*)data, (ushort*)buf_bayer, h, w, alg_cv::image_format(data_type));
-        cv::convertScaleAbs(img_bayer16, img_rgb8, 0.25, 0);
+        /* PCIE RAW Data Conversion */
+        ushort* pdata = (ushort*)malloc(sizeof(ushort) * data_size);
+        for(int i = 0; i < int(data_size / 4); i++)
+        {
+            pdata[4*i] = (((((ushort)data[5*i]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 0) & 0x0003));
+            pdata[4*i+1] = (((((ushort)data[5*i+1]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 2) & 0x0003));
+            pdata[4*i+2] = (((((ushort)data[5*i+2]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 4) & 0x0003));
+            pdata[4*i+3] = (((((ushort)data[5*i+3]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 6) & 0x0003));
+        }
+        /* End - PCIE RAW Data Conversion */
+        /* Demosaic */
+        cv::Mat img_byer = cv::Mat(h, w, CV_16UC1, pdata);
+        cv::convertScaleAbs(img_byer, img_byer, 0.25, 0);
+        cv::Mat img_rgb8;
+        cv::cvtColor(img_byer, img_rgb8, cv::COLOR_BayerBG2RGB);
+        /* Image Display */
+//        cv::resize(img_rgb8, img_rgb8, cv::Size(1280,720));
+        cv::imshow(image_name, img_rgb8);
+        free(pdata);
     }
-
-    /* Image Display & Write */
-//    cv::resize(img_rgb8, img_rgb8, cv::Size(640,360));
-    cv::imshow(image_name, img_rgb8);
+    /* Image Data Write */
     char c = cv::waitKey(1);
     if(c == 32)
     {
