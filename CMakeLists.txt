@@ -6,6 +6,7 @@ if(OpenMP_CXX_FOUND)
     add_definitions(-DWITH_OPENMP)
 endif()
 
+message(STATUS "Processor name is ${CMAKE_SYSTEM_PROCESSOR}")
 include_directories(${CMAKE_SOURCE_DIR}/pcie_sdk/include ${CMAKE_SOURCE_DIR}/src)
 
 set(PROJECT_LINK_DIR ${CMAKE_SOURCE_DIR}/pcie_sdk/lib)
@@ -113,7 +114,7 @@ else()
     if (WITH_GSTREAMER)
         add_executable(${PROJECT_NAME}_init src/c/demo_init.c)
         target_link_libraries(${PROJECT_NAME}_init
-            ${PROJECT_LINK_DIR}/linux/libpcie_sdk_stream.so
+            ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk_stream.so
             pthread
             anl
             ${GSTREAM_LIBS}
@@ -134,7 +135,7 @@ else()
     else ()
         add_executable(${PROJECT_NAME}_init src/c/demo_init.c)
         target_link_libraries(${PROJECT_NAME}_init
-            ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
+            ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk.so
             pthread
             anl
         )
@@ -142,14 +143,14 @@ else()
 
     add_executable(${PROJECT_NAME}_client src/c/demo_client.c)
     target_link_libraries(${PROJECT_NAME}_client
-        ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
+        ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk.so
         pthread
         anl
     )
 
     add_executable(${PROJECT_NAME}_service src/c/demo_service.c)
     target_link_libraries(${PROJECT_NAME}_service
-        ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
+        ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk.so
         pthread
         anl
     )
@@ -160,7 +161,7 @@ else()
             )
         target_link_libraries(${PROJECT_NAME}_image_disp
             ${OpenCV_LIBS}
-            ${PROJECT_LINK_DIR}/linux/libpcie_sdk.so
+            ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk.so
             pthread
             anl
         )
@@ -173,7 +174,7 @@ else()
         install (TARGETS ${PROJECT_NAME}_image_disp RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
     endif ()
 
-    FILE(GLOB PCIE_SDK_LIB "${CMAKE_SOURCE_DIR}/pcie_sdk/lib/linux/libpcie_sdk*")
+    FILE(GLOB PCIE_SDK_LIB "${CMAKE_SOURCE_DIR}/pcie_sdk/lib/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk*")
     install (FILES ${PCIE_SDK_LIB} DESTINATION ${CMAKE_INSTALL_DIR}/lib)
 endif()
 
