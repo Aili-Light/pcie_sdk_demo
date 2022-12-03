@@ -184,7 +184,7 @@ else()
 
         target_link_libraries(${PROJECT_NAME}_gl_disp
             ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk.so
-            ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libcuda_utils.so
+            ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk_cuda.so
             pthread
             anl
             X11
