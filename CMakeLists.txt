@@ -7,7 +7,7 @@ if(OpenMP_CXX_FOUND)
 endif()
 
 message(STATUS "Processor name is ${CMAKE_SYSTEM_PROCESSOR}")
-include_directories(${CMAKE_SOURCE_DIR}/pcie_sdk/include ${CMAKE_SOURCE_DIR}/src)
+include_directories(${CMAKE_SOURCE_DIR}/pcie_sdk/include ${CMAKE_SOURCE_DIR}/src/c)
 
 set(PROJECT_LINK_DIR ${CMAKE_SOURCE_DIR}/pcie_sdk/lib)
 
@@ -64,34 +64,34 @@ if (MINGW32)
     set(CMAKE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/release/mingw32)
 
     if (WITH_GSTREAMER)
-        add_executable(${PROJECT_NAME}_init src/c/demo_init.c)
+        add_executable(${PROJECT_NAME}_init src/c/demo/demo_init.c)
         target_link_libraries(${PROJECT_NAME}_init
             ${PROJECT_LINK_DIR}/mingw32/libpcie_sdk_stream.dll
             pthread
         )
     else ()
-        add_executable(${PROJECT_NAME}_init src/c/demo_init.c)
+        add_executable(${PROJECT_NAME}_init src/c/demo/demo_init.c)
         target_link_libraries(${PROJECT_NAME}_init
             ${PROJECT_LINK_DIR}/mingw32/libpcie_sdk.dll
             pthread
         )
     endif ()
 
-    add_executable(${PROJECT_NAME}_client src/c/demo_client.c)
+    add_executable(${PROJECT_NAME}_client src/c/demo/demo_client.c)
     target_link_libraries(${PROJECT_NAME}_client
         ${PROJECT_LINK_DIR}/mingw32/libpcie_sdk.dll
         pthread
     )
 
-    add_executable(${PROJECT_NAME}_service src/c/demo_service.c)
+    add_executable(${PROJECT_NAME}_service src/c/demo/demo_service.c)
     target_link_libraries(${PROJECT_NAME}_service
         ${PROJECT_LINK_DIR}/mingw32/libpcie_sdk.dll
         pthread
     )
     if (BUILD_IMAGE_DISP)
         add_executable(${PROJECT_NAME}_image_disp
-            src/c/demo_image_display.cpp
-            src/c/alg_cvtColor.cpp
+            src/c/demo/demo_image_display.cpp
+            src/c/alg_cvt/alg_cvtColor.cpp
             )
         target_link_libraries(${PROJECT_NAME}_image_disp
             ${OpenCV_LIBS}
@@ -112,7 +112,7 @@ else()
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
     if (WITH_GSTREAMER)
-        add_executable(${PROJECT_NAME}_init src/c/demo_init.c)
+        add_executable(${PROJECT_NAME}_init src/c/demo/demo_init.c)
         target_link_libraries(${PROJECT_NAME}_init
             ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk_stream.so
             pthread
@@ -121,7 +121,7 @@ else()
         )
     elseif (WITH_ROS)
         message("-- Build with ROS")
-        add_executable(${PROJECT_NAME}_init src/c/demo_init.c)
+        add_executable(${PROJECT_NAME}_init src/c/demo/demo_init.c)
         add_dependencies(${PROJECT_NAME}_init 
                         ${${PROJECT_NAME}_EXPORTED_TARGETS} 
                         ${catkin_EXPORTED_TARGETS}
@@ -133,7 +133,7 @@ else()
             ${catkin_LIBRARIES}
         )
     else ()
-        add_executable(${PROJECT_NAME}_init src/c/demo_init.c)
+        add_executable(${PROJECT_NAME}_init src/c/demo/demo_init.c)
         target_link_libraries(${PROJECT_NAME}_init
             ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk.so
             pthread
@@ -141,14 +141,14 @@ else()
         )
     endif ()
 
-    add_executable(${PROJECT_NAME}_client src/c/demo_client.c)
+    add_executable(${PROJECT_NAME}_client src/c/demo/demo_client.c)
     target_link_libraries(${PROJECT_NAME}_client
         ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk.so
         pthread
         anl
     )
 
-    add_executable(${PROJECT_NAME}_service src/c/demo_service.c)
+    add_executable(${PROJECT_NAME}_service src/c/demo/demo_service.c)
     target_link_libraries(${PROJECT_NAME}_service
         ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk.so
         pthread
@@ -156,8 +156,8 @@ else()
     )
     if (BUILD_IMAGE_DISP)
         add_executable(${PROJECT_NAME}_image_disp
-            src/c/demo_image_display.cpp
-            src/c/alg_cvtColor.cpp
+            src/c/demo/demo_image_display.cpp
+            src/c/alg_cvt/alg_cvtColor.cpp
             )
         target_link_libraries(${PROJECT_NAME}_image_disp
             ${OpenCV_LIBS}
@@ -173,6 +173,27 @@ else()
         set_target_properties(${PROJECT_NAME}_image_disp PROPERTIES LINKER_LANGUAGE CXX)
         install (TARGETS ${PROJECT_NAME}_image_disp RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
     endif ()
+
+    if (BUILD_GL_DISPLAY)
+        find_package(CUDA REQUIRED)
+        find_package(OpenGL REQUIRED)
+        find_package(GLEW REQUIRED)
+        add_executable(${PROJECT_NAME}_gl_disp
+            src/c/demo/demo_opengl_display.cpp
+        )
+
+        target_link_libraries(${PROJECT_NAME}_gl_disp
+            ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk.so
+            ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libcuda_utils.so
+            pthread
+            anl
+            X11
+            OpenGL::GL
+            GLEW::GLEW
+        )
+        set_target_properties(${PROJECT_NAME}_gl_disp PROPERTIES LINKER_LANGUAGE CXX)
+        install (TARGETS ${PROJECT_NAME}_gl_disp RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
+    endif()
 
     FILE(GLOB PCIE_SDK_LIB "${CMAKE_SOURCE_DIR}/pcie_sdk/lib/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk*")
     install (FILES ${PCIE_SDK_LIB} DESTINATION ${CMAKE_INSTALL_DIR}/lib)
