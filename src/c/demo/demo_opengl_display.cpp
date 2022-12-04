@@ -7,7 +7,7 @@
 #include <semaphore.h>
 #include "alg_sdk/client.h"
 #include "alg_common/basic_types.h"
-#include "gl_disp/alg_camera.h"
+#include "alg_camera/alg_camera.h"
 
 #define ALG_SDK_IMAGE_DATA_BUFF_LEN 8
 #ifndef __MINGW32__
@@ -91,7 +91,7 @@ void *camera_display_thread(void *arg)
         if (!camera->is_init())
         {
             printf("Init camera [%d]\n", ch_id);
-            camera->init_camera(ch_id);
+            camera->init_camera(ch_id, ALG_CAMERA_FLAG_SOURCE_PCIE);
         }
         pthread_mutex_lock(&mutex);
         camera->img_converter();

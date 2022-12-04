@@ -51,12 +51,12 @@ public:
 	/**
 	 * Construct a new ring buffer.
 	 */
-	inline RingBuffer( uint32_t flags=Threaded );
+	RingBuffer( uint32_t flags=Threaded );
 
 	/**
 	 * Destructor
 	 */
-	inline ~RingBuffer();
+	~RingBuffer();
 
 	/**
 	 * Allocate memory for a set of buffers, where each buffer has the specified size.
@@ -68,37 +68,37 @@ public:
 	 * @returns `true` if the allocations succeeded or was previously done.
 	 *          `false` if a memory allocation error occurred.
 	 */
-	inline bool Alloc( uint32_t numBuffers, size_t size, uint32_t flags=0 );
+	bool Alloc( uint32_t numBuffers, size_t size, uint32_t flags=0 );
 
 	/**
 	 * Free the buffer allocations.
 	 */
-	inline void Free();
+	void Free();
 
 	/**
 	 * Get the next read/write buffer without advancing the position in the queue.
 	 */
-	inline void* Peek( uint32_t flags );
+	void* Peek( uint32_t flags );
 
 	/**
 	 * Get the next read/write buffer and advance the position in the queue.
 	 */
-	inline void* Next( uint32_t flags );
+	void* Next( uint32_t flags );
 
 	/**
 	 * Get the flags of the ring buffer.
 	 */
-	inline uint32_t GetFlags() const;
+	uint32_t GetFlags() const;
 	
 	/**
 	 * Set the ring buffer's flags.
 	 */
-	inline void SetFlags( uint32_t flags );
+	void SetFlags( uint32_t flags );
 	
 	/**
 	 * Enable or disable multi-threading.
 	 */
-	inline void SetThreaded( bool threaded );
+	void SetThreaded( bool threaded );
 
 protected:
 
@@ -114,7 +114,7 @@ protected:
 };
 
 // inline implementations
-#include "RingBuffer.inl"
+// #include "RingBuffer.inl"
 
 #endif
 

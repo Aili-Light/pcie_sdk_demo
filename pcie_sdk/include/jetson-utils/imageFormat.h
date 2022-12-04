@@ -23,10 +23,11 @@
 #ifndef __IMAGE_FORMAT_H_
 #define __IMAGE_FORMAT_H_
 
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include "vector_types.h"		
 // include vector types (float4, float3, uchar4, uchar3, ect.)
-#include "cuda/cudaUtility.h"		
-
 
 /**
  * The imageFormat enum is used to identify the pixel format and colorspace
@@ -66,6 +67,10 @@ enum imageFormat
 	IMAGE_YVYU,					/**< YUV YVYU 4:2:2 packed (`'yvyu'`) */
 	IMAGE_UYVY,					/**< YUV UYVY 4:2:2 packed (`'uyvy'`) */
 	IMAGE_VYUY,					/**< YUV VYUY 4:2:2 packed (`'vyuy'`) */
+	IMAGE_Y2UV,					/**< YUV YUYV 4:2:2 packed (`'yuyv'`) Y1/Y2 switch */
+	IMAGE_Y2VU,					/**< YUV YVYU 4:2:2 packed (`'yvyu'`) Y1/Y2 switch */
+	IMAGE_UVY2,					/**< YUV UYVY 4:2:2 packed (`'uyvy'`) Y1/Y2 switch */
+	IMAGE_VUY2,					/**< YUV VYUY 4:2:2 packed (`'vyuy'`) Y1/Y2 switch */
 	IMAGE_I420,					/**< YUV I420 4:2:0 planar (`'i420'`) */
 	IMAGE_YV12,					/**< YUV YV12 4:2:0 planar (`'yv12'`) */
 	IMAGE_NV12,					/**< YUV NV12 4:2:0 planar (`'nv12'`) */

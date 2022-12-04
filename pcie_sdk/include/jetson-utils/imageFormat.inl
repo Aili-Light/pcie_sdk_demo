@@ -25,7 +25,7 @@
 
 #include <strings.h>
 #include <type_traits>
-
+// #include "imageFormat.h"
 
 // imageFormatToStr
 inline const char* imageFormatToStr( imageFormat format )
@@ -47,6 +47,10 @@ inline const char* imageFormatToStr( imageFormat format )
 		case IMAGE_VYUY:	 	return "vyuy";
 		case IMAGE_YUYV:	 	return "yuyv";
 		case IMAGE_YVYU:		return "yvyu";
+		case IMAGE_UVY2:	 	return "uvy2";
+		case IMAGE_VUY2:	 	return "vuy2";
+		case IMAGE_Y2UV:	 	return "y2uv";
+		case IMAGE_Y2VU:		return "y2vu";
 		case IMAGE_BAYER_BGGR:	return "bayer-bggr";
 		case IMAGE_BAYER_GBRG:	return "bayer-gbrg";
 		case IMAGE_BAYER_GRBG:	return "bayer-grbg";
@@ -171,6 +175,10 @@ inline size_t imageFormatChannels( imageFormat format )
 		case IMAGE_I420:
 		case IMAGE_YV12:
 		case IMAGE_NV12:
+		case IMAGE_UVY2:
+		case IMAGE_VUY2:
+		case IMAGE_Y2UV:		
+		case IMAGE_Y2VU:
 		case IMAGE_UYVY:
 		case IMAGE_VYUY:
 		case IMAGE_YUYV:		
@@ -203,7 +211,12 @@ inline size_t imageFormatDepth( imageFormat format )
 		case IMAGE_I420:
 		case IMAGE_YV12:
 		case IMAGE_NV12:		return 12;
+		case IMAGE_UVY2:
+		case IMAGE_VUY2:
+		case IMAGE_Y2UV:
+		case IMAGE_Y2VU:
 		case IMAGE_UYVY:
+		case IMAGE_VYUY:
 		case IMAGE_YUYV:		
 		case IMAGE_YVYU:		return 16;
 		case IMAGE_BAYER_BGGR:

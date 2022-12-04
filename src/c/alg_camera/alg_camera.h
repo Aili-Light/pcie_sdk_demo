@@ -24,9 +24,12 @@ SOFTWARE.
 #ifndef __ALG_CAMERA_H__
 #define __ALG_CAMERA_H__
 
-#include "glDisplay.h"
+#include "gl_display/glDisplay.h"
 #include "jetson-utils/RingBuffer.h"
 #include "alg_common/basic_types.h"
+
+#define ALG_CAMERA_FLAG_SOURCE_PCIE 0
+#define ALG_CAMERA_FLAG_SOURCE_V4L2 1
 
 class AlgCamera 
 {
@@ -35,7 +38,7 @@ public:
     ~AlgCamera();
 
     /* Initialize Camera */
-    int init_camera(int _ch_id);
+    int init_camera(int ch_id, int flag);
 
     /* Close Camera */
     int close_camera();
@@ -83,6 +86,15 @@ private:
 
     /* Image format */
     int format;
+
+    /* Image Source */
+    int flag_src;
+
+    /* Image Frame Index */
+    uint32_t frame_index;
+
+    /* Image Timestamp */
+    uint64_t timestamp;
 
     /* PCIE Image Data */
     pcie_image_data_t* pcie_image;

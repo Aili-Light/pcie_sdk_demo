@@ -38,46 +38,46 @@ public:
 	/**
 	 * Constructor
 	 */
-	inline Mutex();
+	 Mutex();
 
 	/**
 	 * Destructor
 	 */
-	inline ~Mutex();
+	 ~Mutex();
 
 	/**
 	 * If the lock is free, aquire it.  Otherwise, return without waiting for it to become available.
 	 * @result True if the lock was aquired, false if not.
 	 */
-	inline bool AttemptLock();
+	 bool AttemptLock();
 	
 	/**
 	 * Aquire the lock, whenever it becomes available.  This could mean just a few instructions
 	 * if the lock is already free, or to block the thread if it isn't.
 	 */
-	inline void Lock();
+	 void Lock();
 
 	/**
 	 * Release the lock
 	 */
-	inline void Unlock();	
+	 void Unlock();	
 
 	/**
 	 * Wait for the lock, then release it immediately.  Use this in situations where you are waiting for
 	 * an event to occur.
 	 */
-	inline void Sync();
+	 void Sync();
 
 	/**
 	 * Get the mutex object
 	 */
-	inline pthread_mutex_t* GetID();
+	 pthread_mutex_t* GetID();
 
 protected:
 	pthread_mutex_t mID;
 };
 
-// inline implementations
-#include "Mutex.inl"
+//  implementations
+// #include "Mutex.inl"
 
 #endif

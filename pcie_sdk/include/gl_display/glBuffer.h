@@ -24,7 +24,6 @@
 #define __GL_BUFFER_H__
 
 
-#include "cuda/cudaUtility.h"
 #include "cuda_gl_interop.h"
 
 

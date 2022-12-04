@@ -180,6 +180,7 @@ else()
         find_package(GLEW REQUIRED)
         add_executable(${PROJECT_NAME}_gl_disp
             src/c/demo/demo_opengl_display.cpp
+            src/c/alg_camera/alg_camera.cpp
         )
 
         target_link_libraries(${PROJECT_NAME}_gl_disp
