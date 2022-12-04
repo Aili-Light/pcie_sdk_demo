@@ -26,7 +26,10 @@ SOFTWARE.
 #include "stdint.h"
 #include "jetson-utils/imageFormat.h"
 
+/* Memory Copy From CPU space (src) to GPU space (dst) */
 void cuda_memcpy_h2d(void* dst, void* src, size_t size);
+
+/* Color Convert from YUV to RGBA by CUDA */
 bool cuda_cvtColor_RGBA(void* img_src, imageFormat src_format, void* img_rgba, int width, int height);
 
 #endif

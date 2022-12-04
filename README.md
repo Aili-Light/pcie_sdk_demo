@@ -155,6 +155,13 @@ ROS Topic Name : `/image_data/stream/xx`
 To display image, use image_view :   
 `rosrun image_view image_view image:=/image_data/stream/00`  
 
+# OpenGL Display Support (with CUDA)
+Install GLEW
+------------------------------------
+1.   `sudo apt-get install libglew-dev glew-utils`  
+2.   Install CUDA Toolkit (see above instructions)  
+3.   Build SDK with option : -DBUILD_GL_DISPLAY=ON  
+
 # Usuage
 Init SDK
 ------------------------------------
@@ -203,6 +210,12 @@ Image Display
    
    display image from select channel :  
    `sudo ./pcie_sdk_demo_image_disp -c <topic_name>`   
+
+Image Display (by OpenGL)
+------------------------------------
+   `cd <install path>`  
+   display all images :   
+   `sudo ./pcie_sdk_demo_gl_disp`   
 
 V4L2 Device
 ------------------------------------
