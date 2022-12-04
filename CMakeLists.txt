@@ -182,7 +182,6 @@ else()
             src/c/demo/demo_opengl_display.cpp
             src/c/alg_camera/alg_camera.cpp
         )
-
         target_link_libraries(${PROJECT_NAME}_gl_disp
             ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk.so
             ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk_cuda.so
@@ -194,7 +193,25 @@ else()
         )
         set_target_properties(${PROJECT_NAME}_gl_disp PROPERTIES LINKER_LANGUAGE CXX)
         install (TARGETS ${PROJECT_NAME}_gl_disp RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
-    endif()
+
+        add_executable(${PROJECT_NAME}_v4l2
+            src/c/demo/demo_v4l2.cpp
+            src/c/alg_camera/alg_camera.cpp
+            src/c/alg_camera/v4l2_camera.cpp
+        )
+        target_link_libraries(${PROJECT_NAME}_v4l2
+            ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk.so
+            ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk_cuda.so
+            pthread
+            anl
+            X11
+            OpenGL::GL
+            GLEW::GLEW
+        )
+        set_target_properties(${PROJECT_NAME}_v4l2 PROPERTIES LINKER_LANGUAGE CXX)
+        install (TARGETS ${PROJECT_NAME}_v4l2 RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
+
+        endif()
 
     FILE(GLOB PCIE_SDK_LIB "${CMAKE_SOURCE_DIR}/pcie_sdk/lib/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk*")
     install (FILES ${PCIE_SDK_LIB} DESTINATION ${CMAKE_INSTALL_DIR}/lib)

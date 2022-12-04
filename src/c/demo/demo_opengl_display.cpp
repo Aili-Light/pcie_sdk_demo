@@ -106,7 +106,6 @@ void *camera_display_thread(void *arg)
 int main(int argc, char **argv)
 {
     /* Create thread */
-
     for (int i = 0; i < ALG_SDK_MAX_CHANNEL; i++)
     {
         camera_disp_args_t arg = {(void *)(AlgCamera *)&g_camera[i], (void *)(intptr_t)i};
