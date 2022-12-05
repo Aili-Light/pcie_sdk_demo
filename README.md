@@ -87,6 +87,7 @@ GStreamer can be built from source on Windows (follow instructions from GStreame
    `sudo apt-get install cuda`  
    After installation, add CUDA to PATH :   
    `export PATH=/usr/local/cuda/bin:$PATH`  
+   `export CPATH=/usr/local/cuda/targets/x86_64-linux/include:$CPATH`  
    `export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH`  
 
 3. add options `-DWITH_CUDA=ON` and `-DWITH_GSTREAMER=ON` in cmake  
@@ -155,7 +156,7 @@ Install GLEW
 ------------------------------------
 1.   `sudo apt-get install libglew-dev glew-utils`  
 2.   Install CUDA Toolkit (see above instructions)  
-3.   Build SDK with cmake option : `-DBUILD_GL_DISPLAY=ON` and `-DWITH_CUDA=ON`  
+3.   Build SDK with cmake option : `-DBUILD_GL_DISPLAY=ON`    
 
 # Usuage
 Init SDK
