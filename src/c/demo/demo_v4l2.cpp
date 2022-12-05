@@ -17,9 +17,11 @@ struct v4l2_dev v4l2loop_device = {
     .req_count = 2,
     .memory_type = V4L2_MEMORY_MMAP,
     .buffers = NULL,
+    .sequence = 0,
     .timestamp = 0,
     .data_len = 0,
     .out_data = NULL,
+    .buf_index = 0,
 };
 
 int main (int argc, char *argv[])

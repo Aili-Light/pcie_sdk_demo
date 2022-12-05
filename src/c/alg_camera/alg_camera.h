@@ -23,13 +23,41 @@ SOFTWARE.
 */
 #ifndef __ALG_CAMERA_H__
 #define __ALG_CAMERA_H__
-
+#include <linux/videodev2.h>
+#include <linux/v4l2-subdev.h>
 #include "gl_display/glDisplay.h"
 #include "jetson-utils/RingBuffer.h"
 #include "alg_common/basic_types.h"
 
 #define ALG_CAMERA_FLAG_SOURCE_PCIE 0
 #define ALG_CAMERA_FLAG_SOURCE_V4L2 1
+
+struct buffer
+{
+    void *start;
+    size_t length;
+};
+
+struct v4l2_dev
+{
+    int fd;
+    char *path;
+    const char *name;
+    const char *subdev_path;
+    char out_type[10];
+    enum v4l2_buf_type buf_type;
+    int format;
+    int width;
+    int height;
+    unsigned int req_count;
+    enum v4l2_memory memory_type;
+    struct buffer *buffers;
+    unsigned int sequence;
+    unsigned long int timestamp;
+    int data_len;
+    unsigned char *out_data;
+    unsigned int buf_index;
+};
 
 class AlgCamera 
 {
@@ -64,6 +92,15 @@ public:
     /* Get pointer to the next image in buffer */
     void* next_image();
 
+    /* Check Image Size 
+     * Return false if sizes do not match
+    */
+    bool check_image_size(size_t s1, size_t s2);
+
+    /* Calculate Frame Rate 
+    */
+    void frame_rate_monitor(const int frame_index);
+
 private:
 
     /* camera initialized */
@@ -87,17 +124,38 @@ private:
     /* Image format */
     int format;
 
-    /* Image Source */
+    /* Image Size */
+    size_t img_size;
+
+    /* Camera Type
+     * Type=ALG_CAMERA_FLAG_SOURCE_PCIE : PCIE Image Data
+     * Type=ALG_CAMERA_FLAG_SOURCE_V4L2 : V4L2 Source
+     */
     int flag_src;
 
     /* Image Frame Index */
     uint32_t frame_index;
 
+    /* Last Image Frame Index */
+    uint32_t last_frame_idx;
+
+    /* Frame Count */
+    uint32_t frame_count;
+
     /* Image Timestamp */
     uint64_t timestamp;
 
+    /* Last Image Timestamp */
+    uint64_t last_timesmp;
+
+    /* Frame Rate */
+    float frame_rate;
+
     /* PCIE Image Data */
     pcie_image_data_t* pcie_image;
+
+    /* V4L2 Device Handler */
+    v4l2_dev* v4l2_device;
 
     /* YUV Image */
     void* nextYUV;

@@ -315,41 +315,17 @@ void capture_frame(struct v4l2_dev *dev, int skip_frame)
             char c_ch_id[2];
             strcpy(c_ch_id, p_path);
             int ch_id = atoi(c_ch_id);
-            alg_camera->init_camera(ch_id, ALG_CAMERA_FLAG_SOURCE_PCIE);
+            alg_camera->init_camera(ch_id, ALG_CAMERA_FLAG_SOURCE_V4L2);
         }
 
         dev->out_data = (unsigned char *)dev->buffers[buf.index].start;
         dev->timestamp = buf.timestamp.tv_sec * 1000000 + buf.timestamp.tv_usec;
-        // printf("image: sequence(frame index) = %d, timestamp = %lu\n", buf.sequence, dev->timestamp);
+        dev->sequence = buf.sequence;
+        dev->buf_index = buf.index;
+        // printf("image: sequence(frame index) = %d, timestamp = %lu\n", dev->sequence, dev->timestamp);
         // printf("frame=%d,stamp=%ld,size=%ld\n", buf.sequence, dev->timestamp, dev->buffers[buf.index].length);
 
-        pcie_image_data_t msg;
-        switch (dev->format)
-        {
-        case V4L2_PIX_FMT_YVYU:
-            msg.image_info_meta.data_type = ALG_SDK_MIPI_DATA_TYPE_YVYU;
-            break;
-        case V4L2_PIX_FMT_YUYV:
-            msg.image_info_meta.data_type = ALG_SDK_MIPI_DATA_TYPE_YUYV;
-            break;
-        case V4L2_PIX_FMT_UYVY:
-            msg.image_info_meta.data_type = ALG_SDK_MIPI_DATA_TYPE_UYVY;
-            break;
-        case V4L2_PIX_FMT_VYUY:
-            msg.image_info_meta.data_type = ALG_SDK_MIPI_DATA_TYPE_VYUY;
-            break;
-        default:
-            msg.image_info_meta.data_type = ALG_SDK_MIPI_DATA_TYPE_DEFAULT;
-            break;
-        }
-        msg.payload = dev->out_data;
-        msg.image_info_meta.frame_index = buf.sequence;
-        msg.image_info_meta.timestamp = dev->timestamp;
-        msg.image_info_meta.width = dev->width;
-        msg.image_info_meta.height = dev->height;
-        msg.image_info_meta.img_size = dev->buffers[buf.index].length;
-
-        alg_camera->capture_image(&msg);
+        alg_camera->capture_image(dev);
         alg_camera->img_converter();
         alg_camera->render_image();
 

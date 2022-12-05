@@ -330,6 +330,11 @@ public:
 	void SetTitle( const char* str );
 
 	/**
+	 * Refresh Display Window.
+	 */
+	void RefreshWindow();
+
+	/**
 	 * Default title bar name
 	 */
 	static const char* DEFAULT_TITLE;

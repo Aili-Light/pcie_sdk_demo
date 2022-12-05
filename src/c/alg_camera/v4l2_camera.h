@@ -40,30 +40,6 @@ SOFTWARE.
 
 #define FMT_NUM_PLANES 1
 
-struct buffer
-{
-    void *start;
-    size_t length;
-};
-
-struct v4l2_dev
-{
-    int fd;
-    char *path;
-    const char *name;
-    const char *subdev_path;
-    char out_type[10];
-    enum v4l2_buf_type buf_type;
-    int format;
-    int width;
-    int height;
-    unsigned int req_count;
-    enum v4l2_memory memory_type;
-    struct buffer *buffers;
-    unsigned long int timestamp;
-    int data_len;
-    unsigned char *out_data;
-};
 
 typedef struct v4l2_capture_args
 {

@@ -24,7 +24,19 @@ SOFTWARE.
 #include "alg_camera.h"
 #include "alg_common/log.h"
 #include "jetson-utils/cuda_impl.h"
-#define SAFE_DELETE(x) 		if(x != NULL) { delete x; x = NULL; }
+#define SAFE_DELETE(x) \
+    if (x != NULL)     \
+    {                  \
+        delete x;      \
+        x = NULL;      \
+    }
+
+uint64_t milliseconds (void)
+{
+    struct timeval tv;
+    gettimeofday (&tv, NULL);
+    return (((uint64_t)tv.tv_sec * 1000) + ((uint64_t)tv.tv_usec / 1000));
+}
 
 AlgCamera::AlgCamera()
 {
@@ -47,7 +59,7 @@ int AlgCamera::init_camera(int _ch_id, int flag)
     this->b_init = true;
     this->ch_id = _ch_id;
     this->flag_src = flag;
-
+    this->frame_count = 0;
     return 0;
 }
 
@@ -61,7 +73,7 @@ int AlgCamera::close_camera()
 
 int AlgCamera::capture_image(void *msg)
 {
-    if(msg == NULL)
+    if (msg == NULL)
         return 1;
 
     if (this->flag_src == ALG_CAMERA_FLAG_SOURCE_PCIE)
@@ -74,13 +86,37 @@ int AlgCamera::capture_image(void *msg)
         this->height = this->pcie_image->image_info_meta.height;
         this->frame_index = this->pcie_image->image_info_meta.frame_index;
         this->timestamp = this->pcie_image->image_info_meta.timestamp;
-        // printf("[channel = %d], [frame = %d], [time %ld], [byte_0 = %d], [byte_end = %d]\n", this->ch_id, 
+        this->img_size = this->pcie_image->image_info_meta.img_size;
+        // printf("[channel = %d], [frame = %d], [time %ld], [byte_0 = %d], [byte_end = %d]\n", this->ch_id,
         // pcie_image->image_info_meta.frame_index,  pcie_image->image_info_meta.timestamp, ((uint8_t*)this->nextYUV)[0], ((uint8_t*)this->nextYUV)[pcie_image->image_info_meta.img_size - 1]);
     }
     else if (this->flag_src == ALG_CAMERA_FLAG_SOURCE_V4L2)
     {
-        // todo : unpack v4l2 data
-        return 1;
+        v4l2_dev *v4l2_device = (v4l2_dev *)msg;
+        switch (v4l2_device->format)
+        {
+        case V4L2_PIX_FMT_YVYU:
+            this->data_type = ALG_SDK_MIPI_DATA_TYPE_YVYU;
+            break;
+        case V4L2_PIX_FMT_YUYV:
+            this->data_type = ALG_SDK_MIPI_DATA_TYPE_YUYV;
+            break;
+        case V4L2_PIX_FMT_UYVY:
+            this->data_type = ALG_SDK_MIPI_DATA_TYPE_UYVY;
+            break;
+        case V4L2_PIX_FMT_VYUY:
+            this->data_type = ALG_SDK_MIPI_DATA_TYPE_VYUY;
+            break;
+        default:
+            this->data_type = ALG_SDK_MIPI_DATA_TYPE_DEFAULT;
+            break;
+        }
+        this->nextYUV = v4l2_device->out_data;
+        this->frame_index = v4l2_device->sequence;
+        this->timestamp = v4l2_device->timestamp;
+        this->width = v4l2_device->width;
+        this->height = v4l2_device->height;
+        this->img_size = v4l2_device->buffers[v4l2_device->buf_index].length;
     }
     else
     {
@@ -121,7 +157,7 @@ int AlgCamera::capture_image(void *msg)
         break;
     case ALG_SDK_MIPI_DATA_TYPE_VUY2:
         this->format = ALG_SDK_VIDEO_FORMAT_VUY2;
-        break;        
+        break;
     default:
         this->format = ALG_SDK_VIDEO_FORMAT_UNKOWN;
         break;
@@ -130,9 +166,14 @@ int AlgCamera::capture_image(void *msg)
     if (this->format == ALG_SDK_VIDEO_FORMAT_YUY2 || this->format == ALG_SDK_VIDEO_FORMAT_YVYU ||
         this->format == ALG_SDK_VIDEO_FORMAT_UYVY || this->format == ALG_SDK_VIDEO_FORMAT_VYUY ||
         this->format == ALG_SDK_VIDEO_FORMAT_Y2UV || this->format == ALG_SDK_VIDEO_FORMAT_Y2VU ||
-        this->format == ALG_SDK_VIDEO_FORMAT_UVY2 || this->format == ALG_SDK_VIDEO_FORMAT_VUY2 )
+        this->format == ALG_SDK_VIDEO_FORMAT_UVY2 || this->format == ALG_SDK_VIDEO_FORMAT_VUY2)
     {
         size_t yuv_size = imageFormatSize(IMAGE_YUYV, width, height);
+        if (!check_image_size(this->img_size, yuv_size))
+        {
+            printf("Image Size NOT Match! [Img_Size:%ld] [YUV_Size:%ld]\n", this->img_size, yuv_size);
+            return 1;
+        }
         if (!this->mBufferYUV.Alloc(2, yuv_size, RingBuffer::ZeroCopy))
         {
             printf("1****CUDA YUV2RGB -- failed to allocate buffers (%zu bytes each)\n", yuv_size);
@@ -162,6 +203,7 @@ int AlgCamera::capture_image(void *msg)
         return 1;
     }
 
+    frame_rate_monitor(this->frame_index);
     return 0;
 }
 
@@ -176,40 +218,40 @@ int AlgCamera::cuda_yuv_2_rgb_converter(void *src, void *dst, int width, int hei
     imageFormat cuda_image_format;
     switch (video_format)
     {
-        case ALG_SDK_VIDEO_FORMAT_YUY2:
-            cuda_image_format = IMAGE_YUYV;
-            break;
-        case ALG_SDK_VIDEO_FORMAT_YVYU:
-            cuda_image_format = IMAGE_YVYU;
-            break;
-        case ALG_SDK_VIDEO_FORMAT_UYVY:
-            cuda_image_format = IMAGE_UYVY;
-            break;
-        case ALG_SDK_VIDEO_FORMAT_VYUY:
-            cuda_image_format = IMAGE_VYUY;
-            break; /* TODO */
-        case ALG_SDK_VIDEO_FORMAT_Y2UV:
-            cuda_image_format = IMAGE_Y2UV;
-            break;
-        case ALG_SDK_VIDEO_FORMAT_Y2VU:
-            cuda_image_format = IMAGE_Y2VU;
-            break;
-        case ALG_SDK_VIDEO_FORMAT_UVY2:
-            cuda_image_format = IMAGE_UVY2;
-            break;
-        case ALG_SDK_VIDEO_FORMAT_VUY2:
-            cuda_image_format = IMAGE_VUY2;
-            break; /* TODO */    
-        default:
-        {
-            printf("CUDA YUV2RGB -- unsupported input video format (%d)\n", video_format);
-            printf("                        supported formats are:\n");
-            printf("                            * yuy2\n");
-            printf("                            * yvyu\n");
-            printf("                            * uyvy\n");
-            printf("                            * vyuy\n");
-            return 1;
-        }
+    case ALG_SDK_VIDEO_FORMAT_YUY2:
+        cuda_image_format = IMAGE_YUYV;
+        break;
+    case ALG_SDK_VIDEO_FORMAT_YVYU:
+        cuda_image_format = IMAGE_YVYU;
+        break;
+    case ALG_SDK_VIDEO_FORMAT_UYVY:
+        cuda_image_format = IMAGE_UYVY;
+        break;
+    case ALG_SDK_VIDEO_FORMAT_VYUY:
+        cuda_image_format = IMAGE_VYUY;
+        break; /* TODO */
+    case ALG_SDK_VIDEO_FORMAT_Y2UV:
+        cuda_image_format = IMAGE_Y2UV;
+        break;
+    case ALG_SDK_VIDEO_FORMAT_Y2VU:
+        cuda_image_format = IMAGE_Y2VU;
+        break;
+    case ALG_SDK_VIDEO_FORMAT_UVY2:
+        cuda_image_format = IMAGE_UVY2;
+        break;
+    case ALG_SDK_VIDEO_FORMAT_VUY2:
+        cuda_image_format = IMAGE_VUY2;
+        break; /* TODO */
+    default:
+    {
+        printf("CUDA YUV2RGB -- unsupported input video format (%d)\n", video_format);
+        printf("                        supported formats are:\n");
+        printf("                            * yuy2\n");
+        printf("                            * yvyu\n");
+        printf("                            * uyvy\n");
+        printf("                            * vyuy\n");
+        return 1;
+    }
     }
 
     const size_t rgb8Size = imageFormatSize(IMAGE_RGBA8, width, height);
@@ -221,7 +263,7 @@ int AlgCamera::cuda_yuv_2_rgb_converter(void *src, void *dst, int width, int hei
 
     void *yuv_img = this->mBufferYUV.Peek(RingBuffer::Read);
     void *next_rgb = this->mBufferRGB.Next(RingBuffer::Write);
-    if(!cuda_cvtColor_RGBA(yuv_img, cuda_image_format, next_rgb, width, height))
+    if (!cuda_cvtColor_RGBA(yuv_img, cuda_image_format, next_rgb, width, height))
     {
         return 1;
     }
@@ -234,19 +276,19 @@ int AlgCamera::img_converter()
 {
     switch (this->format)
     {
-        case ALG_SDK_VIDEO_FORMAT_YUY2:
-        case ALG_SDK_VIDEO_FORMAT_YVYU:
-        case ALG_SDK_VIDEO_FORMAT_UYVY:
-        case ALG_SDK_VIDEO_FORMAT_VYUY:
-        case ALG_SDK_VIDEO_FORMAT_Y2UV:
-        case ALG_SDK_VIDEO_FORMAT_Y2VU:
-        case ALG_SDK_VIDEO_FORMAT_UVY2:
-        case ALG_SDK_VIDEO_FORMAT_VUY2:        
-            cuda_yuv_2_rgb_converter(this->nextYUV, this->nextRGB, this->width, this->height, this->format);
-            break;
-        default:
-            break;
-        }
+    case ALG_SDK_VIDEO_FORMAT_YUY2:
+    case ALG_SDK_VIDEO_FORMAT_YVYU:
+    case ALG_SDK_VIDEO_FORMAT_UYVY:
+    case ALG_SDK_VIDEO_FORMAT_VYUY:
+    case ALG_SDK_VIDEO_FORMAT_Y2UV:
+    case ALG_SDK_VIDEO_FORMAT_Y2VU:
+    case ALG_SDK_VIDEO_FORMAT_UVY2:
+    case ALG_SDK_VIDEO_FORMAT_VUY2:
+        cuda_yuv_2_rgb_converter(this->nextYUV, this->nextRGB, this->width, this->height, this->format);
+        break;
+    default:
+        break;
+    }
     return 0;
 }
 
@@ -259,8 +301,9 @@ int AlgCamera::render_image()
 
         // // update status bar
         char str[256];
-        sprintf(str, "Channel[%02d] (%ux%u) | %.02f FPS", this->ch_id, this->width, this->height, display->GetFPS());
+        sprintf(str, "Channel[%02d] (%ux%u) | %.02f FPS | Timestamp: %ld", this->ch_id, this->width, this->height, this->frame_rate, this->timestamp);
         display->SetTitle(str);
+        display->RefreshWindow();
     }
 
     return 0;
@@ -280,3 +323,40 @@ void *AlgCamera::next_image()
 {
     return this->mBufferRGB.Peek(RingBuffer::Read);
 }
+
+
+bool AlgCamera::check_image_size(size_t s1, size_t s2)
+{
+    if (s1 == s2)
+        return true;
+    else
+        return false;
+}
+
+void AlgCamera::frame_rate_monitor(const int frame_index)
+{
+    /* Current frame should be last frame +1, 
+        otherwise some frames may be lost.
+    */
+    if( (frame_index - this->last_frame_idx <= 1) || (this->last_frame_idx == 0) )
+    {
+        this->last_frame_idx = frame_index;
+    }
+    else
+    {
+        // printf("Frame Monitor : Frame drop ! [Current Frame %d] [Last Frame %d]\n", frame_index, g_f_last[ch_id]);
+        this->last_frame_idx = frame_index;
+    }
+    
+    uint64_t t_now = milliseconds();
+    this->frame_count++;
+    uint64_t delta_t = t_now - last_timesmp;
+    if (delta_t > 1000)  // for 1000 milliseconds
+    {
+        last_timesmp = t_now;
+        frame_rate = (float)this->frame_count / delta_t * 1000.0f;
+        printf("Frame Monitor : [Channel %d] [Index %d] [Frame Rate = %f]\n", ch_id, frame_index, frame_rate);
+        this->frame_count = 0;
+    }
+}
+
