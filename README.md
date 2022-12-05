@@ -64,20 +64,15 @@ Install GStreamer (Windows)
 GStreamer can be built from source on Windows (follow instructions from GStreamer's github page). But for convenience we also provide pre-built package for users. Please contact us for the package.  
 
 
-# Virtual v4l2 device  (Ubuntu)
+# V4L2 Driver  (Ubuntu)
 ------------------------------------
-   Download v4l2loopback from source (https://github.com/umlaeute/v4l2loopback) and follow the build instruction.
+   Get v4l2loopback source file from Aili-Light (do NOT use soruce from public git repository) and follow the build instruction.
 1. `make & sudo make install`  
 2. `sudo depmod -a`  
 3. `sudo modprobe v4l2loopback`  
-4. `sudo su`  
-5. `echo "v4l2loopback" | tee /etc/modules-load.d/modules.conf`  
-6. `echo "options v4l2loopback video_nr=0,1,2,3,4,5,6,7 card_label=\"gmsl camera\" exclusive_caps=1" | tee /etc/modprobe.d/v4l2loopback.conf`  
-7. `update-initramfs -c -k $(uname -r)`  
-8. `reboot`  
-   After reboot, you should be able to see multiple virtual v4l2 devices by typing :
-   `ls /dev/video*`  
-   `/dev/video0` `/dev/video1`  ....  
+   If you see error : Unknown symbol in module, please mannually load videodev kernel:  
+   `sudo modprobe videodev`  
+
 
 # Video Codec With CUDA (Ubuntu)
 1. Install nvidia driver :  
@@ -160,7 +155,7 @@ Install GLEW
 ------------------------------------
 1.   `sudo apt-get install libglew-dev glew-utils`  
 2.   Install CUDA Toolkit (see above instructions)  
-3.   Build SDK with option : -DBUILD_GL_DISPLAY=ON  
+3.   Build SDK with cmake option : `-DBUILD_GL_DISPLAY=ON` and `-DWITH_CUDA=ON`  
 
 # Usuage
 Init SDK
@@ -172,7 +167,7 @@ Init SDK
    `sudo python init_sdk.py`  
    
    To use v4l2 video stream, init sdk as :  
-   `sudo ./pcie_sdk_demo_init -v`   
+   `sudo ./pcie_sdk_demo_init --v4l2loop`   
    
    For video codec (with CUDA), init sdk as :  
    `sudo ./pcie_sdk_demo_init -d` (display only)  
@@ -215,15 +210,24 @@ Image Display (by OpenGL)
 ------------------------------------
    `cd <install path>`  
    display all images :   
-   `sudo ./pcie_sdk_demo_gl_disp`   
+   `sudo ./pcie_sdk_demo_gl_disp -all`   
 
-V4L2 Device
+   display image from select channel :  
+   `sudo ./pcie_sdk_demo_gl_disp -c <topic_name>` 
+
+Image Display (from V4L2 Device)
 ------------------------------------
-   To capture video stream (You can change parameters : device, width, height..) :  
-   `gst-launch-1.0 v4l2src device=/dev/video0 ! rawvideoparse width=1920 height=1280 format=4 ! videoconvert ! autovideosink`  
+   `cd <install path>`  
+   display from v4l2 device :   
+   `sudo ./pcie_sdk_demo_v4l2 <device name>`   
+   device name example : `/dev/video102`  
+
+   Alternatively, you can use other tools like:  
+   Gstreamer (You can change parameters : device, width, height..) :  
+   `gst-launch-1.0 v4l2src device=/dev/video102 ! rawvideoparse width=1920 height=1280 format=4 ! videoconvert ! autovideosink`  
     
-   Or Use VLC Player -> Open Capture Device :  
-   `/dev/video0`  
+   Or VLC Player -> Open Capture Device :  
+   `/dev/video102`  
 
 Stream Over RTMP
 ------------------------------------

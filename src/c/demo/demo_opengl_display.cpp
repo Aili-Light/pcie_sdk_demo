@@ -64,7 +64,6 @@ int get_channel_id(const pcie_image_data_t *msg)
     return ch_id;
 }
 
-
 void callback_image_data(void *p)
 {
     pcie_image_data_t *msg = (pcie_image_data_t *)p;
@@ -128,16 +127,41 @@ int main(int argc, char **argv)
         }
     }
 
-    int rc;
-    const char *image_data_0 = "/image_data/stream";
-    printf("Subscribe to topic %s\n", image_data_0);
-
-    printf("Client [%s] subscribe to topic [%s]\n", topic_image_head_d, topic_image_head_d);
-    rc = alg_sdk_subscribe(image_data_0, callback_image_data);
-    if (rc < 0)
+    if ((argc == 2) && (strcmp(argv[1], "-all") == 0))
     {
-        printf("Subscribe to topic %s Error!\n", image_data_0);
-        // return 0;
+        int rc;
+        const char *image_data_0 = "/image_data/stream";
+        printf("Subscribe to topic %s\n", image_data_0);
+
+        printf("Client [%s] subscribe to topic [%s]\n", topic_image_head_d, topic_image_head_d);
+        rc = alg_sdk_subscribe(image_data_0, callback_image_data);
+        if (rc < 0)
+        {
+            printf("Subscribe to topic %s Error!\n", image_data_0);
+            // return 0;
+        }
+    }
+    else if ((argc == 3) && (strcmp(argv[1], "-c") == 0))
+    {
+        int rc;
+        const char *topic_name = argv[2];
+        printf("subscribe to topic [%s]\n", topic_name);
+
+        /* Check the head of topic name */
+        if (strncmp(topic_name, topic_image_head_d, strlen(topic_image_head_d)) == 0)
+        {
+            rc = alg_sdk_subscribe(topic_name, callback_image_data);
+            if (rc < 0)
+            {
+                printf("Subscribe to topic %s Error!\n", topic_name);
+                // return 0;
+            }
+        }
+        else
+        {
+            printf("Subscribe to topic %s Error!\n", topic_name);
+            exit(0);
+        }
     }
 
     if (alg_sdk_init_client())
@@ -146,7 +170,6 @@ int main(int argc, char **argv)
         exit(0);
     }
     /* Do something here. */
-
     for (int i = 0; i < ALG_SDK_MAX_CHANNEL; i++)
     {
         if (&g_camera_disp_thred[i] != NULL)
