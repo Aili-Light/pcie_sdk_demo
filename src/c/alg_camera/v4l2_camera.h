@@ -36,10 +36,35 @@ SOFTWARE.
 #include <asm/types.h>
 #include <linux/videodev2.h>
 #include <linux/v4l2-subdev.h>
-#include "alg_camera/alg_camera.h"
 
 #define FMT_NUM_PLANES 1
 
+struct buffer
+{
+    void *start;
+    size_t length;
+};
+
+struct v4l2_dev
+{
+    int fd;
+    char *path;
+    const char *name;
+    const char *subdev_path;
+    char out_type[10];
+    enum v4l2_buf_type buf_type;
+    int format;
+    int width;
+    int height;
+    unsigned int req_count;
+    enum v4l2_memory memory_type;
+    struct buffer *buffers;
+    unsigned int sequence;
+    unsigned long int timestamp;
+    int data_len;
+    unsigned char *out_data;
+    unsigned int buf_index;
+};
 
 typedef struct v4l2_capture_args
 {
@@ -58,7 +83,7 @@ void require_buf(struct v4l2_dev *dev);
 void alloc_buf(struct v4l2_dev *dev);
 void queue_buf(struct v4l2_dev *dev);
 void stream_on(struct v4l2_dev *dev);
-void capture_frame(struct v4l2_dev *dev, int skip_frame);
+void capture_frame(struct v4l2_dev *dev);
 void save_picture(const char *filename, unsigned char *file_data, unsigned int len, int is_overwrite);
 void stream_off(struct v4l2_dev *dev);
 void set_fps(struct v4l2_dev *dev, unsigned int fps);

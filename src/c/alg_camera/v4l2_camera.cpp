@@ -22,7 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include "v4l2_camera.h"
-AlgCamera g_camera;
 
 void close_device(struct v4l2_dev *dev)
 {
@@ -285,56 +284,40 @@ void stream_on(struct v4l2_dev *dev)
     return;
 }
 
-void capture_frame(struct v4l2_dev *dev, int skip_frame)
+void capture_frame(struct v4l2_dev *dev)
 {
     struct v4l2_buffer buf;
     struct v4l2_plane planes[FMT_NUM_PLANES];
-    AlgCamera *alg_camera = &g_camera;
-    
-    for (int i = 0; (i <= skip_frame) || (skip_frame == -1); ++i)
+
+    memset(&buf, 0, sizeof(buf));
+    buf.type = dev->buf_type;
+    buf.memory = dev->memory_type;
+
+    if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == dev->buf_type)
     {
-        memset(&buf, 0, sizeof(buf));
-        buf.type = dev->buf_type;
-        buf.memory = dev->memory_type;
-
-        if (V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE == dev->buf_type)
-        {
-            buf.m.planes = planes;
-            buf.length = FMT_NUM_PLANES;
-        }
-
-        if (ioctl(dev->fd, VIDIOC_DQBUF, &buf) == -1)
-        {
-            printf("VIDIOC_DQBUF failed!\n\n");
-            exit_failure(dev);
-        }
-        if (!alg_camera->is_init())
-        {
-            printf("Init V4L2 Camera [%s]\n", dev->path);
-            const char *p_path = &dev->path[11];
-            char c_ch_id[2];
-            strcpy(c_ch_id, p_path);
-            int ch_id = atoi(c_ch_id);
-            alg_camera->init_camera(ch_id, ALG_CAMERA_FLAG_SOURCE_V4L2);
-        }
-
-        dev->out_data = (unsigned char *)dev->buffers[buf.index].start;
-        dev->timestamp = buf.timestamp.tv_sec * 1000000 + buf.timestamp.tv_usec;
-        dev->sequence = buf.sequence;
-        dev->buf_index = buf.index;
-        // printf("image: sequence(frame index) = %d, timestamp = %lu\n", dev->sequence, dev->timestamp);
-        // printf("frame=%d,stamp=%ld,size=%ld\n", buf.sequence, dev->timestamp, dev->buffers[buf.index].length);
-
-        alg_camera->capture_image(dev);
-        alg_camera->img_converter();
-        alg_camera->render_image();
-
-        if (ioctl(dev->fd, VIDIOC_QBUF, &buf) == -1)
-        {
-            printf("VIDIOC_QBUF failed!\n");
-            exit_failure(dev);
-        }
+        buf.m.planes = planes;
+        buf.length = FMT_NUM_PLANES;
     }
+
+    if (ioctl(dev->fd, VIDIOC_DQBUF, &buf) == -1)
+    {
+        printf("VIDIOC_DQBUF failed!\n\n");
+        exit_failure(dev);
+    }
+
+    dev->out_data = (unsigned char *)dev->buffers[buf.index].start;
+    dev->timestamp = buf.timestamp.tv_sec * 1000000 + buf.timestamp.tv_usec;
+    dev->sequence = buf.sequence;
+    dev->buf_index = buf.index;
+    // printf("image: sequence(frame index) = %d, timestamp = %lu\n", dev->sequence, dev->timestamp);
+    // printf("frame=%d,stamp=%ld,size=%ld\n", buf.sequence, dev->timestamp, dev->buffers[buf.index].length);
+
+    if (ioctl(dev->fd, VIDIOC_QBUF, &buf) == -1)
+    {
+        printf("VIDIOC_QBUF failed!\n");
+        exit_failure(dev);
+    }
+
     return;
 }
 

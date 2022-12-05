@@ -23,41 +23,13 @@ SOFTWARE.
 */
 #ifndef __ALG_CAMERA_H__
 #define __ALG_CAMERA_H__
-#include <linux/videodev2.h>
-#include <linux/v4l2-subdev.h>
 #include "gl_display/glDisplay.h"
 #include "jetson-utils/RingBuffer.h"
 #include "alg_common/basic_types.h"
+#include "alg_camera/v4l2_camera.h"
 
 #define ALG_CAMERA_FLAG_SOURCE_PCIE 0
 #define ALG_CAMERA_FLAG_SOURCE_V4L2 1
-
-struct buffer
-{
-    void *start;
-    size_t length;
-};
-
-struct v4l2_dev
-{
-    int fd;
-    char *path;
-    const char *name;
-    const char *subdev_path;
-    char out_type[10];
-    enum v4l2_buf_type buf_type;
-    int format;
-    int width;
-    int height;
-    unsigned int req_count;
-    enum v4l2_memory memory_type;
-    struct buffer *buffers;
-    unsigned int sequence;
-    unsigned long int timestamp;
-    int data_len;
-    unsigned char *out_data;
-    unsigned int buf_index;
-};
 
 class AlgCamera 
 {
