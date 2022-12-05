@@ -609,6 +609,20 @@ public:
 	 * for videoSource streams, or `--output-height=N` for videoOutput streams.
 	 */
 	uint32_t height;	
+
+	/**
+	 * The width of the stream (in pixels).
+	 * This option can be set from the command line using `--input-width=N`
+	 * for videoSource streams, or `--output-width=N` for videoOutput streams.
+	 */
+	uint32_t image_width;
+	
+	/**
+	 * The height of the stream (in pixels).
+	 * This option can be set from the command line using `--input-height=N`
+	 * for videoSource streams, or `--output-height=N` for videoOutput streams.
+	 */
+	uint32_t image_height;	
 	/**
 	 * The framerate of the stream (the default is 30Hz).
 	 * This option can be set from the command line using `--input-rate=N` or `--output-rate=N`
