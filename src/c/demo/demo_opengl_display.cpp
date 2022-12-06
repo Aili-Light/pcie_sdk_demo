@@ -95,6 +95,7 @@ void *camera_display_thread(void *arg)
         pthread_mutex_lock(&mutex);
         camera->img_converter();
         camera->render_image();
+        // camera->save_all_images();
         pthread_mutex_unlock(&mutex);
 
         if (camera->is_closed())

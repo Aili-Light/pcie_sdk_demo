@@ -112,6 +112,9 @@ private:
      */
     int flag_src;
 
+    /* flag is saving image */
+    bool b_saving_image;
+
     /* Image Frame Index */
     uint32_t frame_index;
 

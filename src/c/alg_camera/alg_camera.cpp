@@ -103,6 +103,7 @@ int AlgCamera::init_camera(int _ch_id, int flag)
     this->ch_id = _ch_id;
     this->flag_src = flag;
     this->frame_count = 0;
+    this->b_saving_image = false;
     return 0;
 }
 
@@ -399,9 +400,11 @@ int AlgCamera::render_image()
             this->display->SetKeyPressFlag();
             char key_str[32];
             this->display->GetKeyPressStr(key_str);
+            printf("key=%d\n", key_str[0]);
 
             if (key_str[0] == 32)
             {
+                /* key=SPACE*/
                 char filename_bmp[128] = {};
                 sprintf(filename_bmp, "data/image_%02d_%08d.bmp", ch_id, frame_index);
                 char filename_raw[128] = {};
@@ -409,6 +412,25 @@ int AlgCamera::render_image()
                 save_image_bmp(filename_bmp, next_image);
                 save_image_raw(filename_raw, this->nextYUV, this->img_size);
             }
+            else if (key_str[0] == 115 && this->b_saving_image == false)
+            {
+                /* key=s */
+                this->b_saving_image = true;
+            }
+            else if (key_str[0] == 115 && this->b_saving_image == true)
+            {
+                this->b_saving_image = false;
+            }
+        }
+
+        if (this->b_saving_image == true)
+        {
+            char filename_bmp[128] = {};
+            sprintf(filename_bmp, "data/image_%02d_%08d.bmp", ch_id, frame_index);
+            char filename_raw[128] = {};
+            sprintf(filename_raw, "data/image_%02d_%08d.raw", ch_id, frame_index);
+            save_image_bmp(filename_bmp, next_image);
+            // save_image_raw(filename_raw, this->nextYUV, this->img_size);
         }
         // // update status bar
         char str[256];
