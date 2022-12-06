@@ -21,9 +21,52 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#include <fstream>
 #include "alg_camera.h"
 #include "alg_common/log.h"
 #include "jetson-utils/cuda_impl.h"
+
+// DWORD bfType;//固定为0x4d42;
+//     DWORD bfSize; //文件大小
+//     WORD bfReserved1; //保留字，不考虑
+//     WORD bfReserved2; //保留字，同上
+//     DWORD bfOffBits; //实际位图数据的偏移字节数，即前三个部分长度之和
+// } BITMAPFILEHEADER;
+
+typedef struct
+{
+    // unsigned short	bfType;	// 2B 文件类型,BM,BA,CT,CP,IC,PT
+    unsigned int bfSize;        // 4B 位图文件大小，单位为B
+    unsigned short bfReserved1; // 2B 保留
+    unsigned short bfReserved2; // 2B 保留
+    unsigned int bfOffBits;     // 4B 文件头开始到图像实际数据之间的偏移量，单位为B
+} BmpFileHeader;
+
+typedef struct
+{
+    unsigned int biSize;        // 4B 数据结构所需要的字节大小
+    int biWidth;                // 4B 图像宽度
+    int biHeight;               // 4B 图像高度
+    unsigned short biPlane;     // 2B 颜色平面数
+    unsigned short biBitCount;  // 2B 图像位深度：1，4，8，16，24，32
+    unsigned int biCompression; // 4B 图像数据压缩类型：0(BI_RGB,不压缩),1(BI_RLE8，8比特游程编码),2(BI_RLE4，4比特游程编码),3(BI_BITFIELDS，比特域),4(BI_JPEG),5(BI_PNG)
+    unsigned int biSizeImage;   // 4B 图像大小，用BI_RGB格式时，可设置为0.
+    int biXPelsPerMeter;        // 4B 水平分辨率
+    int biYPelsPerMeter;        // 4B 垂直分辨率
+    unsigned int biClrUsed;     // 4B 颜色索引数
+    unsigned int biClrImport;   // 4B 对图像显示有重要影响的颜色索引数，0表示都重要
+} BmpInfoHeader;
+
+enum BMPImageFormat
+{
+    BMP_IMAGE_BINARY = 0x0001, // 二值图像
+    BMP_IMAGE_GREY = 0x0008,   // 灰度图像
+    BMP_IMAGE_RGB = 0x0018,    // 彩色RGB图像
+    BMP_IMAGE_BGR = 0x0019,    // 彩色BGR图像
+    BMP_IMAGE_RGBA = 0x0020,   // 彩色RGBA图像
+    BMP_IMAGE_BGRA = 0x0021    // 彩色BGRA图像
+};
+
 #define SAFE_DELETE(x) \
     if (x != NULL)     \
     {                  \
@@ -31,10 +74,10 @@ SOFTWARE.
         x = NULL;      \
     }
 
-uint64_t milliseconds (void)
+uint64_t milliseconds(void)
 {
     struct timeval tv;
-    gettimeofday (&tv, NULL);
+    gettimeofday(&tv, NULL);
     return (((uint64_t)tv.tv_sec * 1000) + ((uint64_t)tv.tv_usec / 1000));
 }
 
@@ -292,13 +335,81 @@ int AlgCamera::img_converter()
     return 0;
 }
 
+void AlgCamera::save_image_raw(const char *filename, void *image_ptr, size_t image_size)
+{
+    std::ofstream storage_file(filename, std::ios::out | std::ios::binary);
+    storage_file.write((char *)image_ptr, image_size);
+    storage_file.close();
+}
+
+void AlgCamera::save_image_bmp(const char *filename, void *image_ptr)
+{
+    BmpFileHeader FileHr;
+    std::ofstream storage_file(filename, std::ios::out | std::ios::binary);
+    unsigned short fileType = 0x4D42;
+    storage_file.write((char *)&fileType, sizeof(unsigned short));
+
+    FileHr.bfSize = img_size * 2 + 54;
+    FileHr.bfReserved1 = 0;
+    FileHr.bfReserved2 = 0;
+    FileHr.bfOffBits = 54;
+    storage_file.write((char *)&FileHr, sizeof(BmpFileHeader));
+
+    BmpInfoHeader InfoHr;
+    InfoHr.biSize = 40;
+    InfoHr.biWidth = this->width;
+
+    /* biHeight = -height : Image Not Flip
+     * biHeight = height : Image Flip
+     */
+    InfoHr.biHeight = -this->height;
+    InfoHr.biPlane = 1;
+    InfoHr.biBitCount = BMP_IMAGE_RGBA / 2 * 2 > 0 ? BMP_IMAGE_RGBA / 2 * 2 : 1;
+    InfoHr.biCompression = 0;
+
+    /* Image Format : RGBA : width*4
+     * Image Format : RGB : width*3
+     */
+    unsigned short PerLine = this->width * 4;
+    short offset = PerLine % 4;
+    if (offset != 0)
+        PerLine += 4 - offset;
+
+    InfoHr.biSizeImage = PerLine * this->height;
+    InfoHr.biXPelsPerMeter = 0;
+    InfoHr.biYPelsPerMeter = 0;
+    InfoHr.biClrUsed = 0;
+    InfoHr.biClrImport = 0;
+    storage_file.write((char *)&InfoHr, sizeof(BmpInfoHeader));
+    storage_file.write((char *)image_ptr, InfoHr.biSizeImage);
+    storage_file.close();
+}
+
 int AlgCamera::render_image()
 {
     // // update display
     if (this->display != NULL)
     {
-        this->display->RenderOnce(this->next_image(), this->width, this->height, IMAGE_RGBA8, 0, 0, 0);
+        void *next_image = this->next_image();
+        this->display->RenderOnce(next_image, this->width, this->height, IMAGE_RGBA8, 0, 0, 0);
 
+        /* Save Image */
+        if (this->display->GetKeyPressFlag())
+        {
+            this->display->SetKeyPressFlag();
+            char key_str[32];
+            this->display->GetKeyPressStr(key_str);
+
+            if (key_str[0] == 32)
+            {
+                char filename_bmp[128] = {};
+                sprintf(filename_bmp, "data/image_%02d_%08d.bmp", ch_id, frame_index);
+                char filename_raw[128] = {};
+                sprintf(filename_raw, "data/image_%02d_%08d.raw", ch_id, frame_index);
+                save_image_bmp(filename_bmp, next_image);
+                save_image_raw(filename_raw, this->nextYUV, this->img_size);
+            }
+        }
         // // update status bar
         char str[256];
         sprintf(str, "Channel[%02d] (%ux%u) | %.02f FPS | Timestamp: %ld", this->ch_id, this->width, this->height, this->frame_rate, this->timestamp);
@@ -324,7 +435,6 @@ void *AlgCamera::next_image()
     return this->mBufferRGB.Peek(RingBuffer::Read);
 }
 
-
 bool AlgCamera::check_image_size(size_t s1, size_t s2)
 {
     if (s1 == s2)
@@ -335,10 +445,10 @@ bool AlgCamera::check_image_size(size_t s1, size_t s2)
 
 void AlgCamera::frame_rate_monitor(const int frame_index)
 {
-    /* Current frame should be last frame +1, 
+    /* Current frame should be last frame +1,
         otherwise some frames may be lost.
     */
-    if( (frame_index - this->last_frame_idx <= 1) || (this->last_frame_idx == 0) )
+    if ((frame_index - this->last_frame_idx <= 1) || (this->last_frame_idx == 0))
     {
         this->last_frame_idx = frame_index;
     }
@@ -347,11 +457,11 @@ void AlgCamera::frame_rate_monitor(const int frame_index)
         // printf("Frame Monitor : Frame drop ! [Current Frame %d] [Last Frame %d]\n", frame_index, g_f_last[ch_id]);
         this->last_frame_idx = frame_index;
     }
-    
+
     uint64_t t_now = milliseconds();
     this->frame_count++;
     uint64_t delta_t = t_now - last_timesmp;
-    if (delta_t > 1000)  // for 1000 milliseconds
+    if (delta_t > 1000) // for 1000 milliseconds
     {
         last_timesmp = t_now;
         frame_rate = (float)this->frame_count / delta_t * 1000.0f;
@@ -359,4 +469,3 @@ void AlgCamera::frame_rate_monitor(const int frame_index)
         this->frame_count = 0;
     }
 }
-

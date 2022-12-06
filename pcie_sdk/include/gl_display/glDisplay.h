@@ -435,6 +435,9 @@ public:
 	 */
 	inline bool GetKey( uint32_t key ) const 			{ const uint32_t idx = key - KEY_OFFSET; if(idx > sizeof(mKeyStates)) return false; return mKeyStates[idx]; }
 
+	void SetKeyPressFlag() 								{mKeyEvtFlag=!mKeyEvtFlag;}
+	bool GetKeyPressFlag() 								{return mKeyEvtFlag;}
+	void GetKeyPressStr(char* str) 						{memcpy(str, mkeyStr, 32);}
 	///@}
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -679,6 +682,9 @@ protected:
 	int      mMouseDragOrigin[2];
 	bool	    mMouseButtons[16];
 	bool     mKeyStates[1024];
+
+	char     mkeyStr[32];
+	bool     mKeyEvtFlag;
 
 	float*   mNormalizedCUDA;
 	uint32_t mNormalizedWidth;

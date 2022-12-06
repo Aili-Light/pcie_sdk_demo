@@ -73,6 +73,13 @@ public:
     */
     void frame_rate_monitor(const int frame_index);
 
+    /* Save Image
+     * save_image_bmp : Save Image in bmp (BGRA Format)
+     * save_image_raw : Save Image in raw (YUV)
+    */
+    void save_image_bmp(const char *filename, void* image_ptr);
+    void save_image_raw(const char *filename, void *image_ptr, size_t image_size);
+
 private:
 
     /* camera initialized */
