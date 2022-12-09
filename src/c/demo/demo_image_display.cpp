@@ -84,20 +84,20 @@ void array_2_mat(uchar* data, int w, int h, int data_type, int ch_id, uint32_t f
     }
     /* Image Data Write */
     char c = cv::waitKey(1);
-    if(c == 32)
-    {
-        /* save raw data */
-        char filename_2[128] = {};
-        sprintf(filename_2, "data/image_%02d_%08d.raw", ch_id, frame_index);
-        ofstream storage_file(filename_2,ios::out | ios::binary);
-        storage_file.write((char *)data, data_size*2);
-        storage_file.close();
+    // if(c == 32)
+    // {
+    //     /* save raw data */
+    //     char filename_2[128] = {};
+    //     sprintf(filename_2, "data/image_%02d_%08d.raw", ch_id, frame_index);
+    //     ofstream storage_file(filename_2,ios::out | ios::binary);
+    //     storage_file.write((char *)data, data_size*2);
+    //     storage_file.close();
 
-        /* save image */
-        char filename[128] = {};
-        sprintf(filename, "data/image_%02d_%08d.bmp", ch_id, frame_index);
-        cv::imwrite(filename, img_rgb8);
-    }
+    //     /* save image */
+    //     char filename[128] = {};
+    //     sprintf(filename, "data/image_%02d_%08d.bmp", ch_id, frame_index);
+    //     cv::imwrite(filename, img_rgb8);
+    // }
 }
 
 void frame_rate_monitor(const int ch_id, const int frame_index)
@@ -140,8 +140,8 @@ void callback_image_data(void *p)
 {
     pcie_image_data_t* msg = (pcie_image_data_t*)p;
     /* Debug message */
-//     printf("[frame = %d], [len %ld], [byte_0 = %d], [byte_end = %d]\n",
-//            msg->image_info_meta.frame_index,  msg->image_info_meta.img_size, ((uint8_t*)msg->payload)[0], ((uint8_t*)msg->payload)[msg->image_info_meta.img_size - 1]);
+    // printf("[frame = %d], [len %ld], [byte_0 = %d], [byte_end = %d]\n",
+    //        msg->image_info_meta.frame_index,  msg->image_info_meta.img_size, ((uint8_t*)msg->payload)[0], ((uint8_t*)msg->payload)[msg->image_info_meta.img_size - 1]);
 
     /* check frame rate (every 1 second) */
     frame_rate_monitor(get_channel_id(msg), msg->image_info_meta.frame_index);
@@ -189,13 +189,18 @@ int main (int argc, char **argv)
     else if ((argc == 2) && (strcmp (argv[1], "-all") == 0))
     {
         int rc;
-        const char* topic_name = "/image_data/stream";
-
-        rc = alg_sdk_subscribe(topic_name, callback_image_data);
-        if (rc < 0)
+        char image_topic_names[ALG_SDK_MAX_CHANNEL][256];
+        for (int i = 0; i < ALG_SDK_MAX_CHANNEL; i++)
         {
-            printf("Subscribe to topic %s Error!\n", topic_name);
-            exit(0);
+            snprintf(image_topic_names[i], 256, "/image_data/stream/%02d", i);
+            printf("Client [%02d] subscribe to topic [%s]\n", i, image_topic_names[i]);
+
+            rc = alg_sdk_subscribe(image_topic_names[i], callback_image_data);
+            if (rc < 0)
+            {
+                printf("Subscribe to topic %s Error!\n", image_topic_names[i]);
+                exit(0);
+            }
         }
 
         if(alg_sdk_init_client())

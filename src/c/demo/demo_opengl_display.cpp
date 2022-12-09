@@ -130,22 +130,25 @@ int main(int argc, char **argv)
     if ((argc == 2) && (strcmp(argv[1], "-all") == 0))
     {
         int rc;
-        const char *image_data_0 = "/image_data/stream";
-        printf("Subscribe to topic %s\n", image_data_0);
-
-        printf("Client [%s] subscribe to topic [%s]\n", topic_image_head_d, topic_image_head_d);
-        rc = alg_sdk_subscribe(image_data_0, callback_image_data);
-        if (rc < 0)
+        char image_topic_names[ALG_SDK_MAX_CHANNEL][256];
+        for (int i = 0; i < ALG_SDK_MAX_CHANNEL; i++)
         {
-            printf("Subscribe to topic %s Error!\n", image_data_0);
-            // return 0;
+            snprintf(image_topic_names[i], 256, "/image_data/stream/%02d", i);
+            printf("Client [%02d] subscribe to topic [%s]\n", i, image_topic_names[i]);
+
+            rc = alg_sdk_subscribe(image_topic_names[i], callback_image_data);
+            if (rc < 0)
+            {
+                printf("Subscribe to topic %s Error!\n", image_topic_names[i]);
+                exit(0);
+            }
         }
     }
     else if ((argc == 3) && (strcmp(argv[1], "-c") == 0))
     {
         int rc;
         const char *topic_name = argv[2];
-        printf("subscribe to topic [%s]\n", topic_name);
+        printf("Client subscribe to topic [%s]\n", topic_name);
 
         /* Check the head of topic name */
         if (strncmp(topic_name, topic_image_head_d, strlen(topic_image_head_d)) == 0)
