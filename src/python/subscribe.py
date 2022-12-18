@@ -1,5 +1,6 @@
 import signal, sys
 import time
+import argparse
 import numpy as np
 import ctypes
 from ctypes import *
@@ -19,7 +20,6 @@ ALG_SDK_MIPI_DATA_TYPE_RAW10 = 0x2B
 ALG_SDK_MIPI_DATA_TYPE_RAW12 = 0x2C
 
 client = algSDKClient()
-topic = b"/image_data/stream"
 
 def array2mat(payload, w, h, data_type, ch_id, frame_index, image_name):
     p_array = np.frombuffer(np.ctypeslib.as_array(payload, shape=((h*w*2, 1, 1))), dtype=np.uint8)
@@ -70,8 +70,20 @@ def CallbackFunc(ptr):
     array2mat(payload, p.contents.image_info_meta.width, p.contents.image_info_meta.height, p.contents.image_info_meta.data_type, get_channel_id(p.contents.common_head.topic_name), p.contents.image_info_meta.frame_index, p.contents.common_head.topic_name)
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description="Subscribe to image data"
+    )
+    parser.add_argument('--topic',
+                        type=str,
+                        help="topic name, example : --topic=/image_data/stream/00",
+                        required=True
+    )
+    args = parser.parse_args()
+    topic = args.topic
+    topic_name = topic.encode('utf-8')
+    
     callback_func = callbackFunc_t(CallbackFunc)
-    client.Subscribe(topic, callback_func)
+    client.Subscribe(topic_name, callback_func)
     ret = client.InitClient()
     if(ret < 0):
         print("Init Client Failed!")
