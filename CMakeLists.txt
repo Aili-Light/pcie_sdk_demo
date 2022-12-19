@@ -30,52 +30,67 @@ if (WITH_ROS)
 endif ()
 
 if (WITH_GSTREAMER)
-    add_definitions(-DWITH_STREAM)
-    include_directories(stream/include)
-    set(GST_INCLUDE_PATH /usr/local/gstreamer-1.0)
-    set(GST_LIBS ${GST_INCLUDE_PATH}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu)
-    include_directories(${GST_INCLUDE_PATH}/include/gstreamer-1.0
-                        ${GST_INCLUDE_PATH}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu/gstreamer-1.0/include
-                        ${GST_INCLUDE_PATH}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu/glib-2.0/include/
+    if (MINGW32)
+        set(GST_INCLUDE_PATH D:/gstreamer/1.0/mingw_x86_64)
+        set(GST_LIBS ${GST_INCLUDE_PATH}/lib)
+        message(STATUS "GST_LIBS is ${GST_LIBS}")
+        include_directories(${GST_INCLUDE_PATH}/include/gstreamer-1.0
+                        ${GST_INCLUDE_PATH}/lib/gstreamer-1.0/include
+                        ${GST_INCLUDE_PATH}/lib/glib-2.0/include/
                         ${GST_INCLUDE_PATH}/include/glib-2.0
-    )
+        )
+        include_directories(stream)
+        file(GLOB project_source_stream stream/stream.cpp stream/render.cpp stream/h264_sei_ntp.cpp stream/h264_sei.cpp stream/h264_stream.cpp stream/h264_nal.cpp stream/gst_utils.cpp)
+        file(GLOB project_source_decode stream/decode.cpp stream/h264_sei_ntp.cpp stream/h264_sei.cpp stream/h264_stream.cpp stream/h264_nal.cpp stream/gst_utils.cpp)
+        set (GSTREAM_LIBS  ${GST_LIBS}/libgstreamer-1.0.dll.a
+                        ${GST_LIBS}/libgstvideo-1.0.dll.a
+                        ${GST_LIBS}/libgstapp-1.0.dll.a
+                        ${GST_LIBS}/libgstwebrtc-1.0.dll.a
+                        ${GST_LIBS}/libgstbase-1.0.dll.a
+                        ${GST_LIBS}/libglib-2.0.dll.a
+                        ${GST_LIBS}/libgobject-2.0.dll.a
+                        ${GST_LIBS}/libgstcodecparsers-1.0.dll.a
+        )
+    else ()
+        add_definitions(-DWITH_STREAM)
+        include_directories(stream/include)
+        set(GST_INCLUDE_PATH /usr/local/gstreamer-1.0)
+        set(GST_LIBS ${GST_INCLUDE_PATH}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu)
+        include_directories(${GST_INCLUDE_PATH}/include/gstreamer-1.0
+                            ${GST_INCLUDE_PATH}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu/gstreamer-1.0/include
+                            ${GST_INCLUDE_PATH}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu/glib-2.0/include/
+                            ${GST_INCLUDE_PATH}/include/glib-2.0
+        )
 
-    set (GSTREAM_LIBS   ${GST_LIBS}/libgstreamer-1.0.so
-                        ${GST_LIBS}/libgstvideo-1.0.so
-                        ${GST_LIBS}/libgstapp-1.0.so
-                        ${GST_LIBS}/libgstwebrtc-1.0.so
-                        ${GST_LIBS}/libgstbase-1.0.so
-                        ${GST_LIBS}/libglib-2.0.so
-                        ${GST_LIBS}/libgobject-2.0.so
-    )
+        set (GSTREAM_LIBS   ${GST_LIBS}/libgstreamer-1.0.so
+                            ${GST_LIBS}/libgstvideo-1.0.so
+                            ${GST_LIBS}/libgstapp-1.0.so
+                            ${GST_LIBS}/libgstwebrtc-1.0.so
+                            ${GST_LIBS}/libgstbase-1.0.so
+                            ${GST_LIBS}/libglib-2.0.so
+                            ${GST_LIBS}/libgobject-2.0.so
+        )
 
-    if (WITH_CUDA)
-        add_definitions(-DWITH_CUDA)
-        set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cuda")
-        find_package(CUDA)
-            message("-- CUDA version: ${CUDA_VERSION}")
+        if (WITH_CUDA)
+            add_definitions(-DWITH_CUDA)
+            set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cuda")
+            find_package(CUDA)
+                message("-- CUDA version: ${CUDA_VERSION}")
 
-        set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -O3)
-    endif()
+            set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -O3)
+        endif()
+    endif ()
 endif ()
 
 if (MINGW32)
     link_directories(${PROJECT_LINK_DIR})
     set(CMAKE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/release/mingw32)
 
-    if (WITH_GSTREAMER)
-        add_executable(${PROJECT_NAME}_init src/c/demo/demo_init.c)
-        target_link_libraries(${PROJECT_NAME}_init
-            ${PROJECT_LINK_DIR}/mingw32/libpcie_sdk_stream.dll
-            pthread
-        )
-    else ()
-        add_executable(${PROJECT_NAME}_init src/c/demo/demo_init.c)
-        target_link_libraries(${PROJECT_NAME}_init
-            ${PROJECT_LINK_DIR}/mingw32/libpcie_sdk.dll
-            pthread
-        )
-    endif ()
+    add_executable(${PROJECT_NAME}_init src/c/demo/demo_init.c)
+    target_link_libraries(${PROJECT_NAME}_init
+        ${PROJECT_LINK_DIR}/mingw32/libpcie_sdk.dll
+        pthread
+    )
 
     add_executable(${PROJECT_NAME}_client src/c/demo/demo_client.c)
     target_link_libraries(${PROJECT_NAME}_client
@@ -88,6 +103,20 @@ if (MINGW32)
         ${PROJECT_LINK_DIR}/mingw32/libpcie_sdk.dll
         pthread
     )
+
+    if (WITH_GSTREAMER)
+        add_executable(${PROJECT_NAME}_gst_camera 
+            src/c/demo/demo_gst_camera.cpp
+            src/c/alg_camera/gst_camera.cpp
+        )
+        target_link_libraries(${PROJECT_NAME}_gst_camera
+        ${PROJECT_LINK_DIR}/mingw32/libpcie_sdk_stream.dll
+            pthread
+        )
+        set_target_properties(${PROJECT_NAME}_gst_camera PROPERTIES LINKER_LANGUAGE CXX)
+        install (TARGETS ${PROJECT_NAME}_gst_camera RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
+    endif ()
+
     if (BUILD_IMAGE_DISP)
         add_executable(${PROJECT_NAME}_image_disp
             src/c/demo/demo_image_display.cpp
