@@ -26,7 +26,9 @@
 #include <stdint.h>
 #include "Mutex.h"
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * Thread-safe circular ring buffer queue
  * @ingroup threads
@@ -115,6 +117,8 @@ protected:
 
 // inline implementations
 // #include "RingBuffer.inl"
-
+#ifdef __cplusplus
+}
+#endif
 #endif
 

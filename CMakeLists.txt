@@ -105,21 +105,12 @@ if (MINGW32)
     install (FILES ${PCIE_SDK_LIB} DESTINATION ${CMAKE_INSTALL_DIR}/bin)
 else()
     set(CMAKE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/release/linux)
-
     set(CMAKE_SKIP_BUILD_RPATH FALSE)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
     set(CMAKE_INSTALL_RPATH "\${ORIGIN}/../lib")
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
-    if (WITH_GSTREAMER)
-        add_executable(${PROJECT_NAME}_init src/c/demo/demo_init.c)
-        target_link_libraries(${PROJECT_NAME}_init
-            ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk_stream.so
-            pthread
-            anl
-            ${GSTREAM_LIBS}
-        )
-    elseif (WITH_ROS)
+    
+    if (WITH_ROS)
         message("-- Build with ROS")
         add_executable(${PROJECT_NAME}_init src/c/demo/demo_init.c)
         add_dependencies(${PROJECT_NAME}_init 
@@ -154,6 +145,22 @@ else()
         pthread
         anl
     )
+
+    if (WITH_GSTREAMER)
+        add_executable(${PROJECT_NAME}_gst_camera 
+                    src/c/demo/demo_gst_camera.cpp
+                    src/c/alg_camera/gst_camera.cpp
+        )
+        target_link_libraries(${PROJECT_NAME}_gst_camera
+            ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk_stream.so
+            pthread
+            anl
+            ${GSTREAM_LIBS}
+        )
+        set_target_properties(${PROJECT_NAME}_gst_camera PROPERTIES LINKER_LANGUAGE CXX)
+        install (TARGETS ${PROJECT_NAME}_gst_camera RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
+    endif ()
+
     if (BUILD_IMAGE_DISP)
         add_executable(${PROJECT_NAME}_image_disp
             src/c/demo/demo_image_display.cpp

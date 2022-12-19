@@ -24,8 +24,9 @@
 #define __MULTITHREAD_MUTEX_H_
 
 #include <pthread.h>
-
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * A lightweight mutual exclusion lock.  It is very fast to check if the mutex is available,
  * lock it, and release it.  However, if the mutex is unavailable when you attempt to
@@ -79,5 +80,7 @@ protected:
 
 //  implementations
 // #include "Mutex.inl"
-
+#ifdef __cplusplus
+}
+#endif
 #endif
