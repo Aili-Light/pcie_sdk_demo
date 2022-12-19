@@ -137,7 +137,7 @@ int GstCamera::capture_image(void *msg)
         memcpy(yuv_img, nextYUV, img_size);
     }
 
-    // frame_rate_monitor(frame_index);
+    frame_rate_monitor(frame_index);
     return 0;
 }
 
