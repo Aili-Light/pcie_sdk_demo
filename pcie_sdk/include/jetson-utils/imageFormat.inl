@@ -23,7 +23,13 @@
 #ifndef __IMAGE_FORMAT_INLINE_H_
 #define __IMAGE_FORMAT_INLINE_H_
 
+#if defined(MSVC)
+#include <string>
+#define strcasecmp stricmp
+#define strncasecmp strnicmp
+#else
 #include <strings.h>
+#endif
 #include <type_traits>
 // #include "imageFormat.h"
 

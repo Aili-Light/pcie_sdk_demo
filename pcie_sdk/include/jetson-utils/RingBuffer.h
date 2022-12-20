@@ -24,16 +24,30 @@
 #define __MULTITHREAD_RINGBUFFER_H_
 
 #include <stdint.h>
+#if not defined(MSVC)
 #include "Mutex.h"
-
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
+#if defined(MINGW32) && defined(BUILD_EXPORT)
+    #ifdef ALG_SDK_EXPORT
+        #define ALG_SDK_API __declspec(dllexport)
+    #else
+        #define ALG_SDK_API __declspec(dllimport)
+    #endif // ALG_SDK_EXPORT
+#else
+    #define ALG_SDK_API extern
+#endif // MINGW32
 /**
  * Thread-safe circular ring buffer queue
  * @ingroup threads
  */
+#if defined(MSVC)
+class ALG_SDK_API RingBuffer
+#else
 class RingBuffer
+#endif
 {
 public:
 	/**

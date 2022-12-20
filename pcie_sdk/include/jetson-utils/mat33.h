@@ -24,7 +24,11 @@
 #define __MATRIX_33_H_
 
 #include <stdio.h>
+#if defined(MSVC)
+#include <windows.h>
+#else
 #include <unistd.h>
+#endif
 #include <math.h>
 
 // #include "logging.h"

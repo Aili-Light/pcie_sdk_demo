@@ -26,10 +26,50 @@ SOFTWARE.
 #include "stdint.h"
 #include "jetson-utils/imageFormat.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+#if defined(MINGW32) && defined(BUILD_EXPORT)
+    #ifdef ALG_SDK_EXPORT
+        #define ALG_SDK_API __declspec(dllexport)
+    #else
+        #define ALG_SDK_API __declspec(dllimport)
+    #endif // ALG_SDK_EXPORT
+#else
+    #define ALG_SDK_API extern
+#endif // MINGW32
+
 /* Memory Copy From CPU space (src) to GPU space (dst) */
-void cuda_memcpy_h2d(void* dst, void* src, size_t size);
+ALG_SDK_API void cuda_memcpy_h2d(void* dst, void* src, size_t size);
 
-/* Color Convert from YUV to RGBA by CUDA */
-bool cuda_cvtColor_RGBA(void* img_src, imageFormat src_format, void* img_rgba, int width, int height);
+/* Color Convert from YUV to RGBA by CUDA 
+* * img_src must point to image in GPU memory
+*/
+ALG_SDK_API bool cuda_cvtColor_RGBA(void* img_src, imageFormat src_format, void* img_rgba, int width, int height);
 
+/* Allocate CUDA Memory */
+ALG_SDK_API bool cuda_alloc_map(void** ptr, size_t size );
+
+/* Color Convert from YUV to I420 by CUDA 
+* img_src must point to image in GPU memory
+*/
+ALG_SDK_API bool cuda_cvtColor_I420(void* img_src, imageFormat src_format, void* img_rgba, int width, int height);
+
+/* CUDA Device Sync */
+ALG_SDK_API void cuda_sync_device();
+
+/* Free CUDA Host 
+* ptr must point to GPU memory
+*/
+ALG_SDK_API void cuda_free_host(void *ptr);
+
+/* CUDA Malloc */
+ALG_SDK_API bool cuda_malloc(void **p, size_t s);
+
+/* CUDA Malloc */
+ALG_SDK_API void cuda_free(void *ptr);
+
+#ifdef __cplusplus
+}
+#endif
 #endif
