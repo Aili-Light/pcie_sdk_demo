@@ -161,7 +161,7 @@ int main(int argc, char **argv)
         if (strcmp(argv[1], "display") == 0)
         {
             strcpy(&appsrc_parse[0][0], "protocol=display");
-            strcpy(&appsrc_parse[1][0], "codec_type=h264");
+            strcpy(&appsrc_parse[1][0], "codec_type=raw");
             strcpy(&appsrc_parse[2][0], "have_sei=0");
         }
         else if (strcmp(argv[1], "file") == 0)
