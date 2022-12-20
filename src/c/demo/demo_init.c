@@ -25,8 +25,8 @@ int main (int argc, char **argv)
     if ((argc == 2) && (strcmp (argv[1], "-s") == 0))
     {
         int rc;
-        int frq = 1000;
-        rc = alg_sdk_init(frq);
+        char *appsrc[] = {"--publish"};
+        rc = alg_sdk_init_v2(1, &appsrc[0]);
         if(rc < 0)
         {
             printf("Init SDK Failed\n");

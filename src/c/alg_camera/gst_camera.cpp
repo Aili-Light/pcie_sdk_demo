@@ -79,7 +79,7 @@ int GstCamera::start_stream()
     // confirm the stream is open
     if (!gst_camera->mStreaming)
     {
-        alg_sdk_log(LOG_VERBOSE, "-----------------Open streamer------------------------\n");
+        printf( "-----------------Open streamer------------------------\n");
         ret = alg_sdk_open_streamer(gst_camera);
         if (ret == false)
         {
@@ -95,7 +95,7 @@ int GstCamera::close_camera()
 {
     if (gst_camera->mStreaming)
     {
-        alg_sdk_log(LOG_VERBOSE, "-----------------Close Camera------------------------\n");
+        printf( "-----------------Close Camera------------------------\n");
         /* Close Camera */
         alg_sdk_close_streamer(gst_camera);
     }
