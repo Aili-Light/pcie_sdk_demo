@@ -43,7 +43,7 @@ extern "C" {
  * Thread-safe circular ring buffer queue
  * @ingroup threads
  */
-#if defined(MSVC)
+#if defined(MINGW32)
 class ALG_SDK_API RingBuffer
 #else
 class RingBuffer
