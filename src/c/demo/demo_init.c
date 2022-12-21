@@ -37,28 +37,9 @@ int main (int argc, char **argv)
     }
     else if ((argc == 2) && (strcmp (argv[1], "-v") == 0))
     {
-#if defined (WITH_STREAM)
         int rc;
-        char *appsrc[] = {"--stream", "protocol=v4l2", "v4l2_device=/dev/video0", "codec_type=raw"};
-        rc = alg_sdk_init_v2(4, &appsrc[0]);
-        if(rc < 0)
-        {
-            printf("Init SDK Failed\n");
-            exit(0);
-        }
-        
-        alg_sdk_spin_on();
-#else
-        printf("Please add option -DWITH_GSTREAM=ON for cmake!\n");
-        exit(0);
-#endif
-    }
-    else if ((argc == 2) && (strcmp (argv[1], "-r") == 0))
-    {
-#if defined (WITH_STREAM) && defined (WITH_CUDA)
-        int rc;
-        char *appsrc[] = {"--stream", "protocol=record", "codec_type=h265", "file_location=."};
-        rc = alg_sdk_init_v2(4, &appsrc[0]);
+        char *appsrc[] = {"--v4l2loop"};
+        rc = alg_sdk_init_v2(1, &appsrc[0]);
         if(rc < 0)
         {
             printf("Init SDK Failed\n");
@@ -66,46 +47,7 @@ int main (int argc, char **argv)
         }
 
         alg_sdk_spin_on();
-#else
-        printf("Please add option -DWITH_GSTREAM=ON and -DWITH_CUDA=ON for cmake!\n");
-        exit(0);
-#endif
-    }
-    else if ((argc == 2) && (strcmp (argv[1], "-d") == 0))
-    {
-#if defined (WITH_STREAM) && defined (WITH_CUDA)
-        int rc;
-        char *appsrc[] = {"--stream", "protocol=display", "codec_type=raw"};
-        rc = alg_sdk_init_v2(3, &appsrc[0]);
-        if(rc < 0)
-        {
-            printf("Init SDK Failed\n");
-            exit(0);
-        }
 
-        alg_sdk_spin_on();
-#else
-        printf("Please add option -DWITH_GSTREAM=ON and -DWITH_CUDA=ON for cmake!\n");
-        exit(0);
-#endif
-    }
-    else if ((argc == 2) && (strcmp (argv[1], "-w") == 0))
-    {
-#if defined (WITH_STREAM) && defined (WITH_CUDA)
-        int rc;
-        char *appsrc[] = {"--stream", "protocol=rtmp", "rtmp_addr=rtmp://127.0.0.1:1935/live/", "codec_type=h264"};
-        rc = alg_sdk_init_v2(4, &appsrc[0]);
-        if(rc < 0)
-        {
-            printf("Init SDK Failed\n");
-            exit(0);
-        }
-
-        alg_sdk_spin_on();
-#else
-        printf("Please add option -DWITH_GSTREAM=ON and -DWITH_CUDA=ON for cmake!\n");
-        exit(0);
-#endif
     }
     else
     {

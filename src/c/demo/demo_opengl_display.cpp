@@ -10,12 +10,6 @@
 #include "alg_camera/alg_camera.h"
 
 #define ALG_SDK_IMAGE_DATA_BUFF_LEN 8
-#ifndef __MINGW32__
-const char *serv_url = "ipc:///tmp/test_pubsub.ipc";
-#else
-const char *serv_url = "tcp://127.0.0.1:5566";
-#endif
-const char *svcs_url = "tcp://127.0.0.1:5555";
 
 const char topic_image_head_d[ALG_SDK_HEAD_COMMON_TOPIC_NAME_LEN] = {ALG_SDK_TOPIC_NAME_IMAGE_DATA};
 

@@ -39,34 +39,53 @@ extern "C" {
     #define ALG_SDK_API extern
 #endif // MINGW32
 
-/* Memory Copy From CPU space (src) to GPU space (dst) */
+/* Memory Copy From CPU space (Host) to GPU space (Device) 
+* @args `src` : pointer to buffer in CPU space
+* @args `dst` : pointer to buffer in GPU space
+*/
 ALG_SDK_API void cuda_memcpy_h2d(void* dst, void* src, size_t size);
 
 /* Color Convert from YUV to RGBA by CUDA 
-* * img_src must point to image in GPU memory
+* img_src pointer to YUV-format-image in GPU memory
+* input image size = width*height*2
+* output image size = width*height*4
+* @return `false` : convert failed
+* @return `true` : convert successed 
 */
 ALG_SDK_API bool cuda_cvtColor_RGBA(void* img_src, imageFormat src_format, void* img_rgba, int width, int height);
 
-/* Allocate CUDA Memory */
-ALG_SDK_API bool cuda_alloc_map(void** ptr, size_t size );
-
 /* Color Convert from YUV to I420 by CUDA 
-* img_src must point to image in GPU memory
+* img_src pointer to image in GPU memory
+* img_src pointer to YUV-format-image in GPU memory
+* input image size = width*height*2
+* output image size = width*height*3
+* @return `false` : convert failed
+* @return `true` : convert successed 
 */
 ALG_SDK_API bool cuda_cvtColor_I420(void* img_src, imageFormat src_format, void* img_rgba, int width, int height);
+
+/* Allocate CUDA Memory 
+* @return `true` if the allocation succeeded, `false` otherwise.
+*/
+ALG_SDK_API bool cuda_alloc_map(void** ptr, size_t size );
+
+/* CUDA Malloc 
+/* Allocate CUDA Memory 
+* @return `true` if the allocation FAILED, `false` otherwise.
+*/
+ALG_SDK_API bool cuda_malloc(void **p, size_t s);
 
 /* CUDA Device Sync */
 ALG_SDK_API void cuda_sync_device();
 
-/* Free CUDA Host 
-* ptr must point to GPU memory
+/* CUDA Free page-locked memory 
+* @args `ptr` pointer to GPU memory
 */
 ALG_SDK_API void cuda_free_host(void *ptr);
 
-/* CUDA Malloc */
-ALG_SDK_API bool cuda_malloc(void **p, size_t s);
-
-/* CUDA Malloc */
+/* CUDA Free memory on the device
+* @args `ptr` pointer to GPU memory
+*/
 ALG_SDK_API void cuda_free(void *ptr);
 
 #ifdef __cplusplus
