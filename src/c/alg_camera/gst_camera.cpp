@@ -23,6 +23,9 @@ SOFTWARE.
 */
 #include "gst_camera.h"
 #include "alg_common/log.h"
+#if defined (WITH_CUDA)
+#include "jetson-utils/cuda_impl.h"
+#endif
 alg_sdk_gst_stream_t gst_streamer[ALG_SDK_MAX_CHANNEL];
 
 uint64_t milliseconds(void)
@@ -134,7 +137,11 @@ int GstCamera::capture_image(void *msg)
     void *yuv_img = this->mBufferYUV.Next(RingBuffer::Write);
     if (yuv_img != NULL)
     {
+#if defined (WITH_CUDA)
+        cuda_memcpy_h2d(yuv_img, nextYUV, img_size);
+#else
         memcpy(yuv_img, nextYUV, img_size);
+#endif
     }
 
     frame_rate_monitor(frame_index);

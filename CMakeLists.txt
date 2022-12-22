@@ -53,6 +53,7 @@ if (WITH_GSTREAMER)
         )
         if (WITH_CUDA)
             add_definitions(-DWITH_CUDA)
+            include_directories(${CUDA_INCLUDE_DIRS})
             set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cuda")
             find_package(CUDA)
                 message("-- CUDA version: ${CUDA_VERSION}")
@@ -113,12 +114,16 @@ if (MINGW32)
     )
 
     if (WITH_GSTREAMER)
+        if (WITH_CUDA)
+            include_directories(${CUDA_INCLUDE_DIRS})
+        endif()
         add_executable(${PROJECT_NAME}_gst_camera 
             src/c/demo/demo_gst_camera.cpp
             src/c/alg_camera/gst_camera.cpp
         )
         target_link_libraries(${PROJECT_NAME}_gst_camera
-        ${PROJECT_LINK_DIR}/mingw32/libpcie_sdk_stream.dll
+            ${PROJECT_LINK_DIR}/mingw32/libpcie_sdk_stream.dll
+            ${PROJECT_LINK_DIR}/mingw32/libpcie_sdk_cuda.dll
             pthread
         )
         set_target_properties(${PROJECT_NAME}_gst_camera PROPERTIES LINKER_LANGUAGE CXX)
