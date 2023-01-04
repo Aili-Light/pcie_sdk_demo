@@ -143,11 +143,12 @@ int main(int argc, char **argv)
         }
     }
 
-    char appsrc_parse[3][1024];
-    char *appsrc[3];
+    char appsrc_parse[4][1024];
+    char *appsrc[4];
     appsrc[0] = &appsrc_parse[0][0];
     appsrc[1] = &appsrc_parse[1][0];
     appsrc[2] = &appsrc_parse[2][0];
+    appsrc[3] = &appsrc_parse[3][0];
 
     if (argc > 1)
     {
@@ -182,12 +183,17 @@ int main(int argc, char **argv)
         exit(0);
     }
 
-    if ((argc == 3) && (strcmp(argv[2], "-all") == 0))
+    if ((argc > 2) && (strcmp(argv[2], "-all") == 0))
     {
+        if (argc > 3)
+        {
+            strcpy(&appsrc_parse[3][0], argv[3]);
+        }
+
         char image_topic_names[ALG_SDK_MAX_CHANNEL][256];
         for (int i = 0; i < ALG_SDK_MAX_CHANNEL; i++)
         {
-            rc = g_camera[i].init_camera(3, &appsrc[0], i);
+            rc = g_camera[i].init_camera(4, &appsrc[0], i);
             if (rc)
             {
                 printf("Setup Gst Camera Error!\n");
@@ -205,9 +211,8 @@ int main(int argc, char **argv)
             }
         }
     }
-    else if ((argc == 4) && (strcmp(argv[2], "-c") == 0))
+    else if ((argc > 3) && (strcmp(argv[2], "-c") == 0))
     {
-        printf("*********************\n");
         const char *topic_name = argv[3];
         printf("Client subscribe to topic [%s]\n", topic_name);
         const char *ptr_topic = (const char*)(topic_name+19);
@@ -215,7 +220,12 @@ int main(int argc, char **argv)
         strcpy(c_ch_id, ptr_topic);
         int ch_id = atoi(c_ch_id);
 
-        rc = g_camera[ch_id].init_camera(3, &appsrc[0], ch_id);
+        if (argc > 4)
+        {
+            strcpy(&appsrc_parse[3][0], argv[4]);
+        }
+
+        rc = g_camera[ch_id].init_camera(4, &appsrc[0], ch_id);
         /* Check the head of topic name */
         if (strncmp(topic_name, topic_image_head_d, strlen(topic_image_head_d)) == 0)
         {
