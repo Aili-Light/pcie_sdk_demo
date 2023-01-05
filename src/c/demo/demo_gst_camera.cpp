@@ -22,6 +22,7 @@ uint64_t g_tlast = 0;
 bool g_signal_recieved = false;
 bool g_send_eos = false;
 bool b_streaming[ALG_SDK_MAX_CHANNEL];
+uint32_t g_thread_num=0;
 
 typedef struct camera_disp_args
 {
@@ -42,13 +43,13 @@ void int_handler(int sig)
     /* Waiting for EOS finish */
     sleep(2);
 
-    for (int i = 0; i < ALG_SDK_MAX_CHANNEL; i++)
+    for (int i = 0; i < g_thread_num; i++)
     {
         g_camera[i].camera_end();
     }
 
     pthread_mutex_destroy(&mutex);
-    for (int i = 0; i < ALG_SDK_MAX_CHANNEL; i++)
+    for (int i = 0; i < g_thread_num; i++)
     {
         sem_destroy(&full[i]);
     }
@@ -113,7 +114,7 @@ int main(int argc, char **argv)
 {
     signal(SIGINT, int_handler);
 
-    printf("Start GStreamer\n");
+    printf("********Start GST Camera********\n");
     // initialize GStreamer libraries
     if (!alg_sdk_stream_gstreamer_init())
     {
@@ -123,25 +124,9 @@ int main(int argc, char **argv)
 
     /* Create thread */
     int rc;
-
-    for (int i = 0; i < ALG_SDK_MAX_CHANNEL; i++)
-    {
-        camera_disp_args_t arg = {(void *)(GstCamera *)&g_camera[i], (void *)(intptr_t)i};
-        g_camera_args[i] = arg;
-    }
-
-    memset(g_camera_disp_thred, 0, sizeof(g_camera_disp_thred));
+    int thred_n=0;
     pthread_mutex_init(&mutex, NULL);
-    for (int i = 0; i < ALG_SDK_MAX_CHANNEL; i++)
-    {
-        sem_init(&full[i], 0, 0);
-        rc = pthread_create(&g_camera_disp_thred[i], NULL, camera_display_thread, (void *)(&g_camera_args[i]));
-        if (rc < 0)
-        {
-            printf("Server Thread Create Error: %s\n", strerror(rc));
-            exit(0);
-        }
-    }
+    memset(g_camera_disp_thred, 0, sizeof(g_camera_disp_thred));
 
     char appsrc_parse[4][1024];
     char *appsrc[4];
@@ -189,10 +174,15 @@ int main(int argc, char **argv)
         {
             strcpy(&appsrc_parse[3][0], argv[3]);
         }
-
+        
         char image_topic_names[ALG_SDK_MAX_CHANNEL][256];
         for (int i = 0; i < ALG_SDK_MAX_CHANNEL; i++)
         {
+            camera_disp_args_t arg = {(void *)(GstCamera *)&g_camera[i], (void *)(intptr_t)i};
+            g_camera_args[thred_n] = arg;
+            sem_init(&full[i], 0, 0);
+            thred_n++;
+
             rc = g_camera[i].init_camera(4, &appsrc[0], i);
             if (rc)
             {
@@ -225,6 +215,11 @@ int main(int argc, char **argv)
             strcpy(&appsrc_parse[3][0], argv[4]);
         }
 
+        camera_disp_args_t arg = {(void *)(GstCamera *)&g_camera[ch_id], (void *)(intptr_t)ch_id};
+        g_camera_args[0] = arg;
+        sem_init(&full[ch_id], 0, 0);
+        thred_n=1;
+        
         rc = g_camera[ch_id].init_camera(4, &appsrc[0], ch_id);
         /* Check the head of topic name */
         if (strncmp(topic_name, topic_image_head_d, strlen(topic_image_head_d)) == 0)
@@ -243,16 +238,27 @@ int main(int argc, char **argv)
         }
     }
 
-
+    /* Init Image Receive Client */
     if (alg_sdk_init_client())
     {
         printf("Init Client Error!\n");
         exit(0);
     }
 
-    /* Do something here. */
+    /* Create Display Thread */
+    g_thread_num = thred_n;
+    for (int i = 0; i < g_thread_num; i++)
+    {
+        rc = pthread_create(&g_camera_disp_thred[i], NULL, camera_display_thread, (void *)(&g_camera_args[i]));
+        if (rc < 0)
+        {
+            printf("Server Thread Create Error: %s\n", strerror(rc));
+            exit(0);
+        }
+    }
 
-    for (int i = 0; i < ALG_SDK_MAX_CHANNEL; i++)
+    /* Code Do Not Run This After. */
+    for (int i = 0; i < g_thread_num; i++)
     {
         if (&g_camera_disp_thred[i] != NULL)
         {
@@ -261,7 +267,8 @@ int main(int argc, char **argv)
     }
     alg_sdk_client_spin_on();
 
-    printf("Stop Client.");
+    /* Never Reach Here. */
+    printf("*********Stop GST Camera***********");
 
     return 0;
 }
