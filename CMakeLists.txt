@@ -4,17 +4,13 @@ project(pcie_sdk_demo)
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
     add_definitions(-DWITH_OPENMP)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
 message(STATUS "Processor name is ${CMAKE_SYSTEM_PROCESSOR}")
 include_directories(${CMAKE_SOURCE_DIR}/pcie_sdk/include ${CMAKE_SOURCE_DIR}/src/c)
-
 set(PROJECT_LINK_DIR ${CMAKE_SOURCE_DIR}/pcie_sdk/lib)
-
-if (BUILD_IMAGE_DISP)
-    find_package(OpenCV REQUIRED)
-    include_directories(${OpenCV_INCLUDE_DIRS})
-endif ()
 
 if (WITH_ROS)
     add_definitions(-DWITH_ROS)
@@ -40,8 +36,6 @@ if (WITH_GSTREAMER)
                         ${GST_INCLUDE_PATH}/include/glib-2.0
         )
         include_directories(stream)
-        file(GLOB project_source_stream stream/stream.cpp stream/render.cpp stream/h264_sei_ntp.cpp stream/h264_sei.cpp stream/h264_stream.cpp stream/h264_nal.cpp stream/gst_utils.cpp)
-        file(GLOB project_source_decode stream/decode.cpp stream/h264_sei_ntp.cpp stream/h264_sei.cpp stream/h264_stream.cpp stream/h264_nal.cpp stream/gst_utils.cpp)
         set (GSTREAM_LIBS  ${GST_LIBS}/libgstreamer-1.0.dll.a
                         ${GST_LIBS}/libgstvideo-1.0.dll.a
                         ${GST_LIBS}/libgstapp-1.0.dll.a
@@ -131,6 +125,8 @@ if (MINGW32)
     endif ()
 
     if (BUILD_IMAGE_DISP)
+        find_package(OpenCV REQUIRED)
+        include_directories(${OpenCV_INCLUDE_DIRS})
         add_executable(${PROJECT_NAME}_image_disp
             src/c/demo/demo_image_display.cpp
             src/c/alg_cvt/alg_cvtColor.cpp
@@ -144,9 +140,7 @@ if (MINGW32)
         install (TARGETS ${PROJECT_NAME}_image_disp RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
     endif ()
     FILE(GLOB PCIE_SDK_LIB "${CMAKE_SOURCE_DIR}/pcie_sdk/lib/mingw32/libpcie_sdk*")
-    # FILE(GLOB PCIE_SDK_CUDA_LIB "${CMAKE_SOURCE_DIR}/pcie_sdk/lib/mingw32/pcie_sdk*")
     install (FILES ${PCIE_SDK_LIB} DESTINATION ${CMAKE_INSTALL_DIR}/bin)
-    # install (FILES ${PCIE_SDK_CUDA_LIB} DESTINATION ${CMAKE_INSTALL_DIR}/bin)
 else()
     set(CMAKE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/release/linux)
     set(CMAKE_SKIP_BUILD_RPATH FALSE)
@@ -206,6 +200,8 @@ else()
     endif ()
 
     if (BUILD_IMAGE_DISP)
+        find_package(OpenCV REQUIRED)
+        include_directories(${OpenCV_INCLUDE_DIRS})
         add_executable(${PROJECT_NAME}_image_disp
             src/c/demo/demo_image_display.cpp
             src/c/alg_cvt/alg_cvtColor.cpp
@@ -261,8 +257,7 @@ else()
         )
         set_target_properties(${PROJECT_NAME}_v4l2 PROPERTIES LINKER_LANGUAGE CXX)
         install (TARGETS ${PROJECT_NAME}_v4l2 RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
-
-        endif()
+    endif()
 
     FILE(GLOB PCIE_SDK_LIB "${CMAKE_SOURCE_DIR}/pcie_sdk/lib/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk*")
     install (FILES ${PCIE_SDK_LIB} DESTINATION ${CMAKE_INSTALL_DIR}/lib)
