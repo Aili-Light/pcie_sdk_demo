@@ -42,10 +42,10 @@ void int_handler(int sig)
     /* Waiting for EOS finish */
     sleep(2);
 
-    for (int i = 0; i < ALG_SDK_MAX_CHANNEL; i++)
-    {
-        g_camera[i].camera_end();
-    }
+    // for (int i = 0; i < ALG_SDK_MAX_CHANNEL; i++)
+    // {
+    //     g_camera[i].camera_end();
+    // }
 
     pthread_mutex_destroy(&mutex);
     for (int i = 0; i < ALG_SDK_MAX_CHANNEL; i++)

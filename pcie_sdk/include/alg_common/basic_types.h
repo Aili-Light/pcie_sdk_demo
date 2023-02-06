@@ -187,6 +187,7 @@ extern "C"
     enum
     {
         ALG_SDK_MIPI_DATA_TYPE_DEFAULT = 0x00, /* Default data type (2-bytes) */
+        ALG_SDK_MIPI_DATA_TYPE_I420 = 0x02,    /* Type Planar YUV420 */
         ALG_SDK_MIPI_DATA_TYPE_UVY2 = 0x18,    /* Type UYVY (2-bytes) but Y1/Y2 switch */
         ALG_SDK_MIPI_DATA_TYPE_VUY2 = 0x19,    /* Type VYUY (2-bytes) but Y1/Y2 switch */
         ALG_SDK_MIPI_DATA_TYPE_Y2UV = 0x1A,    /* Type YUYV (2-bytes) but Y1/Y2 switch */
