@@ -95,7 +95,7 @@ void array_2_mat(uchar* data, int w, int h, int data_type, int ch_id, uint32_t f
         /* End - PCIE RAW Data Conversion */
         /* Demosaic */
         cv::Mat img_byer = cv::Mat(h, w, CV_16UC1, pdata);
-        cv::convertScaleAbs(img_byer, img_byer, 0.25, 0);
+        cv::convertScaleAbs(img_byer, img_byer, 0.0625, 0);
         cv::Mat img_rgb8;
         cv::cvtColor(img_byer, img_rgb8, cv::COLOR_BayerBG2RGB);
         /* Image Display */
