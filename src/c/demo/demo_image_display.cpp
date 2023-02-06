@@ -82,6 +82,27 @@ void array_2_mat(uchar* data, int w, int h, int data_type, int ch_id, uint32_t f
         cv::imshow(image_name, img_rgb8);
         free(pdata);
     }
+    else if(data_type == ALG_SDK_MIPI_DATA_TYPE_RAW12)
+    {
+        /* raw to rgb conversion */
+        /* PCIE RAW Data Conversion */
+        ushort* pdata = (ushort*)malloc(sizeof(ushort) * data_size);
+        for(int i = 0; i < int(data_size / 2); i++)
+        {
+            pdata[2*i] = (((((ushort)data[3*i]) << 4) & 0x0FF0) | (ushort)((data[3*i+2] >> 0) & 0x000F));
+            pdata[2*i+1] = (((((ushort)data[3*i+1]) << 4) & 0x0FF0) | (ushort)((data[3*i+2] >> 4) & 0x000F));
+        }
+        /* End - PCIE RAW Data Conversion */
+        /* Demosaic */
+        cv::Mat img_byer = cv::Mat(h, w, CV_16UC1, pdata);
+        cv::convertScaleAbs(img_byer, img_byer, 0.25, 0);
+        cv::Mat img_rgb8;
+        cv::cvtColor(img_byer, img_rgb8, cv::COLOR_BayerBG2RGB);
+        /* Image Display */
+//        cv::resize(img_rgb8, img_rgb8, cv::Size(1280,720));
+        cv::imshow(image_name, img_rgb8);
+        free(pdata);
+    }
     /* Image Data Write */
     char c = cv::waitKey(1);
     // if(c == 32)
