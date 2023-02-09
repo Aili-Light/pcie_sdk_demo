@@ -218,7 +218,7 @@ int AlgCamera::capture_image(void *msg)
             printf("Image Size NOT Match! [Img_Size:%ld] [YUV_Size:%ld]\n", this->img_size, yuv_size);
             return 1;
         }
-        if (!this->mBufferYUV.Alloc(5, yuv_size, RingBuffer::ZeroCopy))
+        if (!this->mBufferYUV.Alloc(2, yuv_size, RingBuffer::ZeroCopy))
         {
             printf("1****CUDA YUV2RGB -- failed to allocate buffers (%zu bytes each)\n", yuv_size);
             // enc_success = false;
@@ -259,6 +259,7 @@ int AlgCamera::cuda_yuv_2_rgb_converter(void *src, void *dst, int width, int hei
         return 1;
     }
 
+    printf("Input Video Format = %d\n", video_format);
     imageFormat cuda_image_format;
     switch (video_format)
     {

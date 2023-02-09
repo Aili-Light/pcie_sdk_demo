@@ -128,7 +128,7 @@ int GstCamera::capture_image(void *msg)
         this->img_size = this->pcie_image->image_info_meta.img_size;
     }
 
-    if (!this->mBufferYUV.Alloc(5, img_size, RingBuffer::ZeroCopy))
+    if (!this->mBufferYUV.Alloc(2, img_size, RingBuffer::ZeroCopy))
     {
         printf("1****GstCamera -- failed to allocate buffers (%zu bytes each)\n", img_size);
         return 1;
