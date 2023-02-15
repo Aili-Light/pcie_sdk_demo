@@ -94,6 +94,11 @@ ALG_SDK_API void cuda_free_host(void *ptr);
 */
 ALG_SDK_API void cuda_free(void *ptr);
 
+/* Get number of CUDA devices
+* @args `count` count to CUDA device
+*/
+ALG_SDK_API void cuda_get_device_count(int *count);
+
 #ifdef __cplusplus
 }
 #endif

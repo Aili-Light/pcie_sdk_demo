@@ -390,6 +390,10 @@ void AlgCamera::save_image_bmp(const char *filename, void *image_ptr)
 int AlgCamera::render_image()
 {
     // // update display
+    int cuda_device_count = 0;
+    cuda_get_device_count(&cuda_device_count);
+    printf("CUDA Device count=%d\n", cuda_device_count);
+
     if (this->display != NULL)
     {
         void *next_image = this->next_image();
