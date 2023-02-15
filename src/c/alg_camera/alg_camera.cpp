@@ -259,7 +259,7 @@ int AlgCamera::cuda_yuv_2_rgb_converter(void *src, void *dst, int width, int hei
         return 1;
     }
 
-    printf("Input Video Format = %d\n", video_format);
+    // printf("Input Video Format = %d\n", video_format);
     imageFormat cuda_image_format;
     switch (video_format)
     {
