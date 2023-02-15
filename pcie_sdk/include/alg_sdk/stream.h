@@ -97,6 +97,7 @@ typedef struct alg_sdk_gst_stream
     int ch_id;
     int rtmp_port;
     int have_sei;
+    int gpu_id;
 
     uint32_t frame_index;
     uint32_t last_frame_index;
