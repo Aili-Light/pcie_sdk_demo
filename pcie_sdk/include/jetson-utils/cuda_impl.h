@@ -99,6 +99,11 @@ ALG_SDK_API void cuda_free(void *ptr);
 */
 ALG_SDK_API void cuda_get_device_count(int *count);
 
+/* Set CUDA device to run program
+* @args `device_id` CUDA device ID
+*/
+ALG_SDK_API void cuda_set_device_id(int device_id);
+
 #ifdef __cplusplus
 }
 #endif
