@@ -127,8 +127,9 @@ int GstCamera::capture_image(void *msg)
         this->timestamp = this->pcie_image->image_info_meta.timestamp;
         this->img_size = this->pcie_image->image_info_meta.img_size;
     }
-
+#if defined (WITH_CUDA)
     cuda_set_device_id(gst_camera->gpu_id);
+#endif
     if (!this->mBufferYUV.Alloc(2, img_size, RingBuffer::ZeroCopy))
     {
         printf("1****GstCamera -- failed to allocate buffers (%zu bytes each)\n", img_size);
