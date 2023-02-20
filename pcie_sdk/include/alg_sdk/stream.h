@@ -105,7 +105,7 @@ typedef struct alg_sdk_gst_stream
 
     bool need_data;
     bool need_sei_data;
-    bool mStreaming;
+    bool mStreaming;  
 
     GstBus *mBus;
     GstElement *mAppSrc;
