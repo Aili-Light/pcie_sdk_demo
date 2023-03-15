@@ -47,7 +47,7 @@ void array_2_mat(uchar* data, int w, int h, int data_type, int ch_id, uint32_t f
 {
     const uint32_t data_size = w * h;
     cv::Mat img_rgb8 = cv::Mat(h, w, CV_8UC3);
-
+    // cv::namedWindow(image_name, cv::WINDOW_NORMAL | cv::WINDOW_KEEPRATIO);
     if(data_type <= ALG_SDK_MIPI_DATA_TYPE_YVYU)
     {
         /* Image Display */

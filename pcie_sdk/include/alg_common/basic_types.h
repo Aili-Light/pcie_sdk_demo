@@ -240,19 +240,20 @@ extern "C"
         uint8_t resv[125];
     } pcie_common_head_t;
 
-    typedef struct alg_sdk_pcie_image_info_meta
+    typedef struct alg_sdk_pcie_image_info_meta  
     {
         uint32_t frame_index;
         uint16_t width;
         uint16_t height;
         uint16_t data_type;
+        float frame_rate;
         float exposure;
         float again;
         float dgain;
         float temp;
-        size_t img_size;
+        uint32_t img_size;
         uint64_t timestamp;
-    } pcie_image_info_meta_t;
+    } pcie_image_info_meta_t __attribute__ ((aligned(1)));
 
     typedef struct alg_sdk_pcie_image_data
     {

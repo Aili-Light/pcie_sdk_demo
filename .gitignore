@@ -1,0 +1,7 @@
+build
+.vscode
+install
+config
+alg_sdk.log
+*.pyc
+get-pip.py
