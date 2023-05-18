@@ -65,6 +65,8 @@ void callback_image_data(void *p)
     int ch_id = get_channel_id(msg);
     // printf("[channel = %d], [frame = %d], [time %ld], [byte_0 = %d], [byte_end = %d]\n", ch_id,
     // msg->image_info_meta.frame_index,  msg->image_info_meta.timestamp, ((uint8_t*)msg->payload)[0], ((uint8_t*)msg->payload)[msg->image_info_meta.img_size - 1]);
+    // printf("[channel = %d], [frame = %d], [time %ld], [Exp = %f], [AGain = %f], [DGain = %f]\n", ch_id,
+    // msg->image_info_meta.frame_index,  msg->image_info_meta.timestamp,  msg->image_info_meta.exposure, msg->image_info_meta.again, msg->image_info_meta.dgain);
 
     pthread_mutex_lock(&mutex[ch_id]);
     g_camera[ch_id].capture_image(msg);

@@ -47,6 +47,8 @@ struct v4l2_dev v4l2loop_device = {
     .data_len = 0,
     .out_data = NULL,
     .buf_index = 0,
+    .reserved = 0,
+    .reserved2 = 0,
 };
 
 void int_handler(int sig)

@@ -64,6 +64,8 @@ struct v4l2_dev
     int data_len;
     unsigned char *out_data;
     unsigned int buf_index;
+    unsigned int reserved;
+    unsigned int reserved2;
 };
 
 typedef struct v4l2_capture_args

@@ -131,6 +131,8 @@ int AlgCamera::capture_image(void *msg)
         this->frame_index = this->pcie_image->image_info_meta.frame_index;
         this->timestamp = this->pcie_image->image_info_meta.timestamp;
         this->img_size = this->pcie_image->image_info_meta.img_size;
+        this->exp_time = this->pcie_image->image_info_meta.exposure;
+        this->sensor_gain = this->pcie_image->image_info_meta.again;
         // printf("[channel = %d], [frame = %d], [time %ld], [byte_0 = %d], [byte_end = %d]\n", this->ch_id,
         // pcie_image->image_info_meta.frame_index,  pcie_image->image_info_meta.timestamp, ((uint8_t*)this->nextYUV)[0], ((uint8_t*)this->nextYUV)[pcie_image->image_info_meta.img_size - 1]);
     }
@@ -161,6 +163,12 @@ int AlgCamera::capture_image(void *msg)
         this->width = v4l2_device->width;
         this->height = v4l2_device->height;
         this->img_size = v4l2_device->buffers[v4l2_device->buf_index].length;
+        float exp_time_v4l2, sensor_gain_v4l2;
+        memcpy((char *)&exp_time_v4l2, (char *)&(v4l2_device->reserved), 4);
+        memcpy((char *)&sensor_gain_v4l2, (char *)&(v4l2_device->reserved2), 4);
+        this->exp_time = exp_time_v4l2;
+        this->sensor_gain = sensor_gain_v4l2;
+        // printf("exp_time=%f, sensor_gain=%f\n", exp_time, sensor_gain);
     }
     else
     {

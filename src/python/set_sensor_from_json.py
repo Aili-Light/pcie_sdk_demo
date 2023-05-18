@@ -1,5 +1,6 @@
 from ast import Not
-import os,sys
+import os
+import sys
 import argparse
 import json
 import algSDKpy
@@ -13,20 +14,20 @@ if __name__ == '__main__':
                         type=str,
                         help="path to json file",
                         required=True
-    )
+                        )
     parser.add_argument('--channel_id',
                         type=int,
                         help="specify which channel the setting goes"
-    )
+                        )
     parser.add_argument('-all_channels',
                         action="store_true",
-                        help="Set this value true to apply same settings for all the channels"    
-    )
+                        help="Set this value true to apply same settings for all the channels"
+                        )
     parser.add_argument('-time_out',
                         type=int,
                         help="Timeout value for request (in milliseconds)",
                         default=5000
-    )
+                        )
     args = parser.parse_args()
 
     json_file = args.json_file
@@ -58,8 +59,18 @@ if __name__ == '__main__':
             print("Set for channel %d" % cfg.ch_id)
         else:
             cfg.ch_id = channel_id
-        
-        cfg.module_type = int(b"0xFFFF",16)
+
+        if sensor_name == "alg_ov_ox08b":
+            cfg.module_type = int(b"0x000C", 16)
+        elif sensor_name == "alg_ov_ov03c":
+            cfg.module_type = int(b"0x000B", 16)
+        elif sensor_name == "alg_sony_isx031":
+            cfg.module_type = int(b"0x0002", 16)
+        elif sensor_name == "alg_sony_isx019":
+            cfg.module_type = int(b"0x0001", 16)        
+        else:
+            cfg.module_type = int(b"0xFFFF", 16)
+
         cfg.width = sensor_width
         cfg.height = sensor_height
         cfg.deser_mode = des_mode
@@ -67,18 +78,18 @@ if __name__ == '__main__':
         cfg.data_type = data_type
 
         try:
-            with open(config_table,"r") as filestream:
+            with open(config_table, "r") as filestream:
                 line_num = 0
                 for line in filestream:
                     line_split = line.split(",")
                     # print("%s, %d" % (line_split[0], int(line_split[0],16)))
-                    cfg.payload[7*line_num] = int(line_split[0],16)
-                    cfg.payload[7*line_num+1] = (int(line_split[1],16) & 0xFF)
-                    cfg.payload[7*line_num+2] = (int(line_split[1],16) >> 8)
-                    cfg.payload[7*line_num+3] = (int(line_split[2],16) & 0xFF)
-                    cfg.payload[7*line_num+4] = (int(line_split[2],16) >> 8)
-                    cfg.payload[7*line_num+5] = (int(line_split[3],16) & 0xFF)
-                    cfg.payload[7*line_num+6] = (int(line_split[3],16) >> 8)
+                    cfg.payload[7*line_num] = int(line_split[0], 16)
+                    cfg.payload[7*line_num+1] = (int(line_split[1], 16) & 0xFF)
+                    cfg.payload[7*line_num+2] = (int(line_split[1], 16) >> 8)
+                    cfg.payload[7*line_num+3] = (int(line_split[2], 16) & 0xFF)
+                    cfg.payload[7*line_num+4] = (int(line_split[2], 16) >> 8)
+                    cfg.payload[7*line_num+5] = (int(line_split[3], 16) & 0xFF)
+                    cfg.payload[7*line_num+6] = (int(line_split[3], 16) >> 8)
                     line_num = line_num + 1
 
             cfg.line_len = line_num
@@ -95,7 +106,7 @@ if __name__ == '__main__':
                     cfg.ch_id = i
                     ret = algSDKpy.CallServices(cmd_topic, cfg, timeo)
                     print(' result = %d ' % ret)
-            else: 
+            else:
                 ret = algSDKpy.CallServices(cmd_topic, cfg, timeo)
                 print(' result = %d ' % ret)
 

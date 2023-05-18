@@ -309,8 +309,10 @@ void capture_frame(struct v4l2_dev *dev)
     dev->timestamp = buf.timestamp.tv_sec * 1000000 + buf.timestamp.tv_usec;
     dev->sequence = buf.sequence;
     dev->buf_index = buf.index;
+    dev->reserved = buf.reserved;
+    dev->reserved2 = buf.reserved2;
     // printf("image: sequence(frame index) = %d, timestamp = %lu\n", dev->sequence, dev->timestamp);
-    // printf("frame=%d,stamp=%ld,size=%ld\n", buf.sequence, dev->timestamp, dev->buffers[buf.index].length);
+    // printf("frame=%d,stamp=%ld,size=%ld,rev=%d\n", buf.sequence, dev->timestamp, dev->buffers[buf.index].length,dev->reserved);
 
     if (ioctl(dev->fd, VIDIOC_QBUF, &buf) == -1)
     {

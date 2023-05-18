@@ -106,6 +106,12 @@ private:
     /* Image Size */
     size_t img_size;
 
+    /* Exposure Time */
+    float exp_time;
+
+    /* Sensor Gain */
+    float sensor_gain;
+
     /* Camera Type
      * Type=ALG_CAMERA_FLAG_SOURCE_PCIE : PCIE Image Data
      * Type=ALG_CAMERA_FLAG_SOURCE_V4L2 : V4L2 Source
