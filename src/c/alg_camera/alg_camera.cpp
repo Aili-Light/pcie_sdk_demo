@@ -419,9 +419,9 @@ int AlgCamera::render_image()
             {
                 /* key=SPACE*/
                 char filename_bmp[128] = {};
-                sprintf(filename_bmp, "data/image_%02d_%08d.bmp", ch_id, frame_index);
+                sprintf(filename_bmp, "data/image_%02d_%lu.bmp", ch_id, timestamp);
                 char filename_raw[128] = {};
-                sprintf(filename_raw, "data/image_%02d_%08d.raw", ch_id, frame_index);
+                sprintf(filename_raw, "data/image_%02d_%lu.raw", ch_id, timestamp);
                 save_image_bmp(filename_bmp, next_image);
                 save_image_raw(filename_raw, this->nextYUV, this->img_size);
             }
@@ -439,9 +439,9 @@ int AlgCamera::render_image()
         if (this->b_saving_image == true)
         {
             char filename_bmp[128] = {};
-            sprintf(filename_bmp, "data/image_%02d_%08d.bmp", ch_id, frame_index);
+            sprintf(filename_bmp, "data/image_%02d_%lu.bmp", ch_id, timestamp);
             char filename_raw[128] = {};
-            sprintf(filename_raw, "data/image_%02d_%08d.raw", ch_id, frame_index);
+            sprintf(filename_raw, "data/image_%02d_%lu.raw", ch_id, timestamp);
             save_image_bmp(filename_bmp, next_image);
             // save_image_raw(filename_raw, this->nextYUV, this->img_size);
         }
