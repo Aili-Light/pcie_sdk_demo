@@ -112,6 +112,9 @@ private:
     /* Sensor Gain */
     float sensor_gain;
 
+    /* Sensor Gain 2*/
+    float sensor_gain_2;
+
     /* Camera Type
      * Type=ALG_CAMERA_FLAG_SOURCE_PCIE : PCIE Image Data
      * Type=ALG_CAMERA_FLAG_SOURCE_V4L2 : V4L2 Source

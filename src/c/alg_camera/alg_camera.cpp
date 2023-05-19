@@ -133,6 +133,8 @@ int AlgCamera::capture_image(void *msg)
         this->img_size = this->pcie_image->image_info_meta.img_size;
         this->exp_time = this->pcie_image->image_info_meta.exposure;
         this->sensor_gain = this->pcie_image->image_info_meta.again;
+        this->sensor_gain_2 = this->pcie_image->image_info_meta.dgain;
+        // printf("exp_time=%f, gain_1=%f, gain_2=%f\n", this->exp_time, this->sensor_gain, this->sensor_gain_2);
         // printf("[channel = %d], [frame = %d], [time %ld], [byte_0 = %d], [byte_end = %d]\n", this->ch_id,
         // pcie_image->image_info_meta.frame_index,  pcie_image->image_info_meta.timestamp, ((uint8_t*)this->nextYUV)[0], ((uint8_t*)this->nextYUV)[pcie_image->image_info_meta.img_size - 1]);
     }
