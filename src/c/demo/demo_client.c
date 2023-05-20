@@ -59,6 +59,8 @@ void save_image_raw(const char *filename, void *image_ptr, uint32_t image_size)
     {
         printf("Out of memory!\n");
     }
+
+    fclose(fp);
 }
 
 void callback_image_data(void *p)

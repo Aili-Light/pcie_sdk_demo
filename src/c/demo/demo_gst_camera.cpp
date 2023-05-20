@@ -149,6 +149,11 @@ int main(int argc, char **argv)
             strcpy(&appsrc_parse[1][0], "codec_type=h264");
             strcpy(&appsrc_parse[2][0], "have_sei=0");
         }
+        else if (strcmp(argv[1], "file-raw") == 0)
+        {
+            strcpy(&appsrc_parse[0][0], "protocol=file");
+            strcpy(&appsrc_parse[1][0], "codec_type=raw");
+        }
         else if (strcmp(argv[1], "file-sei") == 0)
         {
             strcpy(&appsrc_parse[0][0], "protocol=file");
