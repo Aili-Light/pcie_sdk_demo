@@ -310,13 +310,16 @@ int AlgCamera::cuda_yuv_2_rgb_converter(void *src, void *dst, int width, int hei
     }
 
     const size_t rgb8Size = imageFormatSize(IMAGE_RGBA8, width, height);
-    if (!this->mBufferRGB.Alloc(5, rgb8Size, RingBuffer::ZeroCopy))
+    if (!this->mBufferRGB.Alloc(2, rgb8Size, RingBuffer::ZeroCopy))
     {
         printf("1****CUDA YUV2RGB -- failed to allocate buffers (%zu bytes each)\n", rgb8Size);
         return 1;
     }
 
-    void *yuv_img = this->mBufferYUV.Peek(RingBuffer::Read);
+    void *yuv_img = this->mBufferYUV.Next(RingBuffer::Read);
+    if (yuv_img == NULL)
+        return 0;
+
     void *next_rgb = this->mBufferRGB.Next(RingBuffer::Write);
     if (!cuda_cvtColor_RGBA(yuv_img, cuda_image_format, next_rgb, width, height))
     {
@@ -407,51 +410,53 @@ int AlgCamera::render_image()
     if (this->display != NULL)
     {
         void *next_image = this->next_image();
-        this->display->RenderOnce(next_image, this->width, this->height, IMAGE_RGBA8, 0, 0, 0);
-
-        /* Save Image */
-        if (this->display->GetKeyPressFlag())
+        if (next_image != NULL)
         {
-            this->display->SetKeyPressFlag();
-            char key_str[32];
-            this->display->GetKeyPressStr(key_str);
-            printf("key=%d\n", key_str[0]);
+            this->display->RenderOnce(next_image, this->width, this->height, IMAGE_RGBA8, 0, 0, 0);
 
-            if (key_str[0] == 32)
+            /* Save Image */
+            if (this->display->GetKeyPressFlag())
             {
-                /* key=SPACE*/
+                this->display->SetKeyPressFlag();
+                char key_str[32];
+                this->display->GetKeyPressStr(key_str);
+                printf("key=%d\n", key_str[0]);
+
+                if (key_str[0] == 32)
+                {
+                    /* key=SPACE*/
+                    char filename_bmp[128] = {};
+                    sprintf(filename_bmp, "data/image_%02d_%lu.bmp", ch_id, timestamp);
+                    char filename_raw[128] = {};
+                    sprintf(filename_raw, "data/image_%02d_%lu.raw", ch_id, timestamp);
+                    save_image_bmp(filename_bmp, next_image);
+                    save_image_raw(filename_raw, this->nextYUV, this->img_size);
+                }
+                else if (key_str[0] == 115 && this->b_saving_image == false)
+                {
+                    /* key=s */
+                    this->b_saving_image = true;
+                }
+                else if (key_str[0] == 115 && this->b_saving_image == true)
+                {
+                    this->b_saving_image = false;
+                }
+            }
+            if (this->b_saving_image == true)
+            {
                 char filename_bmp[128] = {};
                 sprintf(filename_bmp, "data/image_%02d_%lu.bmp", ch_id, timestamp);
                 char filename_raw[128] = {};
                 sprintf(filename_raw, "data/image_%02d_%lu.raw", ch_id, timestamp);
                 save_image_bmp(filename_bmp, next_image);
-                save_image_raw(filename_raw, this->nextYUV, this->img_size);
+                // save_image_raw(filename_raw, this->nextYUV, this->img_size);
             }
-            else if (key_str[0] == 115 && this->b_saving_image == false)
-            {
-                /* key=s */
-                this->b_saving_image = true;
-            }
-            else if (key_str[0] == 115 && this->b_saving_image == true)
-            {
-                this->b_saving_image = false;
-            }
+            // // update status bar
+            char str[256];
+            sprintf(str, "Channel[%02d] (%ux%u) | %.02f FPS | Timestamp: %ld", this->ch_id, this->width, this->height, this->frame_rate, this->timestamp);
+            display->SetTitle(str);
+            display->RefreshWindow();
         }
-
-        if (this->b_saving_image == true)
-        {
-            char filename_bmp[128] = {};
-            sprintf(filename_bmp, "data/image_%02d_%lu.bmp", ch_id, timestamp);
-            char filename_raw[128] = {};
-            sprintf(filename_raw, "data/image_%02d_%lu.raw", ch_id, timestamp);
-            save_image_bmp(filename_bmp, next_image);
-            // save_image_raw(filename_raw, this->nextYUV, this->img_size);
-        }
-        // // update status bar
-        char str[256];
-        sprintf(str, "Channel[%02d] (%ux%u) | %.02f FPS | Timestamp: %ld", this->ch_id, this->width, this->height, this->frame_rate, this->timestamp);
-        display->SetTitle(str);
-        display->RefreshWindow();
     }
 
     return 0;
@@ -469,7 +474,7 @@ bool AlgCamera::is_init()
 
 void *AlgCamera::next_image()
 {
-    return this->mBufferRGB.Peek(RingBuffer::Read);
+    return this->mBufferRGB.Peek(RingBuffer::ReadLatest);
 }
 
 bool AlgCamera::check_image_size(size_t s1, size_t s2)

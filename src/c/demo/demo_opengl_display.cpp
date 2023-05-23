@@ -68,9 +68,7 @@ void callback_image_data(void *p)
     // printf("[channel = %d], [frame = %d], [time %ld], [Exp = %f], [AGain = %f], [DGain = %f]\n", ch_id,
     // msg->image_info_meta.frame_index,  msg->image_info_meta.timestamp,  msg->image_info_meta.exposure, msg->image_info_meta.again, msg->image_info_meta.dgain);
 
-    pthread_mutex_lock(&mutex[ch_id]);
     g_camera[ch_id].capture_image(msg);
-    pthread_mutex_unlock(&mutex[ch_id]);
     sem_post(&full[ch_id]);
 }
 
@@ -88,10 +86,8 @@ void *camera_display_thread(void *arg)
             printf("Init camera [%d]\n", ch_id);
             camera->init_camera(ch_id, ALG_CAMERA_FLAG_SOURCE_PCIE);
         }
-        pthread_mutex_lock(&mutex[ch_id]);
         camera->img_converter();
         camera->render_image();
-        pthread_mutex_unlock(&mutex[ch_id]);
 
         if (camera->is_closed())
             g_signal_recieved = true;
