@@ -14,7 +14,7 @@
 const char topic_image_head_d[ALG_SDK_HEAD_COMMON_TOPIC_NAME_LEN] = {ALG_SDK_TOPIC_NAME_IMAGE_DATA};
 
 static pthread_t g_camera_disp_thred[ALG_SDK_MAX_CHANNEL];
-static pthread_mutex_t mutex[ALG_SDK_MAX_CHANNEL];
+static pthread_mutex_t mutex;
 static sem_t full[ALG_SDK_MAX_CHANNEL];
 static uint64_t g_t_last[ALG_SDK_MAX_CHANNEL] = {0};
 static uint32_t g_f_count[ALG_SDK_MAX_CHANNEL] = {0};
@@ -39,9 +39,9 @@ void int_handler(int sig)
         g_camera[i].close_camera();
     }
 
+    pthread_mutex_destroy(&mutex);
     for (int i = 0; i < ALG_SDK_MAX_CHANNEL; i++)
     {
-        pthread_mutex_destroy(&mutex[i]);
         sem_destroy(&full[i]);
     }
     /* terminate program */
@@ -67,8 +67,8 @@ void callback_image_data(void *p)
     // msg->image_info_meta.frame_index,  msg->image_info_meta.timestamp, ((uint8_t*)msg->payload)[0], ((uint8_t*)msg->payload)[msg->image_info_meta.img_size - 1]);
     // printf("[channel = %d], [frame = %d], [time %ld], [Exp = %f], [AGain = %f], [DGain = %f]\n", ch_id,
     // msg->image_info_meta.frame_index,  msg->image_info_meta.timestamp,  msg->image_info_meta.exposure, msg->image_info_meta.again, msg->image_info_meta.dgain);
-
     g_camera[ch_id].capture_image(msg);
+
     sem_post(&full[ch_id]);
 }
 
@@ -86,8 +86,9 @@ void *camera_display_thread(void *arg)
             printf("Init camera [%d]\n", ch_id);
             camera->init_camera(ch_id, ALG_CAMERA_FLAG_SOURCE_PCIE);
         }
-        camera->img_converter();
-        camera->render_image();
+
+        if (!camera->img_converter())   // image convert success
+            camera->render_image();
 
         if (camera->is_closed())
             g_signal_recieved = true;
@@ -97,17 +98,18 @@ void *camera_display_thread(void *arg)
 int main(int argc, char **argv)
 {
     /* Create thread */
+    memset(&g_camera, 0, sizeof(g_camera));
     for (int i = 0; i < ALG_SDK_MAX_CHANNEL; i++)
     {
         camera_disp_args_t arg = {(void *)(AlgCamera *)&g_camera[i], (void *)(intptr_t)i};
         g_camera_args[i] = arg;
     }
 
-    memset(g_camera_disp_thred, 0, sizeof(g_camera_disp_thred));
+    memset(&g_camera_disp_thred, 0, sizeof(g_camera_disp_thred));
+    pthread_mutex_init(&mutex, NULL);
 
     for (int i = 0; i < ALG_SDK_MAX_CHANNEL; i++)
     {
-        pthread_mutex_init(&mutex[i], NULL);
         sem_init(&full[i], 0, 0);
 
         int rc;

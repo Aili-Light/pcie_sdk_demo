@@ -318,7 +318,7 @@ int AlgCamera::cuda_yuv_2_rgb_converter(void *src, void *dst, int width, int hei
 
     void *yuv_img = this->mBufferYUV.Next(RingBuffer::Read);
     if (yuv_img == NULL)
-        return 0;
+        return 1;
 
     void *next_rgb = this->mBufferRGB.Next(RingBuffer::Write);
     if (!cuda_cvtColor_RGBA(yuv_img, cuda_image_format, next_rgb, width, height))
@@ -342,7 +342,7 @@ int AlgCamera::img_converter()
     case ALG_SDK_VIDEO_FORMAT_Y2VU:
     case ALG_SDK_VIDEO_FORMAT_UVY2:
     case ALG_SDK_VIDEO_FORMAT_VUY2:
-        cuda_yuv_2_rgb_converter(this->nextYUV, this->nextRGB, this->width, this->height, this->format);
+        return(cuda_yuv_2_rgb_converter(this->nextYUV, this->nextRGB, this->width, this->height, this->format));
         break;
     default:
         break;
