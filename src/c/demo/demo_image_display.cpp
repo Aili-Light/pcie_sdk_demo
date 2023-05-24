@@ -56,8 +56,8 @@ void array_2_mat(uchar* data, int w, int h, int data_type, int ch_id, uint32_t f
         alg_cv::alg_sdk_cvtColor((uchar*)data, (uchar*)buf_rgb, w, h, alg_cv::image_format(data_type));
         /* Image Display */
 //        cv::resize(img_rgb8, img_rgb8, cv::Size(1280,720));
+        cv::namedWindow(image_name, CV_WINDOW_NORMAL);
         cv::imshow(image_name, img_rgb8);
-
     }
     else if(data_type == ALG_SDK_MIPI_DATA_TYPE_RAW10)
     {
@@ -79,6 +79,7 @@ void array_2_mat(uchar* data, int w, int h, int data_type, int ch_id, uint32_t f
         cv::cvtColor(img_byer, img_rgb8, cv::COLOR_BayerBG2RGB);
         /* Image Display */
 //        cv::resize(img_rgb8, img_rgb8, cv::Size(1280,720));
+        cv::namedWindow(image_name, CV_WINDOW_NORMAL);
         cv::imshow(image_name, img_rgb8);
         free(pdata);
     }
@@ -100,6 +101,7 @@ void array_2_mat(uchar* data, int w, int h, int data_type, int ch_id, uint32_t f
         cv::cvtColor(img_byer, img_rgb8, cv::COLOR_BayerBG2RGB);
         /* Image Display */
 //        cv::resize(img_rgb8, img_rgb8, cv::Size(1280,720));
+        cv::namedWindow(image_name, CV_WINDOW_NORMAL);
         cv::imshow(image_name, img_rgb8);
         free(pdata);
     }
@@ -119,6 +121,7 @@ void array_2_mat(uchar* data, int w, int h, int data_type, int ch_id, uint32_t f
     //     sprintf(filename, "data/image_%02d_%08d.bmp", ch_id, frame_index);
     //     cv::imwrite(filename, img_rgb8);
     // }
+    
 }
 
 void frame_rate_monitor(const int ch_id, const int frame_index)
