@@ -39,7 +39,7 @@ int get_channel_id(const pcie_image_data_t *msg)
 {
     const char *ptr_topic = &msg->common_head.topic_name[19];
     char c_ch_id[2];
-    strcpy(c_ch_id, ptr_topic);
+    strncpy(c_ch_id, ptr_topic, 2);
     int ch_id = atoi(c_ch_id);
 
     return ch_id;
@@ -66,8 +66,8 @@ void save_image_raw(const char *filename, void *image_ptr, uint32_t image_size)
 void callback_image_data(void *p)
 {
     pcie_image_data_t *msg = (pcie_image_data_t *)p;
-       printf("[frame = %d], [time %ld], [byte_0 = %d], [byte_end = %d]\n",
-              msg->image_info_meta.frame_index,  msg->image_info_meta.timestamp, ((uint8_t*)msg->payload)[0], ((uint8_t*)msg->payload)[msg->image_info_meta.img_size - 1]);
+    // printf("[frame = %d], [time %ld], [byte_0 = %d], [byte_end = %d]\n",
+    //         msg->image_info_meta.frame_index,  msg->image_info_meta.timestamp, ((uint8_t*)msg->payload)[0], ((uint8_t*)msg->payload)[msg->image_info_meta.img_size - 1]);
 
     /* check frame rate (every 1 second) */
     frame_rate_monitor(get_channel_id(msg), msg->image_info_meta.frame_index);

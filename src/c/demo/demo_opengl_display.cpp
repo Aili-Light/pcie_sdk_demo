@@ -52,7 +52,7 @@ int get_channel_id(const pcie_image_data_t *msg)
 {
     const char *ptr_topic = &msg->common_head.topic_name[19];
     char c_ch_id[2];
-    strcpy(c_ch_id, ptr_topic);
+    strncpy(c_ch_id, ptr_topic, 2);
     int ch_id = atoi(c_ch_id);
 
     return ch_id;

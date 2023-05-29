@@ -61,7 +61,7 @@ int get_channel_id(const pcie_image_data_t *msg)
 {
     const char *ptr_topic = &msg->common_head.topic_name[19];
     char c_ch_id[2];
-    strcpy(c_ch_id, ptr_topic);
+    strncpy(c_ch_id, ptr_topic, 2);
     int ch_id = atoi(c_ch_id);
 
     return ch_id;
@@ -79,9 +79,9 @@ void callback_image_data(void *p)
     // printf("[channel = %d], [frame = %d], [time %ld], [byte_0 = %d], [byte_end = %d]\n", ch_id,
     // msg->image_info_meta.frame_index,  msg->image_info_meta.timestamp, ((uint8_t*)msg->payload)[0], ((uint8_t*)msg->payload)[msg->image_info_meta.img_size - 1]);
 
-    pthread_mutex_lock(&mutex);
+    // pthread_mutex_lock(&mutex);
     g_camera[ch_id].capture_image(msg);
-    pthread_mutex_unlock(&mutex);
+    // pthread_mutex_unlock(&mutex);
     sem_post(&full[ch_id]);
 }
 
@@ -99,9 +99,7 @@ void *camera_display_thread(void *arg)
             printf("Start camera streaming [%d]\n", ch_id);
             camera->start_stream();
         }
-        pthread_mutex_lock(&mutex);
         camera->render_image();
-        pthread_mutex_unlock(&mutex);
 
         if (g_send_eos == true)
         {
@@ -165,6 +163,18 @@ int main(int argc, char **argv)
             strcpy(&appsrc_parse[0][0], "protocol=file");
             strcpy(&appsrc_parse[1][0], "codec_type=h264");
             strcpy(&appsrc_parse[2][0], "have_sei=3");
+        }
+        else if (strcmp(argv[1], "record") == 0)
+        {
+            strcpy(&appsrc_parse[0][0], "protocol=record");
+            strcpy(&appsrc_parse[1][0], "codec_type=h264");
+            strcpy(&appsrc_parse[2][0], "have_sei=0");
+        }
+        else if (strcmp(argv[1], "record-sei") == 0)
+        {
+            strcpy(&appsrc_parse[0][0], "protocol=record");
+            strcpy(&appsrc_parse[1][0], "codec_type=h264");
+            strcpy(&appsrc_parse[2][0], "have_sei=1");
         }
     }
     else
