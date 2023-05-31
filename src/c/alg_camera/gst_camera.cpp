@@ -157,7 +157,6 @@ void GstCamera::render_image()
         return;
 
     void *next_img = this->mBufferYUV.Peek(RingBuffer::Read);
-    uint64_t t1, t2;
     alg_sdk_stream_encode_image(next_img, width, height, gst_camera, data_type, frame_index, timestamp);
 }
 
