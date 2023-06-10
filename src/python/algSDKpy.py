@@ -96,6 +96,14 @@ class pcie_image_data_t(Structure):
     ("payload", c_void_p),
     ]
 
+class service_debug_control(Structure):
+    _fields_ = [("ack_mode",c_uint8),
+    ("debug_flag",c_uint8),
+    ("ack_code", c_uint8),
+    ("ack_debug_flag", c_uint8)
+    ]
+
+
 callbackFunc_t = ctypes.CFUNCTYPE(c_void_p, c_void_p)
 if os.name == 'nt' :
     pcie_sdk = ctypes.CDLL('../../pcie_sdk/lib/mingw32/libpcie_sdk.dll', winmode=0)

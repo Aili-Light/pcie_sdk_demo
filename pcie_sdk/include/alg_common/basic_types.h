@@ -123,6 +123,7 @@ extern "C"
         ALG_SDK_SERVICE_COMM_CMD_GET_STATUS = 0x06,
         ALG_SDK_SERVICE_COMM_CMD_SET_TIME = 0x07,
         ALG_SDK_SERVICE_COMM_CMD_GET_TIME = 0x08,
+        ALG_SDK_SERVICE_PCIE_CMD_DEBUG_CTL = 0x09,
     };
 
     enum
@@ -356,6 +357,17 @@ extern "C"
         uint8_t ack_code;
         uint8_t ch_sel[ALG_SDK_MAX_CHANNEL];
     } service_stream_control_t;
+
+    typedef struct alg_sdk_service_debug_control
+    {
+        /* Request Field */
+        uint8_t ack_mode;
+        uint8_t debug_flag;
+
+        /* Reply Field */
+        uint8_t ack_code;
+        uint8_t ack_debug_flag;
+    } service_debug_control_t;
 
     typedef struct alg_sdk_amp_msg
     {
