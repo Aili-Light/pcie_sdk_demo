@@ -35,6 +35,6 @@ if __name__ == '__main__':
             cam_ctl.control[ch_id] = 1
 
     ret = algSDKpy.CallServices(cmd_topic, cam_ctl, timeo)
-    print(' result = %d ' % ret)
+    print(' result = %d, ack code [%d]' % (ret, cam_ctl.ack_code))
 
     print('---------finish-------------')

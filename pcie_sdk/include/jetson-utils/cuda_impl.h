@@ -51,6 +51,12 @@ ALG_SDK_API void cuda_memcpy_h2d(void* dst, void* src, size_t size);
 */
 ALG_SDK_API void cuda_memcpy_d2h(void* dst, void* src, size_t size);
 
+/* Memory Copy From GPU space (Device) to GPU space(Device)
+* @args `src` : pointer to buffer in GPU space
+* @args `dst` : pointer to buffer in GPU space
+*/
+ALG_SDK_API void cuda_memcpy_d2d(void *dst, void *src, size_t size);
+
 /* Color Convert from YUV to RGBA by CUDA 
 * img_src pointer to YUV-format-image in GPU memory
 * input image size = width*height*2

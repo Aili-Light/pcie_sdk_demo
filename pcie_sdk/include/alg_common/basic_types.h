@@ -176,7 +176,10 @@ extern "C"
         ALG_SDK_VIDEO_FORMAT_UYVY = 5,   /* Packed YUY-422 format (U-Y-V-Y-U-Y-V-Y) */
         ALG_SDK_VIDEO_FORMAT_VYUY = 64,  /* Packed YUY-422 format (V-Y-U-Y-V-Y-U-Y) */
         ALG_SDK_VIDEO_FORMAT_YVYU = 19,  /* Packed YUY-422 format (Y-V-Y-U-Y-V-Y-U) */
+        ALG_SDK_VIDEO_FORMAT_RGBA = 11,  /* RGB packed into 32 bits without padding (R-G-B-A-R-G-B-A) */
+        ALG_SDK_VIDEO_FORMAT_BGRA = 12,  /* RGB packed into 32 bits without padding (B-G-R-A-B-G-R-A) */
         ALG_SDK_VIDEO_FORMAT_RGB = 15,   /* RGB packed into 24 bits without padding (R-G-B-R-G-B) */
+        ALG_SDK_VIDEO_FORMAT_BGR = 16,   /* RGB packed into 24 bits without padding (B-G-R-B-G-R) */
         ALG_SDK_VIDEO_FORMAT_RAW10 = 90, /* RAW 10-bit */
         ALG_SDK_VIDEO_FORMAT_RAW12 = 91, /* RAW 10-bit */
         ALG_SDK_VIDEO_FORMAT_Y2UV = 104,  /* Packed YUY-422 format (Y2-U-Y1-V-Y2-U-Y1-V) */
