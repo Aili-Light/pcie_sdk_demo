@@ -181,7 +181,7 @@ int main (int argc, char **argv)
         return 0;
 
     }
-    else if ((argc == 3) && (strcmp(argv[1], "-fw_update_by_file") == 0))
+    else if ((argc == 4) && (strcmp(argv[1], "-fw_update_by_file") == 0))
     {
         char *file_name = argv[2];
         const char *topic_name = "/service/board/fw_update";
@@ -190,13 +190,7 @@ int main (int argc, char **argv)
                 .ack_mode = 1,
                 .board_id = 0,
             };
-
-            // service_camera_fw_update_t t = {
-            //     .ack_mode = 1,
-            //     .board_id = 0,
-            //     .channel_id = 1,
-            // };
-
+            t.board_id = atoi(argv[2]);
             FILE *fp = fopen(file_name, "r");
             printf("current path %s\r\n", file_name);
             if(fp == NULL)
@@ -252,7 +246,7 @@ int main (int argc, char **argv)
                     return -1;
                 }
 
-                printf("[ack : %d], [dev_id : %d]\n", t.ack_code, t.dev_id);
+                printf("[ack : %d]\n", t.ack_code);
             }
 
             free(fw);
@@ -263,7 +257,7 @@ int main (int argc, char **argv)
         return 0;
 
     }
-    else if ((argc == 3) && (strcmp(argv[1], "-channel_info") == 0))
+    else if ((argc == 4) && (strcmp(argv[1], "-channel_info") == 0))
     {
         const char *topic_name = "/service/channel/info";
         service_board_channel_info_get_t  t = {
@@ -271,8 +265,8 @@ int main (int argc, char **argv)
             .board_id = 0,
             .channel_num = 0,
         };
-        t.channel_num = atoi(argv[2]);
-        printf("t.channel: %d\r\n",t.channel_num);
+        t.board_id = atoi(argv[2]);
+        t.channel_num = atoi(argv[3]);
         rc = alg_sdk_call_service(topic_name, &t, timeout);
         if (rc < 0)
         {
@@ -286,7 +280,7 @@ int main (int argc, char **argv)
         printf("camera_width: %d,camera_height: %d\r\n",t.camera_width,t.camera_height);
         printf("camera_slv_trigger_start: %d\r\n",t.camera_slv_trigger_start);
     }
-    else if ((argc == 3) && (strcmp(argv[1], "-get_i2c_addr_info") == 0))
+    else if ((argc == 4) && (strcmp(argv[1], "-get_i2c_addr_info") == 0))
     {
         const char *topic_name = "/service/i2c/info";
         service_board_i2c_info_get_t  t = {
@@ -294,8 +288,8 @@ int main (int argc, char **argv)
             .board_id = 0,
             .channel_num = 0,
         };
-        t.channel_num = atoi(argv[2]);
-        printf("t.channel: %d\r\n",t.channel_num);
+        t.board_id = atoi(argv[2]);
+        t.channel_num = atoi(argv[3]);
         rc = alg_sdk_call_service(topic_name, &t, timeout);
         if (rc < 0)
         {
@@ -347,7 +341,7 @@ int main (int argc, char **argv)
         /* End */
 
     }
-    else if ((argc == 2) && (strcmp(argv[1], "-get_board_info") == 0))
+    else if ((argc == 3) && (strcmp(argv[1], "-get_board_info") == 0))
     {
 
         /* Example : Read IIC */
@@ -358,6 +352,7 @@ int main (int argc, char **argv)
             .board_id = 0,
         };
 
+        t.board_id = atoi(argv[2]);
         rc = alg_sdk_call_service(topic_name, &t, timeout);
         if (rc < 0)
         {
@@ -378,7 +373,7 @@ int main (int argc, char **argv)
         printf("board_channel_num: %d\r\n",t.board_channel_num);
         /* End */
     }
-    else if ((argc == 3) && (strcmp(argv[1], "-get_camera_info") == 0))
+    else if ((argc == 4) && (strcmp(argv[1], "-get_camera_info") == 0))
     {
 
         /* Example : Read IIC */
@@ -389,9 +384,8 @@ int main (int argc, char **argv)
             .board_id = 0,
             .channel = 0,
         };
-
-        t.channel = atoi(argv[2]);
-        printf("t.channel:%d\r\n",t.channel);
+        t.board_id = atoi(argv[2]);
+        t.channel = atoi(argv[3]);
         rc = alg_sdk_call_service(topic_name, &t, timeout);
         if (rc < 0)
         {
