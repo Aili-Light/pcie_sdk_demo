@@ -584,6 +584,14 @@ extern "C"
         uint8_t second;
         uint32_t us;
     } aili_utc_time_t;
+
+    typedef struct
+    {
+        uint8_t using_time_mode;
+        aili_utc_time_t utc_time;
+        uint64_t unix_time;
+        uint64_t relative_time;
+    } aili_timestamp_ctl_t;
 #pragma pack()
     typedef struct alg_sdk_service_set_time
     {
@@ -598,14 +606,6 @@ extern "C"
         /* Reply Field */
         uint8_t ack_code;
     } service_set_time_t;
-
-    typedef struct
-    {
-        uint8_t using_time_mode;
-        aili_utc_time_t utc_time;
-        uint64_t unix_time;
-        uint64_t relative_time;
-    } aili_timestamp_ctl_t __attribute__((aligned(1)));
 
     typedef struct
     {
