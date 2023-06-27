@@ -67,6 +67,27 @@ SOFTWARE.
 #define ALG_SDK_MAX_CHANNEL 16
 #define ALG_SDK_MAX_DESERDES 8
 #define ALG_SDK_CHANNEL_PER_DEV 8
+#define ALG_SDK_MAX_BIN_SIZE    (10*1024)
+#define ALG_SDK_BOARD_TYPE_NAME_LENTH	15
+#define ALG_SDK_SERIAL_NUM_NAME_LENTH	15
+#define ALG_SDK_PS_VERSION_NUM_LENTH	15
+#define ALG_SDK_PL_VERSION_NUM_LENTH	15
+
+#define  ALG_SDK_CAMERA_NAME_LENTH      10
+#define  ALG_SDK_RESERVED	            10
+#define  ALG_SDK_IIC_ADDR_DEV_NUM	    128
+
+#define  ALG_SDK_HARDWARE_VISION_LENGTH        	4
+#define  ALG_SDK_CIS_TYPE_LENGTH               	20
+#define  ALG_SDK_SERDES_TYPE_LENGTH            	20
+#define  ALG_SDK_DATA_TYPE_NAME_LENGTH         	20
+#define  ALG_SDK_PRODUCT_ID_LENGTH             	21
+#define  ALG_SDK_SENSOR_COLOR_PATTERN_LENGTH   	10
+#define  ALG_SDK_ORDER_NUMBER_LENGTH           	15
+#define  ALG_SDK_SALE_SERIAL_NUMBER_LENGTH     	25
+#define  ALG_SDK_PRODUCT_SERIAL_NUMBER_LENGTH  	15
+#define  ALG_SDK_PLOT_NUMBER_LENGTH            	10
+#define  ALG_SDK_PRODUCT_DATE_LENGTH           	15
 
 #ifdef __cplusplus
 extern "C"
@@ -235,6 +256,74 @@ extern "C"
         AILI_SLAVE_TRIGGER_MAX,
     };
 
+#pragma pack(push,1)
+    typedef struct alg_sdk_module_product_info
+    {
+        //basic info
+        uint32_t    config_table_uid_1ch;
+        uint32_t    config_table_uid_2ch;
+        uint32_t    config_table_uid_4ch;
+        char        product_id[ALG_SDK_PRODUCT_ID_LENGTH];
+        uint32_t    vendeor_id;
+        uint8_t     module_type;
+        char        hardware_vision[ALG_SDK_HARDWARE_VISION_LENGTH];
+        uint16_t    firmware_version_uid;
+        uint8_t     cis_iic_addr;
+        uint8_t     serdes_iic_addr;
+        uint8_t     isp_iic_addr;
+        uint8_t     pmic_iic_addr;
+        uint8_t     eeprom_iic_addr;
+        uint8_t     imu_1_iic_addr;
+        uint8_t     imu_2_iic_addr;
+        uint32_t    eeprom_register_addr;
+        char        cis_type[ALG_SDK_CIS_TYPE_LENGTH];
+        char        serdes_type[ALG_SDK_SERDES_TYPE_LENGTH];
+        uint8_t     hfov;
+        uint8_t     resolution;
+        char        data_type_name[ALG_SDK_DATA_TYPE_NAME_LENGTH];
+        uint8_t     data_type_value;
+        char        sensor_color_pattern[ALG_SDK_SENSOR_COLOR_PATTERN_LENGTH];
+        uint16_t    width;
+        uint16_t    height;
+        uint8_t     frame_rate;
+        uint8_t     work_mode;
+        uint8_t     serdes_mode;
+
+        //product info
+        char        order_number[ALG_SDK_ORDER_NUMBER_LENGTH];
+        char        sale_serial_number[ALG_SDK_SALE_SERIAL_NUMBER_LENGTH];
+        char        product_serial_number[ALG_SDK_PRODUCT_SERIAL_NUMBER_LENGTH];
+        char        plot_number[ALG_SDK_PLOT_NUMBER_LENGTH];
+        char        product_date[ALG_SDK_PRODUCT_DATE_LENGTH];
+        uint8_t     product_location;
+        uint8_t     calibrate_internal_parameters;
+        float       test_item_mtf_middle;
+        float       test_item_mtf_0_5_up;
+        float       test_item_mtf_0_5_down;
+        float       test_item_mtf_0_5_left;
+        float       test_item_mtf_0_5_right;
+        float       test_item_mtf_0_7_9_up;
+        float       test_item_mtf_0_7_9_down;
+        float       test_item_mtf_0_7_9_left;
+        float       test_item_mtf_0_7_9_right;
+        float       leak_big;
+        float       leak_small;
+        float       prassure;
+        float       threadhold;
+        uint32_t    sensor_uid;
+        uint32_t    reserved_2;
+        uint32_t    reserved_3;
+        uint32_t    reserved_4;
+        uint32_t    reserved_5;
+        uint32_t    reserved_6;
+        uint32_t    reserved_7;
+        uint32_t    reserved_8;
+        uint32_t    reserved_9;
+        uint32_t    reserved_10;
+        uint16_t    verifycrc16;
+    }alg_sdk_module_product_info_t;
+#pragma pack(pop)
+
     typedef struct alg_sdk_pcie_common_head
     {
         uint8_t head;
@@ -297,7 +386,7 @@ extern "C"
 
         uint64_t timestamp;
     } service_get_time_t;
-
+#pragma pack(push,1)
     typedef struct alg_sdk_service_camera_config
     {
         /* Request Field */
@@ -317,6 +406,92 @@ extern "C"
         uint8_t channel;
     } service_camera_config_t;
 
+    typedef struct alg_sdk_service_camera_fw_update
+    {
+        /* Request Field */
+        uint8_t     ack_mode;
+        uint8_t     board_id;
+        uint8_t     channel_id;
+        uint8_t     is_completed;
+        uint32_t    fw_bin_size;
+        uint8_t     payload[ALG_SDK_MAX_BIN_SIZE];
+
+        /* Reply Field */
+        uint8_t     ack_code;
+        uint8_t     dev_id;
+    }service_camera_fw_update_t;
+
+    typedef struct alg_sdk_service_board_fw_update
+    {
+        /* Request Field */
+        uint8_t     ack_mode;
+        uint8_t     board_id;
+        uint32_t    fw_bin_size;
+        uint8_t     payload[ALG_SDK_MAX_BIN_SIZE];
+
+        /* Reply Field */
+        uint8_t     ack_code;
+        uint8_t     dev_id;
+    } service_board_fw_update_t;
+
+    typedef struct alg_sdk_service_board_channel_info
+    {
+        uint8_t     ack_mode;
+        uint8_t     board_id;
+        uint8_t     channel_num;
+
+        uint8_t     ack_code;
+        char        camera_link_status;
+        char        camera_streaming_on_status;
+        char        camera_name[ALG_SDK_CAMERA_NAME_LENTH];
+        int         camera_width;
+        int         camera_height;
+        char        camera_slv_trigger_start;
+        char        reserved1[ALG_SDK_RESERVED];
+        char        reserved2[ALG_SDK_RESERVED];
+        char        reserved3[ALG_SDK_RESERVED];
+        char        reserved4[ALG_SDK_RESERVED];
+        char        reserved5[ALG_SDK_RESERVED];
+    }service_board_channel_info_get_t;
+    typedef struct alg_sdk_service_board_i2c_info
+    {
+        uint8_t     ack_mode;
+        uint8_t     board_id;
+        uint8_t     channel_num;
+
+        uint8_t     ack_code;
+        uint8_t     i2c_addr_dev_cnt;
+        uint8_t     i2c_addr_array[ALG_SDK_IIC_ADDR_DEV_NUM];
+    }service_board_i2c_info_get_t;
+
+    typedef struct alg_sdk_service_board_info
+    {
+        /* Request Field */
+        uint8_t     ack_mode;
+        uint8_t     board_id;
+
+        /* Reply Field */
+        uint8_t     ack_code;
+        char        device_type[ALG_SDK_BOARD_TYPE_NAME_LENTH];
+        char        SN[ALG_SDK_SERIAL_NUM_NAME_LENTH];
+        uint8_t     hardware_version_num;
+        char        ps_firmware_version[ALG_SDK_PS_VERSION_NUM_LENTH];
+        char        pl_firmware_version[ALG_SDK_PL_VERSION_NUM_LENTH];
+        char        board_channel_num;
+    } service_board_info_get_t;
+
+    typedef struct alg_sdk_service_camera_info
+    {
+        /* Request Field */
+        uint8_t     ack_mode;
+        uint8_t     board_id;
+        uint8_t     channel;
+
+        /* Reply Field */
+        uint8_t     ack_code;
+        alg_sdk_module_product_info_t   camera_info;
+    } service_camera_info_get_t;
+#pragma pack(pop)
     typedef struct alg_sdk_service_camera_read_reg
     {
         /* Request Field */
@@ -397,7 +572,6 @@ extern "C"
         struct alg_sdk_task *next;
         void *control;
     } alg_sdk_task_t;
-
 #pragma pack(1)
     typedef struct alg_sdk_utc_time
     {
@@ -410,6 +584,7 @@ extern "C"
         uint8_t second;
         uint32_t us;
     } aili_utc_time_t;
+
     typedef struct
     {
         uint8_t using_time_mode;
@@ -418,7 +593,7 @@ extern "C"
         uint64_t relative_time;
     } aili_timestamp_ctl_t;
 #pragma pack()
- typedef struct alg_sdk_service_set_time
+    typedef struct alg_sdk_service_set_time
     {
         /* Request Field */
         uint8_t ack_mode;
@@ -431,6 +606,7 @@ extern "C"
         /* Reply Field */
         uint8_t ack_code;
     } service_set_time_t;
+
     typedef struct
     {
         uint32_t trigger_delay_time_us; //触发延时
