@@ -431,7 +431,6 @@ extern "C"
 
         /* Reply Field */
         uint8_t     ack_code;
-        uint8_t     dev_id;
     } service_board_fw_update_t;
 
     typedef struct alg_sdk_service_board_channel_info
