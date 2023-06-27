@@ -12,6 +12,7 @@ ALG_SDK_MAX_DESERDES = 8
 ALG_SDK_CHANNEL_PER_DEV = 8
 
 class service_camera_config(Structure):
+    _pack_ = 1
     _fields_ = [("ack_mode",c_uint8),
     ("ch_id",c_uint8),
     ("module_type", c_uint16),

@@ -3,6 +3,47 @@
 
 #include "alg_sdk/service.h"
 
+int load_board_fw_update_bin(const char *filename,uint8_t* payload, uint32_t *len)
+{
+    char *path = filename;
+    FILE *fp = fopen(path, "r");
+    printf("current path %s\r\n", path);
+    if(fp == NULL)
+    {
+        printf("file open failed,maybe file name is error\r\n");
+        return -1;
+    }
+
+    char *fw = malloc(1 * 1024 * 1024);
+    if(fw == NULL)
+    {
+        printf("malloc error\r\n");
+        fclose(fp);
+        return -1;
+    }
+
+    uint32_t size = fread(fw, 1, 1 * 1024 * 1024, fp);
+    if (size >= 1024)
+    {
+        printf("read fw bin size %d\r\n", size);
+    }
+    else
+    {
+        printf("file name is not right\r\n");
+        return -1;
+    }
+    //copy fw update bin
+    memcpy(payload,fw,size);
+    *len = size;
+
+    printf("size:%d\r\n",size);
+
+    free(fw);
+    fclose(fp);
+
+    return 0;
+}
+
 int load_sensor_config(const char* filename, uint8_t* payload, uint16_t* len)
 {
     int len_line=0;
@@ -126,6 +167,7 @@ int main (int argc, char **argv)
             /* Debug Info End */
 
             printf("ch %d, type %d\n", t.ch_id, t.module_type);
+            timeout = 10000;
             rc = alg_sdk_call_service(topic_name, &t, timeout);
             if (rc < 0)
             {
@@ -138,6 +180,135 @@ int main (int argc, char **argv)
 
         return 0;
 
+    }
+    else if ((argc == 3) && (strcmp(argv[1], "-fw_update_by_file") == 0))
+    {
+        char *file_name = argv[2];
+        const char *topic_name = "/service/board/fw_update";
+        {
+            service_board_fw_update_t t = {
+                .ack_mode = 1,
+                .board_id = 0,
+            };
+
+            // service_camera_fw_update_t t = {
+            //     .ack_mode = 1,
+            //     .board_id = 0,
+            //     .channel_id = 1,
+            // };
+
+            FILE *fp = fopen(file_name, "r");
+            printf("current path %s\r\n", file_name);
+            if(fp == NULL)
+            {
+                printf("file open failed,maybe file name is error\r\n");
+                return -1;
+            }
+
+            char *fw = malloc(64 * 1024 * 1024);
+            if(fw == NULL)
+            {
+                printf("malloc error\r\n");
+                fclose(fp);
+                return -1;
+            }
+            uint32_t offset = 0;
+
+            fseek(fp,0+offset,SEEK_SET);
+            uint32_t size = fread(fw, 1, 64 * 1024 * 1024, fp);
+            if (size >= 1024)
+            {
+                printf("read fw bin size %d\r\n", size);
+            }
+            else
+            {
+                printf("file name is not right\r\n");
+                return -1;
+            }
+
+            printf("size:%d\r\n",size);
+            uint8_t send_completed = 0;
+            while (!send_completed)
+            {
+                if (size >= ALG_SDK_MAX_BIN_SIZE)
+                {
+                    memcpy(t.payload,fw+offset,ALG_SDK_MAX_BIN_SIZE);
+                    t.fw_bin_size = ALG_SDK_MAX_BIN_SIZE;
+                    size -= ALG_SDK_MAX_BIN_SIZE;
+                    offset += ALG_SDK_MAX_BIN_SIZE;
+                }
+                else
+                {
+                    memcpy(t.payload,fw+offset,size);
+                    t.fw_bin_size = size;
+                    send_completed = 1;
+                    printf("send finished!\r\n");
+                }
+
+                rc = alg_sdk_call_service(topic_name, &t, timeout);
+                if (rc < 0)
+                {
+                    printf("Request Service : [%s] Error!\n", topic_name);
+                    return -1;
+                }
+
+                printf("[ack : %d], [dev_id : %d]\n", t.ack_code, t.dev_id);
+            }
+
+            free(fw);
+            fclose(fp);
+
+        }
+
+        return 0;
+
+    }
+    else if ((argc == 3) && (strcmp(argv[1], "-channel_info") == 0))
+    {
+        const char *topic_name = "/service/channel/info";
+        service_board_channel_info_get_t  t = {
+            .ack_mode = 1,
+            .board_id = 0,
+            .channel_num = 0,
+        };
+        t.channel_num = atoi(argv[2]);
+        printf("t.channel: %d\r\n",t.channel_num);
+        rc = alg_sdk_call_service(topic_name, &t, timeout);
+        if (rc < 0)
+        {
+            printf( "Request Service : [%s] Error!\n", topic_name);
+            return 0;
+        }
+
+        printf("[ack : %d]\n", t.ack_code);
+        printf("camera_link_status: %d,camera_streaming_on_status: %d\r\n",t.camera_link_status,t.camera_streaming_on_status);
+        printf("camera_name: %s\r\n",t.camera_name);
+        printf("camera_width: %d,camera_height: %d\r\n",t.camera_width,t.camera_height);
+        printf("camera_slv_trigger_start: %d\r\n",t.camera_slv_trigger_start);
+    }
+    else if ((argc == 3) && (strcmp(argv[1], "-get_i2c_addr_info") == 0))
+    {
+        const char *topic_name = "/service/i2c/info";
+        service_board_i2c_info_get_t  t = {
+            .ack_mode = 1,
+            .board_id = 0,
+            .channel_num = 0,
+        };
+        t.channel_num = atoi(argv[2]);
+        printf("t.channel: %d\r\n",t.channel_num);
+        rc = alg_sdk_call_service(topic_name, &t, timeout);
+        if (rc < 0)
+        {
+            printf( "Request Service : [%s] Error!\n", topic_name);
+            return 0;
+        }
+
+        printf("[ack : %d]\n", t.ack_code);
+        printf("i2c_addr_dev_cnt: %d\r\n",t.i2c_addr_dev_cnt);
+        for (int i = 0; i < t.i2c_addr_dev_cnt; i++)
+        {
+            printf("i2c_addr_array[%d]:0x%x\r\n",i,t.i2c_addr_array[i]);
+        }
     }
     else if ((argc == 2) && (strcmp(argv[1], "-read_reg") == 0))
     {
@@ -175,6 +346,62 @@ int main (int argc, char **argv)
         }
         /* End */
 
+    }
+    else if ((argc == 2) && (strcmp(argv[1], "-get_board_info") == 0))
+    {
+
+        /* Example : Read IIC */
+        const char *topic_name = "/service/board/get_info";
+
+        service_board_info_get_t t = {
+            .ack_mode = 1,
+            .board_id = 0,
+        };
+
+        rc = alg_sdk_call_service(topic_name, &t, timeout);
+        if (rc < 0)
+        {
+            printf( "Request Service : [%s] Error!\n", topic_name);
+            return 0;
+        }
+
+        printf("[ack : %d]\n", t.ack_code);
+        char *device_type = t.device_type;
+        printf("device_type: %s\r\n",device_type);
+        char *sn = t.SN;
+        printf("SN: %s\r\n",sn);
+        printf("hardware_version_num: %d\r\n",t.hardware_version_num);
+        char *ps_ver = t.ps_firmware_version;
+        printf("ps_ver: %s\r\n",ps_ver);
+        char *pl_ver = t.pl_firmware_version;
+        printf("pl_firmware_version: %s\r\n",pl_ver);
+        printf("board_channel_num: %d\r\n",t.board_channel_num);
+        /* End */
+    }
+    else if ((argc == 3) && (strcmp(argv[1], "-get_camera_info") == 0))
+    {
+
+        /* Example : Read IIC */
+        const char *topic_name = "/service/camera/get_info";
+
+        service_camera_info_get_t t = {
+            .ack_mode = 1,
+            .board_id = 0,
+            .channel = 0,
+        };
+
+        t.channel = atoi(argv[2]);
+        printf("t.channel:%d\r\n",t.channel);
+        rc = alg_sdk_call_service(topic_name, &t, timeout);
+        if (rc < 0)
+        {
+            printf( "Request Service : [%s] Error!\n", topic_name);
+            return 0;
+        }
+
+        printf("[ack : %d]\n", t.ack_code);
+        printf("[sensor_uid : 0x%x]\n", t.camera_info.sensor_uid);
+        /* End */
     }
     else if ((argc == 2) && (strcmp(argv[1], "-stream_on") == 0))
     {
