@@ -67,14 +67,15 @@ SOFTWARE.
 #define ALG_SDK_MAX_CHANNEL 16
 #define ALG_SDK_MAX_DESERDES 8
 #define ALG_SDK_CHANNEL_PER_DEV 8
-#define ALG_SDK_MAX_BIN_SIZE    (10*1024)
+#define ALG_SDK_MAX_BIN_SIZE        (4*1024)
+#define ALG_SDK_MAX_BIN_SIZE_TOTAL  (16*1024*1024)
+
 #define ALG_SDK_BOARD_TYPE_NAME_LENTH	15
 #define ALG_SDK_SERIAL_NUM_NAME_LENTH	15
 #define ALG_SDK_PS_VERSION_NUM_LENTH	15
 #define ALG_SDK_PL_VERSION_NUM_LENTH	15
-
-#define  ALG_SDK_CAMERA_NAME_LENTH      10
-#define  ALG_SDK_RESERVED	            10
+#define ALG_SDK_CAMERA_NAME_LENTH	    10
+#define ALG_SDK_RESERVED	            10
 #define  ALG_SDK_IIC_ADDR_DEV_NUM	    128
 
 #define  ALG_SDK_HARDWARE_VISION_LENGTH        	4
@@ -154,11 +155,17 @@ extern "C"
         ALG_SDK_SERVICE_PCIE_CMD_STREAM_CTL = 0x0e,
         ALG_SDK_SERVICE_PCIE_CMD_SENSOR_CONFIG = 0x10,
         ALG_SDK_SERVICE_PCIE_CMD_SET_TRIGGER = 0x0f,
+        ALG_SDK_SERVICE_PCIE_CMD_FW_UPDATE = 0x11,
+        ALG_SDK_SERVICE_PCIE_CMD_BOARD_INFO_GET = 0x12,
+        ALG_SDK_SERVICE_PCIE_CMD_CAMERA_INFO_GET = 0x13,
+        ALG_SDK_SERVICE_PCIE_CMD_CHANNEL_INFO_GET = 0x14,
+        ALG_SDK_SERVICE_PCIE_CMD_I2C_INFO_GET = 0x15,
     };
 
     enum
     {
         ALG_SDK_CMD_REPLY_ACK_CODE_SUCCESS = 0x00,
+        ALG_SDK_CMD_REPLY_ACK_CODE_FAILED = 0x01,
         ALG_SDK_CMD_REPLY_ACK_CODE_PARAM_ERR = 0xE0,
         ALG_SDK_CMD_REPLY_ACK_CODE_DEFAULT = 0xFF,
     };
@@ -323,7 +330,6 @@ extern "C"
         uint16_t    verifycrc16;
     }alg_sdk_module_product_info_t;
 #pragma pack(pop)
-
     typedef struct alg_sdk_pcie_common_head
     {
         uint8_t head;
@@ -405,7 +411,6 @@ extern "C"
         uint8_t ack_code;
         uint8_t channel;
     } service_camera_config_t;
-
     typedef struct alg_sdk_service_camera_fw_update
     {
         /* Request Field */
@@ -420,7 +425,6 @@ extern "C"
         uint8_t     ack_code;
         uint8_t     dev_id;
     }service_camera_fw_update_t;
-
     typedef struct alg_sdk_service_board_fw_update
     {
         /* Request Field */
@@ -478,7 +482,6 @@ extern "C"
         char        pl_firmware_version[ALG_SDK_PL_VERSION_NUM_LENTH];
         char        board_channel_num;
     } service_board_info_get_t;
-
     typedef struct alg_sdk_service_camera_info
     {
         /* Request Field */
@@ -583,7 +586,6 @@ extern "C"
         uint8_t second;
         uint32_t us;
     } aili_utc_time_t;
-
     typedef struct
     {
         uint8_t using_time_mode;
@@ -592,7 +594,7 @@ extern "C"
         uint64_t relative_time;
     } aili_timestamp_ctl_t;
 #pragma pack()
-    typedef struct alg_sdk_service_set_time
+ typedef struct alg_sdk_service_set_time
     {
         /* Request Field */
         uint8_t ack_mode;
@@ -605,7 +607,6 @@ extern "C"
         /* Reply Field */
         uint8_t ack_code;
     } service_set_time_t;
-
     typedef struct
     {
         uint32_t trigger_delay_time_us; //触发延时
