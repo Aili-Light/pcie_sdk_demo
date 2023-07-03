@@ -279,6 +279,7 @@ int main (int argc, char **argv)
         printf("camera_name: %s\r\n",t.camera_name);
         printf("camera_width: %d,camera_height: %d\r\n",t.camera_width,t.camera_height);
         printf("camera_slv_trigger_start: %d\r\n",t.camera_slv_trigger_start);
+        printf("camera_data_type: %d\r\n",t.camera_mipi_data_type);
     }
     else if ((argc == 4) && (strcmp(argv[1], "-get_i2c_addr_info") == 0))
     {
