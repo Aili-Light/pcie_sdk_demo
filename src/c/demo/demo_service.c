@@ -217,10 +217,9 @@ int main (int argc, char **argv)
             else
             {
                 printf("file name is not right\r\n");
+                free(fw);
                 return -1;
             }
-
-            printf("size:%d\r\n",size);
             uint8_t send_completed = 0;
             while (!send_completed)
             {
@@ -255,7 +254,92 @@ int main (int argc, char **argv)
         }
 
         return 0;
+    }
+    //./pcie_sdk_demo_service -write_file  0:/aili_camera_file/8M/082/03/single_ch/  /home/../*.log   0
+    else if ((argc == 5) && (strcmp(argv[1], "-write_file") == 0))
+    {
+        char *file_path = argv[3];
+        char file_name[255] = {0};
+        memcpy(file_name,file_path,strlen(file_path)+1);
+        const char *topic_name = "/service/write/file";
+        {
+            service_write_file_t t = {
+                .ack_mode = 1,
+                .board_id = 0,
+            };
+            t.board_id = atoi(argv[4]);
+            memcpy(t.file_path,argv[2],strlen(argv[2]));
+            char *tmp_buf,*strtok_file_name;
+            strtok(file_name,"/");
+            while ((tmp_buf = strtok(NULL, "/")) != NULL) {
+                strtok_file_name = tmp_buf;
+            }
+            strncat(t.file_path,strtok_file_name,strlen(strtok_file_name)+1);
+            printf("t.file_path = %s\n", t.file_path);
 
+            FILE *fp = fopen(file_path, "r");
+            printf("file path: %s\r\n", file_path);
+            if(fp == NULL)
+            {
+                printf("file open failed,maybe file name is error\r\n");
+                return -1;
+            }
+
+            char *fw = malloc(64 * 1024 * 1024);
+            if(fw == NULL)
+            {
+                printf("malloc error\r\n");
+                fclose(fp);
+                return -1;
+            }
+            uint32_t offset = 0;
+
+            fseek(fp,0+offset,SEEK_SET);
+            uint32_t size = fread(fw, 1, 64 * 1024 * 1024, fp);
+            if (size >= 1024)
+            {
+                printf("read fw bin size %d\r\n", size);
+            }
+            else
+            {
+                printf("file name is not right\r\n");
+                free(fw);
+                return -1;
+            }
+            uint8_t send_completed = 0;
+            while (!send_completed)
+            {
+                if (size >= ALG_SDK_MAX_BIN_SIZE)
+                {
+                    memcpy(t.payload,fw+offset,ALG_SDK_MAX_BIN_SIZE);
+                    t.fw_bin_size = ALG_SDK_MAX_BIN_SIZE;
+                    size -= ALG_SDK_MAX_BIN_SIZE;
+                    offset += ALG_SDK_MAX_BIN_SIZE;
+                }
+                else
+                {
+                    memcpy(t.payload,fw+offset,size);
+                    t.fw_bin_size = size;
+                    send_completed = 1;
+                    printf("send finished!\r\n");
+                }
+
+                rc = alg_sdk_call_service(topic_name, &t, timeout);
+                if (rc < 0)
+                {
+                    printf("Request Service : [%s] Error!\n", topic_name);
+                    return -1;
+                }
+
+                printf("[ack : %d]\n", t.ack_code);
+            }
+
+            free(fw);
+            fclose(fp);
+
+        }
+
+        return 0;
     }
     else if ((argc == 4) && (strcmp(argv[1], "-channel_info") == 0))
     {
