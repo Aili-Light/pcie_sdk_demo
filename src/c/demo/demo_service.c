@@ -403,7 +403,7 @@ int main (int argc, char **argv)
             .line_len = 1,
         };
 
-        uint16_t reg[10] = {0x0000, 0xa291, 0xb102, 0xb2c3, 0xc194, 0xc2d8, 0xd296, 0xd267, 0xe598, 0xe620};
+        uint16_t reg[1] = {0x0000};
 
         for (int i = 0; i < t1.line_len; i++)
         {
@@ -425,6 +425,37 @@ int main (int argc, char **argv)
         }
         /* End */
 
+    }
+    else if ((argc == 2) && (strcmp(argv[1], "-write_reg") == 0))
+    {
+
+        /* Example : Read IIC */
+        const char *topic_name = "/service/camera/write_reg";
+
+        service_camera_write_reg_t t1 = {
+            .ack_mode = 1,
+            .ch_id = 3,
+            .msg_type = 0x1608,
+            .device_addr = 0x90,
+            .line_len = 2,
+        };
+
+        uint16_t reg[2] = {0x0002, 0x00f3};
+
+        for (int i = 0; i < t1.line_len; i++)
+        {
+            t1.payload[i] = reg[i];
+        }
+
+        rc = alg_sdk_call_service(topic_name, &t1, timeout);
+        if (rc < 0)
+        {
+            printf( "Request Service : [%s] Error!\n", topic_name);
+            return 0;
+        }
+
+        printf("[ack : %d], [channel : %d]\n", t1.ack_code, t1.channel);
+        /* End */
     }
     else if ((argc == 3) && (strcmp(argv[1], "-get_board_info") == 0))
     {
