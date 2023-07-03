@@ -67,6 +67,10 @@ SOFTWARE.
 #define ALG_SDK_MAX_CHANNEL 16
 #define ALG_SDK_MAX_DESERDES 8
 #define ALG_SDK_CHANNEL_PER_DEV 8
+#define ALG_SDK_FILE_PATH_LEN        (255)
+#define ALG_SDK_PUSH_FILE_PATH_LEN    (60)
+#define ONE_MAX_TRANSMISSION_SIZE    (65535)
+
 #define ALG_SDK_MAX_BIN_SIZE        (4*1024)
 #define ALG_SDK_MAX_BIN_SIZE_TOTAL  (16*1024*1024)
 
@@ -436,6 +440,18 @@ extern "C"
         /* Reply Field */
         uint8_t     ack_code;
     } service_board_fw_update_t;
+    typedef struct alg_sdk_service_write_file
+    {
+        /* Request Field */
+        uint8_t     ack_mode;
+        uint8_t     board_id;
+        uint32_t    fw_bin_size;
+        uint8_t     file_path[ALG_SDK_FILE_PATH_LEN];
+        uint8_t     payload[ALG_SDK_MAX_BIN_SIZE];
+
+        /* Reply Field */
+        uint8_t     ack_code;
+    } service_write_file_t;
 
     typedef struct alg_sdk_service_board_channel_info
     {
