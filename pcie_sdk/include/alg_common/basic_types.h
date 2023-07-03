@@ -450,6 +450,7 @@ extern "C"
         int         camera_width;
         int         camera_height;
         char        camera_slv_trigger_start;
+        uint8_t     camera_mipi_data_type;
         char        reserved1[ALG_SDK_RESERVED];
         char        reserved2[ALG_SDK_RESERVED];
         char        reserved3[ALG_SDK_RESERVED];
