@@ -64,9 +64,8 @@ inline const char* imageFormatToStr( imageFormat format )
 		case IMAGE_GRAY8:	 	return "gray8";
 		case IMAGE_GRAY32F:  	return "gray32f";
 		case IMAGE_UNKNOWN: 	return "unknown";
+        default: return "unknown";
 	};
-	
-	return "unknown";
 }
 
 // imageFormatIsRGB
@@ -157,9 +156,8 @@ inline imageBaseType imageFormatBaseType( imageFormat format )
 		case IMAGE_BGR32F:		
 		case IMAGE_RGBA32F: 
 		case IMAGE_BGRA32F:		return IMAGE_FLOAT;
+        default: return IMAGE_UINT8;
 	}
-
-	return IMAGE_UINT8;
 }
 
 
@@ -193,9 +191,8 @@ inline size_t imageFormatChannels( imageFormat format )
 		case IMAGE_BAYER_GBRG:
 		case IMAGE_BAYER_GRBG:
 		case IMAGE_BAYER_RGGB:	return 1;
+        default: return 0;
 	}
-
-	return 0;
 }
 
 
@@ -229,9 +226,8 @@ inline size_t imageFormatDepth( imageFormat format )
 		case IMAGE_BAYER_GBRG:
 		case IMAGE_BAYER_GRBG:
 		case IMAGE_BAYER_RGGB:	return sizeof(unsigned char) * 8;
+        default: return 0;
 	}
-
-	return 0;
 }
 
 

@@ -76,7 +76,7 @@ ALG_SDK_API bool cuda_cvtColor_I420(void* img_src, imageFormat src_format, void*
 ALG_SDK_API bool cuda_alloc_map(void** ptr, size_t size );
 
 /* CUDA Malloc 
-/* Allocate CUDA Memory 
+* Allocate CUDA Memory 
 * @return `true` if the allocation FAILED, `false` otherwise.
 */
 ALG_SDK_API bool cuda_malloc(void **p, size_t s);

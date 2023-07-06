@@ -164,6 +164,7 @@ extern "C"
         ALG_SDK_SERVICE_PCIE_CMD_CAMERA_INFO_GET = 0x13,
         ALG_SDK_SERVICE_PCIE_CMD_CHANNEL_INFO_GET = 0x14,
         ALG_SDK_SERVICE_PCIE_CMD_I2C_INFO_GET = 0x15,
+        ALG_SDK_SERVICE_PCIE_CMD_WRITE_FILE = 0x16,
     };
 
     enum
@@ -672,6 +673,15 @@ extern "C"
         /* Reply Field */
         uint8_t ack_code;
     } service_set_trigger_t;
+
+#pragma pack(1)
+    typedef struct
+    {
+        char    path[ALG_SDK_PUSH_FILE_PATH_LEN];
+        uint16_t size;
+        uint16_t count;
+    } host_rpc_push_file_t;
+#pragma pack()
 
 #ifdef __cplusplus
 }
