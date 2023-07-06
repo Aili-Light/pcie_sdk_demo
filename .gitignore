@@ -7,3 +7,4 @@ alg_sdk.log
 *.pyc
 get-pip.py
 CMakeLists.txt.user
+tools/
