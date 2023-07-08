@@ -296,17 +296,16 @@ int main (int argc, char **argv)
 
             fseek(fp,0+offset,SEEK_SET);
             uint32_t size = fread(fw, 1, 64 * 1024 * 1024, fp);
-            if (size >= 1024)
+            if (size == 0)
             {
-                printf("read fw bin size %d\r\n", size);
-            }
-            else
-            {
-                printf("file name is not right\r\n");
+                printf("file size is 0, return!!");
                 free(fw);
-                return -1;
+                fw = NULL;
+                return;
             }
+            printf("read fw bin size %d\r\n", size);
             uint8_t send_completed = 0;
+            timeout = 15000;
             while (!send_completed)
             {
                 if (size >= ALG_SDK_MAX_BIN_SIZE)
@@ -323,7 +322,6 @@ int main (int argc, char **argv)
                     send_completed = 1;
                     printf("send finished!\r\n");
                 }
-
                 rc = alg_sdk_call_service(topic_name, &t, timeout);
                 if (rc < 0)
                 {
