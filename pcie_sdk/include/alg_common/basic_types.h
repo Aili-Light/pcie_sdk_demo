@@ -279,7 +279,7 @@ extern "C"
         uint32_t    vendeor_id;
         uint8_t     module_type;
         char        hardware_vision[ALG_SDK_HARDWARE_VISION_LENGTH];
-        uint16_t    firmware_version_uid;
+        uint32_t    firmware_version_uid;
         uint8_t     cis_iic_addr;
         uint8_t     serdes_iic_addr;
         uint8_t     isp_iic_addr;
