@@ -5,7 +5,7 @@
 
 int load_board_fw_update_bin(const char *filename,uint8_t* payload, uint32_t *len)
 {
-    char *path = filename;
+    const char *path = filename;
     FILE *fp = fopen(path, "r");
     printf("current path %s\r\n", path);
     if(fp == NULL)
@@ -301,7 +301,7 @@ int main (int argc, char **argv)
                 printf("file size is 0, return!!");
                 free(fw);
                 fw = NULL;
-                return;
+                return -1;
             }
             printf("read fw bin size %d\r\n", size);
             uint8_t send_completed = 0;
