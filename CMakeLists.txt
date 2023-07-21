@@ -57,22 +57,11 @@ if (WITH_GSTREAMER)
     else ()
         add_definitions(-DWITH_STREAM)
         include_directories(stream/include)
-        set(GST_INCLUDE_PATH /usr/local/gstreamer-1.0)
-        set(GST_LIBS ${GST_INCLUDE_PATH}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu)
-        include_directories(${GST_INCLUDE_PATH}/include/gstreamer-1.0
-                            ${GST_INCLUDE_PATH}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu/gstreamer-1.0/include
-                            ${GST_INCLUDE_PATH}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu/glib-2.0/include/
-                            ${GST_INCLUDE_PATH}/include/glib-2.0
-        )
-
-        set (GSTREAM_LIBS   ${GST_LIBS}/libgstreamer-1.0.so
-                            ${GST_LIBS}/libgstvideo-1.0.so
-                            ${GST_LIBS}/libgstapp-1.0.so
-                            ${GST_LIBS}/libgstwebrtc-1.0.so
-                            ${GST_LIBS}/libgstbase-1.0.so
-                            ${GST_LIBS}/libglib-2.0.so
-                            ${GST_LIBS}/libgobject-2.0.so
-        )
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(GST_LIBS REQUIRED IMPORTED_TARGET gstreamer-1.0 gobject-2.0 glib-2.0)
+        # MESSAGE(STATUS "GST_LIBS_INCLUDE_DIRS:   ${GST_LIBS_INCLUDE_DIRS}")
+        # MESSAGE(STATUS "GST_LIBS_LIBRARY_DIRS:   ${GST_LIBS_LIBRARY_DIRS}")	
+        include_directories(${GST_LIBS_INCLUDE_DIRS})
 
         if (WITH_CUDA)
             add_definitions(-DWITH_CUDA)
@@ -193,7 +182,6 @@ else()
             ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk_stream.so
             pthread
             anl
-            ${GSTREAM_LIBS}
         )
         set_target_properties(${PROJECT_NAME}_gst_camera PROPERTIES LINKER_LANGUAGE CXX)
         install (TARGETS ${PROJECT_NAME}_gst_camera RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
