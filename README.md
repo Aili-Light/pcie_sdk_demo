@@ -64,6 +64,12 @@ Install GStreamer (Windows)
 ------------------------------------
 GStreamer can be built from source on Windows (follow instructions from GStreamer's github page). But for convenience we also provide pre-built package for users. Please contact us for the package.  
 
+Use pkg-config  (Windows)
+------------------------------------
+1. download pkg-config from:  
+    `http://sourceforge.net/projects/pkgconfiglite`  
+2. extract pkg-config.ext and put it into mingw bin directory  
+3. add PKG_CONFIG_PATH in system path (value is the path to gstreamer)      
 
 # V4L2 Driver  (Ubuntu)
 ------------------------------------
