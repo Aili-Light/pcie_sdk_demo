@@ -37,13 +37,14 @@ Install GStreamer (Ubuntu)
    `meson --prefix=/usr/local/gstreamer-1.0 builddir`  
    After GStreamer has installed, you have to add PATH to your system environment.
 1. `vim ~/.bashrc`  
-2. append line : `export LD_LIBRARY_PATH=/usr/local/gstreamer-1.0/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH`  
-3. append line : `export GST_PLUGIN_PATH=/usr/local/gstreamer-1.0/lib/x86_64-linux-gnu/gstreamer-1.0/`  
-4. append line : `alias sudo='sudo PATH="$PATH" LD_LIBRARY_PATH="$LD_LIBRARY_PATH" GST_PLUGIN_PATH="$GST_PLUGIN_PATH"'`  
-5. save .bashrc and then `source ~/.bashrc`  
-6. `sudo vim /etc/ld.so.conf`  
-7. append line : `/usr/local/gstreamer-1.0/lib/x86_64-linux-gnu/`  
-8. `sudo ldconfig`  
+2. append line : `export CPATH=/usr/local/gstreamer-1.0/include/gstreamer-1.0:/usr/local/gstreamer-1.0/include/glib-2.0:/usr/local/gstreamer-1.0/lib/x86_64-linux-gnu/glib-2.0/include`  
+3. append line : `export LD_LIBRARY_PATH=/usr/local/gstreamer-1.0/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH`  
+4. append line : `export GST_PLUGIN_PATH=/usr/local/gstreamer-1.0/lib/x86_64-linux-gnu/gstreamer-1.0/`  
+5. append line : `alias sudo='sudo PATH="$PATH" LD_LIBRARY_PATH="$LD_LIBRARY_PATH" GST_PLUGIN_PATH="$GST_PLUGIN_PATH"'`  
+6. save .bashrc and then `source ~/.bashrc`  
+7. `sudo vim /etc/ld.so.conf`  
+8. append line : `/usr/local/gstreamer-1.0/lib/x86_64-linux-gnu/`  
+9. `sudo ldconfig`  
    Check if GStreamer is perfectly install. 
    Type : `gst-launch-1.0 --version`  
    You should be able to see :  
