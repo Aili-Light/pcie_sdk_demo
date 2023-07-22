@@ -12,39 +12,9 @@ message(STATUS "Processor name is ${CMAKE_SYSTEM_PROCESSOR}")
 include_directories(${CMAKE_SOURCE_DIR}/pcie_sdk/include ${CMAKE_SOURCE_DIR}/src/c)
 set(PROJECT_LINK_DIR ${CMAKE_SOURCE_DIR}/pcie_sdk/lib)
 
-if (WITH_ROS)
-    add_definitions(-DWITH_ROS)
-    find_package(catkin REQUIRED COMPONENTS
-        roscpp
-        rospy
-        std_msgs
-        sensor_msgs
-    )
-    include_directories(
-        ${catkin_INCLUDE_DIRS}
-    )
-endif ()
-
 if (WITH_GSTREAMER)
     if (MINGW32)
-        set(GST_INCLUDE_PATH D:/gstreamer/1.0/mingw_x86_64)
-        set(GST_LIBS ${GST_INCLUDE_PATH}/lib)
-        message(STATUS "GST_LIBS is ${GST_LIBS}")
-        include_directories(${GST_INCLUDE_PATH}/include/gstreamer-1.0
-                        ${GST_INCLUDE_PATH}/lib/gstreamer-1.0/include
-                        ${GST_INCLUDE_PATH}/lib/glib-2.0/include/
-                        ${GST_INCLUDE_PATH}/include/glib-2.0
-        )
         include_directories(stream)
-        set (GSTREAM_LIBS  ${GST_LIBS}/libgstreamer-1.0.dll.a
-                        ${GST_LIBS}/libgstvideo-1.0.dll.a
-                        ${GST_LIBS}/libgstapp-1.0.dll.a
-                        ${GST_LIBS}/libgstwebrtc-1.0.dll.a
-                        ${GST_LIBS}/libgstbase-1.0.dll.a
-                        ${GST_LIBS}/libglib-2.0.dll.a
-                        ${GST_LIBS}/libgobject-2.0.dll.a
-                        ${GST_LIBS}/libgstcodecparsers-1.0.dll.a
-        )
         if (WITH_CUDA)
             add_definitions(-DWITH_CUDA)
             include_directories(${CUDA_INCLUDE_DIRS})
