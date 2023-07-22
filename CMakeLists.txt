@@ -57,6 +57,12 @@ if (WITH_GSTREAMER)
     else ()
         add_definitions(-DWITH_STREAM)
         include_directories(stream/include)
+
+        find_package(PkgConfig REQUIRED)
+        pkg_search_module(GST_LIBS REQUIRED gstreamer-1.0 gobject-2.0 glib-2.0)
+        MESSAGE(STATUS "GST_LIBS_INCLUDE_DIRS:   ${GST_LIBS_INCLUDE_DIRS}")
+        include_directories(${GST_LIBS_INCLUDE_DIRS})
+        
         if (WITH_CUDA)
             add_definitions(-DWITH_CUDA)
             set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cuda")
