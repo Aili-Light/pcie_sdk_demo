@@ -334,7 +334,7 @@ extern "C"
         uint32_t    reserved_10;
         uint16_t    verifycrc16;
     }alg_sdk_module_product_info_t;
-#pragma pack(pop)
+
     typedef struct alg_sdk_pcie_common_head
     {
         uint8_t head;
@@ -344,7 +344,7 @@ extern "C"
         uint8_t resv[125];
     } pcie_common_head_t;
 
-    typedef struct alg_sdk_pcie_image_info_meta  
+    typedef struct alg_sdk_pcie_image_info_meta
     {
         uint32_t frame_index;
         uint16_t width;
@@ -357,7 +357,9 @@ extern "C"
         float temp;
         uint32_t img_size;
         uint64_t timestamp;
-    } pcie_image_info_meta_t __attribute__ ((aligned(1)));
+        uint32_t debug_info[256];
+        uint16_t crc16;
+    } pcie_image_info_meta_t;
 
     typedef struct alg_sdk_pcie_image_data
     {
@@ -365,7 +367,7 @@ extern "C"
         pcie_image_info_meta_t image_info_meta;
         void *payload;
     } pcie_image_data_t;
-
+#pragma pack(pop)
     typedef struct alg_sdk_pcie_poc_info_meta
     {
         float vol;
