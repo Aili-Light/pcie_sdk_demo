@@ -258,7 +258,7 @@ int main (int argc, char **argv)
     //./pcie_sdk_demo_service -write_file  0:/aili_camera_file/8M/082/03/single_ch/  /home/../*.log   0
     else if ((argc == 5) && (strcmp(argv[1], "-write_file") == 0))
     {
-        char *file_path = argv[3];
+        const char *file_path = argv[3];
         char file_name[255] = {0};
         memcpy(file_name,file_path,strlen(file_path)+1);
         const char *topic_name = "/service/write/file";
@@ -395,13 +395,13 @@ int main (int argc, char **argv)
 
         service_camera_read_reg_t t1 = {
             .ack_mode = 1,
-            .ch_id = 3,
+            .ch_id = 0,
             .msg_type = 0x1608,
-            .device_addr = 0x90,
+            .device_addr = 0x80,
             .line_len = 1,
         };
 
-        uint16_t reg[1] = {0x0000};
+        uint16_t reg[1] = {0x0383};
 
         for (int i = 0; i < t1.line_len; i++)
         {
@@ -419,7 +419,7 @@ int main (int argc, char **argv)
 
         for (int i = 0; i < t1.length_r; i++)
         {
-            printf("[len : %d][data : %d]\n", t1.length_r, t1.data[i]);
+            printf("[len : %d], [data : %d]\n", t1.length_r, t1.data[i]&0xff);
         }
         /* End */
 
@@ -432,13 +432,13 @@ int main (int argc, char **argv)
 
         service_camera_write_reg_t t1 = {
             .ack_mode = 1,
-            .ch_id = 3,
+            .ch_id = 0,
             .msg_type = 0x1608,
-            .device_addr = 0x90,
+            .device_addr = 0x80,
             .line_len = 2,
         };
 
-        uint16_t reg[2] = {0x0002, 0x00f3};
+        uint16_t reg[2] = {0x0383, 0x0007};
 
         for (int i = 0; i < t1.line_len; i++)
         {

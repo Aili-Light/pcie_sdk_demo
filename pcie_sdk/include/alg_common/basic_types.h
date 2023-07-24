@@ -82,17 +82,20 @@ SOFTWARE.
 #define ALG_SDK_RESERVED	            10
 #define  ALG_SDK_IIC_ADDR_DEV_NUM	    128
 
+
 #define  ALG_SDK_HARDWARE_VISION_LENGTH        	4
 #define  ALG_SDK_CIS_TYPE_LENGTH               	20
 #define  ALG_SDK_SERDES_TYPE_LENGTH            	20
 #define  ALG_SDK_DATA_TYPE_NAME_LENGTH         	20
 #define  ALG_SDK_PRODUCT_ID_LENGTH             	21
 #define  ALG_SDK_SENSOR_COLOR_PATTERN_LENGTH   	10
+#define  ALG_SDK_SENSOR_WORK_MODE_LENGTH        20
 #define  ALG_SDK_ORDER_NUMBER_LENGTH           	15
 #define  ALG_SDK_SALE_SERIAL_NUMBER_LENGTH     	25
 #define  ALG_SDK_PRODUCT_SERIAL_NUMBER_LENGTH  	15
 #define  ALG_SDK_PLOT_NUMBER_LENGTH            	10
 #define  ALG_SDK_PRODUCT_DATE_LENGTH           	15
+#define  ALG_SDK_INTER_PARAMER_MODEL_LENGTH     10
 
 #ifdef __cplusplus
 extern "C"
@@ -272,69 +275,81 @@ extern "C"
     typedef struct alg_sdk_module_product_info
     {
         //basic info
-        uint32_t    config_table_uid_1ch;
-        uint32_t    config_table_uid_2ch;
-        uint32_t    config_table_uid_4ch;
-        char        product_id[ALG_SDK_PRODUCT_ID_LENGTH];
-        uint32_t    vendeor_id;
-        uint8_t     module_type;
-        char        hardware_vision[ALG_SDK_HARDWARE_VISION_LENGTH];
-        uint32_t    firmware_version_uid;
-        uint8_t     cis_iic_addr;
-        uint8_t     serdes_iic_addr;
-        uint8_t     isp_iic_addr;
-        uint8_t     pmic_iic_addr;
-        uint8_t     eeprom_iic_addr;
-        uint8_t     imu_1_iic_addr;
-        uint8_t     imu_2_iic_addr;
-        uint32_t    eeprom_register_addr;
-        char        cis_type[ALG_SDK_CIS_TYPE_LENGTH];
-        char        serdes_type[ALG_SDK_SERDES_TYPE_LENGTH];
-        uint8_t     hfov;
-        uint8_t     resolution;
-        char        data_type_name[ALG_SDK_DATA_TYPE_NAME_LENGTH];
-        uint8_t     data_type_value;
-        char        sensor_color_pattern[ALG_SDK_SENSOR_COLOR_PATTERN_LENGTH];
-        uint16_t    width;
-        uint16_t    height;
-        uint8_t     frame_rate;
-        uint8_t     work_mode;
-        uint8_t     serdes_mode;
+        uint32_t    m_pSensorUid;
+        char        m_bProduct_ID[ALG_SDK_PRODUCT_ID_LENGTH];
+        uint8_t     m_bModule_Type;
+        char        m_bHardware_Vision[ALG_SDK_HARDWARE_VISION_LENGTH];
+        uint32_t    m_bFirmware_Version_UID;
+        uint8_t     m_bCIS_IIC_Address;
+        uint8_t     m_bSerDes_IIC_Address;
+        uint8_t     m_bISP_IIC_Address;
+        uint8_t     m_bPMIC_IIC_Address;
+        uint8_t     m_bEEPROM_IIC_Address;
+        uint8_t     m_bIMU_1_IIC_Address;
+        uint8_t     m_bIMU_2_IIC_Address;
+        uint8_t     m_bEEPROM_Model;
+        char        m_bCIS_Type[ALG_SDK_CIS_TYPE_LENGTH];
+        uint8_t     m_bSerDes_Type;
+        uint8_t     m_bHFOV;
+        char        m_bData_Type_Name[ALG_SDK_DATA_TYPE_NAME_LENGTH];
+        uint8_t     m_bData_Type_Value;
+        char        m_bSensor_Color_Pattern[ALG_SDK_SENSOR_COLOR_PATTERN_LENGTH];
+        uint16_t    m_bWidth;
+        uint16_t    m_bHeight;
+        uint8_t     m_bFrame_Rate;
+        char        m_bWork_Mode[ALG_SDK_SENSOR_WORK_MODE_LENGTH];
+        uint8_t     m_bSerDes_Mode;
 
         //product info
-        char        order_number[ALG_SDK_ORDER_NUMBER_LENGTH];
-        char        sale_serial_number[ALG_SDK_SALE_SERIAL_NUMBER_LENGTH];
-        char        product_serial_number[ALG_SDK_PRODUCT_SERIAL_NUMBER_LENGTH];
-        char        plot_number[ALG_SDK_PLOT_NUMBER_LENGTH];
-        char        product_date[ALG_SDK_PRODUCT_DATE_LENGTH];
-        uint8_t     product_location;
-        uint8_t     calibrate_internal_parameters;
-        float       test_item_mtf_middle;
-        float       test_item_mtf_0_5_up;
-        float       test_item_mtf_0_5_down;
-        float       test_item_mtf_0_5_left;
-        float       test_item_mtf_0_5_right;
-        float       test_item_mtf_0_7_9_up;
-        float       test_item_mtf_0_7_9_down;
-        float       test_item_mtf_0_7_9_left;
-        float       test_item_mtf_0_7_9_right;
-        float       leak_big;
-        float       leak_small;
-        float       prassure;
-        float       threadhold;
-        uint32_t    sensor_uid;
-        uint32_t    reserved_2;
-        uint32_t    reserved_3;
-        uint32_t    reserved_4;
-        uint32_t    reserved_5;
-        uint32_t    reserved_6;
-        uint32_t    reserved_7;
-        uint32_t    reserved_8;
-        uint32_t    reserved_9;
-        uint32_t    reserved_10;
-        uint16_t    verifycrc16;
+        char        m_pProduct_Serial_Number[ALG_SDK_PRODUCT_SERIAL_NUMBER_LENGTH];
+        char        m_pPLot_Number[ALG_SDK_PLOT_NUMBER_LENGTH];
+        char        m_pProduct_Date[ALG_SDK_PRODUCT_DATE_LENGTH];
+        uint32_t    m_bVendeor_ID;
+        uint8_t     m_pProduct_Location;
+        uint8_t     m_pCalibrate_Internal_Parameters;
+        float       m_pTestItem_MTF_Middle;
+        float       m_pTestItem_MTF_0_5_Up;
+        float       m_pTestItem_MTF_0_5_Down;
+        float       m_pTestItem_MTF_0_5_Left;
+        float       m_pTestItem_MTF_0_5_Right;
+        float       m_pTestItem_MTF_0_7_9_Up;
+        float       m_pTestItem_MTF_0_7_9_Down;
+        float       m_pTestItem_MTF_0_7_9_Left;
+        float       m_pTestItem_MTF_0_7_9_Right;
+        float       m_pLeak_Big;
+        float       m_pLeak_Small;
+        float       m_pPrassure;
+        float       m_pThreadhold;
+
+        //inter param model
+        char        m_iInterParam_Model[ALG_SDK_INTER_PARAMER_MODEL_LENGTH];
+        uint16_t    m_iInterParam_Width;
+        uint16_t    m_iInterParam_Height;
+        float       m_iInterParam_RMS;
+        uint8_t     m_iInterParam_ValidNum;
+        float       m_iInterParam_fx;
+        float       m_iInterParam_fy;
+        float       m_iInterParam_cx;
+        float       m_iInterParam_cy;
+        float       m_iInterParam_k1;
+        float       m_iInterParam_k2;
+        float       m_iInterParam_k3;
+        float       m_iInterParam_k4;
+        float       m_iInterParam_k5;
+        float       m_iInterParam_k6;
+        float       m_iInterParam_k7;
+        float       m_iInterParam_k8;
+        float       m_iInterParam_k9;
+        float       m_iInterParam_k10;
+        float       m_iInterParam_k11;
+        float       m_iInterParam_k12;
+        float       m_iInterParam_k13;
+        float       m_iInterParam_k14;
+        float       m_iInterParam_k15;
+        float       m_iInterParam_k16;
+        uint16_t    m_pVerifyCRC16;
     }alg_sdk_module_product_info_t;
-#pragma pack(pop)
+
     typedef struct alg_sdk_pcie_common_head
     {
         uint8_t head;
@@ -344,7 +359,7 @@ extern "C"
         uint8_t resv[125];
     } pcie_common_head_t;
 
-    typedef struct alg_sdk_pcie_image_info_meta  
+    typedef struct alg_sdk_pcie_image_info_meta
     {
         uint32_t frame_index;
         uint16_t width;
@@ -357,7 +372,9 @@ extern "C"
         float temp;
         uint32_t img_size;
         uint64_t timestamp;
-    } pcie_image_info_meta_t __attribute__ ((aligned(1)));
+        uint32_t debug_info[256];
+        uint16_t crc16;
+    } pcie_image_info_meta_t;
 
     typedef struct alg_sdk_pcie_image_data
     {
@@ -365,7 +382,7 @@ extern "C"
         pcie_image_info_meta_t image_info_meta;
         void *payload;
     } pcie_image_data_t;
-
+#pragma pack(pop)
     typedef struct alg_sdk_pcie_poc_info_meta
     {
         float vol;
