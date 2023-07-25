@@ -163,16 +163,23 @@ void callback_image_data(void *p)
 {
     pcie_image_data_t* msg = (pcie_image_data_t*)p;
     /* Debug message */
-    // printf("[frame = %d], [len %ld], [byte_0 = %d], [byte_end = %d]\n",
-    //        msg->image_info_meta.frame_index,  msg->image_info_meta.img_size, ((uint8_t*)msg->payload)[0], ((uint8_t*)msg->payload)[msg->image_info_meta.img_size - 1]);
+    int ch_id = get_channel_id(msg);
+    // float poc_current = 0.0f;
+    // float poc_voltage = 0.0f;
+    // memcpy(&poc_current, &msg->image_info_meta.debug_info[1], sizeof(uint32_t));
+    // memcpy(&poc_voltage, &msg->image_info_meta.debug_info[0], sizeof(uint32_t));
+    // // printf("[frame = %d], [len %ld], [byte_0 = %d], [byte_end = %d]\n",
+    // //        msg->image_info_meta.frame_index,  msg->image_info_meta.img_size, ((uint8_t*)msg->payload)[0], ((uint8_t*)msg->payload)[msg->image_info_meta.img_size - 1]);
+    // printf("[channel = %d], [frame = %d], [time %ld], [Exp = %f], [AGain = %f], [DGain = %f], [Current = %f], [Voltage = %f]\n", ch_id,
+    // msg->image_info_meta.frame_index,  msg->image_info_meta.timestamp,  msg->image_info_meta.exposure, msg->image_info_meta.again, msg->image_info_meta.dgain, poc_current, poc_voltage);
 
     /* check frame rate (every 1 second) */
-    frame_rate_monitor(get_channel_id(msg), msg->image_info_meta.frame_index);
+    frame_rate_monitor(ch_id, msg->image_info_meta.frame_index);
 
     /* for Image Display (by OpenCV)
         This may cause frame rate drop when CPU has run out of resources. 
     */
-   array_2_mat((uchar*)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, msg->image_info_meta.data_type, get_channel_id(msg), msg->image_info_meta.frame_index, msg->common_head.topic_name);  // YUV422 type is CV_8U2
+   array_2_mat((uchar*)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, msg->image_info_meta.data_type, ch_id, msg->image_info_meta.frame_index, msg->common_head.topic_name);  // YUV422 type is CV_8U2
 }
 
 int main (int argc, char **argv)
