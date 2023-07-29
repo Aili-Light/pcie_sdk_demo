@@ -373,6 +373,7 @@ int main (int argc, char **argv)
         };
         t.board_id = atoi(argv[2]);
         t.channel_num = atoi(argv[3]);
+        timeout = 10000;
         rc = alg_sdk_call_service(topic_name, &t, timeout);
         if (rc < 0)
         {
@@ -381,13 +382,13 @@ int main (int argc, char **argv)
         }
 
         printf("[ack : %d]\n", t.ack_code);
-        printf("i2c_addr_dev_cnt: %d\r\n",t.i2c_addr_dev_cnt);
+        printf("i2c_dev_cnt: %d\r\n",t.i2c_addr_dev_cnt);
         for (int i = 0; i < t.i2c_addr_dev_cnt; i++)
         {
-            printf("i2c_addr_array[%d]:0x%x\r\n",i,t.i2c_addr_array[i]);
+            printf("i2c_dev_addr[%d]:0x%x\r\n",i,t.i2c_addr_array[i]);
         }
     }
-    else if ((argc == 2) && (strcmp(argv[1], "-read_reg") == 0))
+    else if ((argc == 7) && (strcmp(argv[1], "-read_reg") == 0))
     {
 
         /* Example : Read IIC */
@@ -397,17 +398,23 @@ int main (int argc, char **argv)
             .ack_mode = 1,
             .ch_id = 0,
             .msg_type = 0x1608,
-            .device_addr = 0x80,
+            .device_addr = 0x90,
             .line_len = 1,
         };
+        uint16_t reg[1] = {0};
+        uint8_t board_id = 0,ch_id = 0;
+        board_id = strtol(argv[2],NULL,16);
+        ch_id = strtol(argv[3],NULL,16);
+        t1.ch_id = board_id*8 + ch_id;
+        t1.device_addr = strtol(argv[4],NULL,16);
+        reg[0] = strtol(argv[5],NULL,16);
+        t1.msg_type = strtol(argv[6],NULL,16);
 
-        uint16_t reg[1] = {0x0383};
-
+        printf("read: ch[%d]: dev_addr:0x%x,reg:0x%x,fmt:0x%x\r\n",t1.ch_id,t1.device_addr,reg[0],t1.msg_type);
         for (int i = 0; i < t1.line_len; i++)
         {
             t1.payload[i] = reg[i];
         }
-
         rc = alg_sdk_call_service(topic_name, &t1, timeout);
         if (rc < 0)
         {
@@ -416,15 +423,19 @@ int main (int argc, char **argv)
         }
 
         printf("[ack : %d], [channel : %d]\n", t1.ack_code, t1.channel);
-
+        if(0 != t1.ack_code)
+        {
+            printf("[Error]: IIC Read Failed! Check Dev_addr or Reg is exit?\r\n");
+            return 0;
+        }
         for (int i = 0; i < t1.length_r; i++)
         {
-            printf("[len : %d], [data : %d]\n", t1.length_r, t1.data[i]&0xff);
+            printf("[len : %d], [read_data[%d] : 0x%X]\n", t1.length_r, i,t1.data[i]&0xff);
         }
         /* End */
 
     }
-    else if ((argc == 2) && (strcmp(argv[1], "-write_reg") == 0))
+    else if ((argc == 8) && (strcmp(argv[1], "-write_reg") == 0))
     {
 
         /* Example : Read IIC */
@@ -437,8 +448,17 @@ int main (int argc, char **argv)
             .device_addr = 0x80,
             .line_len = 2,
         };
-
-        uint16_t reg[2] = {0x0383, 0x0007};
+        uint8_t board_id = 0;
+        uint8_t ch_id = 0;
+        uint16_t reg[2] = {0};
+        board_id = strtol(argv[2],NULL,16);
+        ch_id = strtol(argv[3],NULL,16);
+        t1.ch_id = board_id*8 + ch_id;
+        t1.device_addr = strtol(argv[4],NULL,16);
+        reg[0] = strtol(argv[5],NULL,16);
+        reg[1] = strtol(argv[6],NULL,16);
+        t1.msg_type = strtol(argv[7],NULL,16);
+        printf("write: ch[%d]: dev_addr:0x%x,reg:0x%x,data:0x%x,fmt:0x%x\r\n",t1.ch_id,t1.device_addr,reg[0],reg[1],t1.msg_type);
 
         for (int i = 0; i < t1.line_len; i++)
         {
@@ -453,6 +473,11 @@ int main (int argc, char **argv)
         }
 
         printf("[ack : %d], [channel : %d]\n", t1.ack_code, t1.channel);
+        if(0 != t1.ack_code)
+        {
+            printf("[Error]:IIC Write Failed! Check Dev_addr or Reg is exit?\r\n");
+            return 0;
+        }
         /* End */
     }
     else if ((argc == 3) && (strcmp(argv[1], "-get_board_info") == 0))
