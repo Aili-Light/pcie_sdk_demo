@@ -508,7 +508,7 @@ int main (int argc, char **argv)
         }
 
         printf("[ack : %d]\n", t.ack_code);
-        printf("[sensor_uid : 0x%x]\n", t.camera_info.sensor_uid);
+        printf("[sensor_uid : 0x%x]\n", t.camera_info.m_pSensorUid);
         /* End */
     }
     else if ((argc == 2) && (strcmp(argv[1], "-stream_on") == 0))

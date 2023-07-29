@@ -63,10 +63,14 @@ void callback_image_data(void *p)
     pcie_image_data_t *msg = (pcie_image_data_t *)p;
 
     int ch_id = get_channel_id(msg);
+    // float poc_current = 0.0f;
+    // float poc_voltage = 0.0f;
+    // memcpy(&poc_current, &msg->image_info_meta.debug_info[1], sizeof(uint32_t));
+    // memcpy(&poc_voltage, &msg->image_info_meta.debug_info[0], sizeof(uint32_t));
     // printf("[channel = %d], [frame = %d], [time %ld], [byte_0 = %d], [byte_end = %d]\n", ch_id,
     // msg->image_info_meta.frame_index,  msg->image_info_meta.timestamp, ((uint8_t*)msg->payload)[0], ((uint8_t*)msg->payload)[msg->image_info_meta.img_size - 1]);
-    // printf("[channel = %d], [frame = %d], [time %ld], [Exp = %f], [AGain = %f], [DGain = %f]\n", ch_id,
-    // msg->image_info_meta.frame_index,  msg->image_info_meta.timestamp,  msg->image_info_meta.exposure, msg->image_info_meta.again, msg->image_info_meta.dgain);
+    // printf("[channel = %d], [frame = %d], [time %ld], [Exp = %f], [AGain = %f], [DGain = %f], [Current = %f], [Voltage = %f]\n", ch_id,
+    // msg->image_info_meta.frame_index,  msg->image_info_meta.timestamp,  msg->image_info_meta.exposure, msg->image_info_meta.again, msg->image_info_meta.dgain, poc_current, poc_voltage);
     g_camera[ch_id].capture_image(msg);
 
     sem_post(&full[ch_id]);
