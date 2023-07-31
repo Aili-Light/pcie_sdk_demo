@@ -135,46 +135,46 @@ int main(int argc, char **argv)
 
     if (argc > 1)
     {
-        if (strcmp(argv[1], "display") == 0)
+        if (strncmp(argv[1], "display", 16) == 0)
         {
-            strcpy(&appsrc_parse[0][0], "protocol=display");
-            strcpy(&appsrc_parse[1][0], "codec_type=raw");
-            strcpy(&appsrc_parse[2][0], "have_sei=0");
+            strncpy(&appsrc_parse[0][0], "protocol=display", 32);
+            strncpy(&appsrc_parse[1][0], "codec_type=raw", 32);
+            strncpy(&appsrc_parse[2][0], "have_sei=0", 32);
         }
-        else if (strcmp(argv[1], "file") == 0)
+        else if (strncmp(argv[1], "file", 16) == 0)
         {
-            strcpy(&appsrc_parse[0][0], "protocol=file");
-            strcpy(&appsrc_parse[1][0], "codec_type=h264");
-            strcpy(&appsrc_parse[2][0], "have_sei=0");
+            strncpy(&appsrc_parse[0][0], "protocol=file", 32);
+            strncpy(&appsrc_parse[1][0], "codec_type=h264", 32);
+            strncpy(&appsrc_parse[2][0], "have_sei=0", 32);
         }
-        else if (strcmp(argv[1], "file-raw") == 0)
+        else if (strncmp(argv[1], "file-raw", 16) == 0)
         {
-            strcpy(&appsrc_parse[0][0], "protocol=file");
-            strcpy(&appsrc_parse[1][0], "codec_type=raw");
+            strncpy(&appsrc_parse[0][0], "protocol=file", 32);
+            strncpy(&appsrc_parse[1][0], "codec_type=raw", 32);
         }
-        else if (strcmp(argv[1], "file-sei") == 0)
+        else if (strncmp(argv[1], "file-sei", 16) == 0)
         {
-            strcpy(&appsrc_parse[0][0], "protocol=file");
-            strcpy(&appsrc_parse[1][0], "codec_type=h264");
-            strcpy(&appsrc_parse[2][0], "have_sei=1");
+            strncpy(&appsrc_parse[0][0], "protocol=file", 32);
+            strncpy(&appsrc_parse[1][0], "codec_type=h264", 32);
+            strncpy(&appsrc_parse[2][0], "have_sei=1", 32);
         }
-        else if (strcmp(argv[1], "file-ntp") == 0)
+        else if (strncmp(argv[1], "file-ntp", 16) == 0)
         {
-            strcpy(&appsrc_parse[0][0], "protocol=file");
-            strcpy(&appsrc_parse[1][0], "codec_type=h264");
-            strcpy(&appsrc_parse[2][0], "have_sei=3");
+            strncpy(&appsrc_parse[0][0], "protocol=file", 32);
+            strncpy(&appsrc_parse[1][0], "codec_type=h264", 32);
+            strncpy(&appsrc_parse[2][0], "have_sei=3", 32);
         }
-        else if (strcmp(argv[1], "record") == 0)
+        else if (strncmp(argv[1], "record", 16) == 0)
         {
-            strcpy(&appsrc_parse[0][0], "protocol=record");
-            strcpy(&appsrc_parse[1][0], "codec_type=h264");
-            strcpy(&appsrc_parse[2][0], "have_sei=0");
+            strncpy(&appsrc_parse[0][0], "protocol=record", 32);
+            strncpy(&appsrc_parse[1][0], "codec_type=h264", 32);
+            strncpy(&appsrc_parse[2][0], "have_sei=0", 32);
         }
-        else if (strcmp(argv[1], "record-sei") == 0)
+        else if (strncmp(argv[1], "record-sei", 16) == 0)
         {
-            strcpy(&appsrc_parse[0][0], "protocol=record");
-            strcpy(&appsrc_parse[1][0], "codec_type=h264");
-            strcpy(&appsrc_parse[2][0], "have_sei=1");
+            strncpy(&appsrc_parse[0][0], "protocol=record", 32);
+            strncpy(&appsrc_parse[1][0], "codec_type=h264", 32);
+            strncpy(&appsrc_parse[2][0], "have_sei=1", 32);
         }
     }
     else
@@ -183,11 +183,11 @@ int main(int argc, char **argv)
         exit(0);
     }
 
-    if ((argc > 2) && (strcmp(argv[2], "-all") == 0))
+    if ((argc > 2) && (strncmp(argv[2], "-all", 16) == 0))
     {
         if (argc > 3)
         {
-            strcpy(&appsrc_parse[3][0], argv[3]);
+            strncpy(&appsrc_parse[3][0], argv[3], 32);
         }
         
         char image_topic_names[ALG_SDK_MAX_CHANNEL][256];
@@ -216,18 +216,18 @@ int main(int argc, char **argv)
             }
         }
     }
-    else if ((argc > 3) && (strcmp(argv[2], "-c") == 0))
+    else if ((argc > 3) && (strncmp(argv[2], "-c", 16) == 0))
     {
         const char *topic_name = argv[3];
         printf("Client subscribe to topic [%s]\n", topic_name);
         const char *ptr_topic = (const char*)(topic_name+19);
         char c_ch_id[2];
-        strcpy(c_ch_id, ptr_topic);
+        strncpy(c_ch_id, ptr_topic, 2);
         int ch_id = atoi(c_ch_id);
 
         if (argc > 4)
         {
-            strcpy(&appsrc_parse[3][0], argv[4]);
+            strncpy(&appsrc_parse[3][0], argv[4], 32);
         }
 
         camera_disp_args_t arg = {(void *)(GstCamera *)&g_camera[ch_id], (void *)(intptr_t)ch_id};
