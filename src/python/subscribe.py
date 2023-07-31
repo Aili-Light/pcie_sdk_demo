@@ -37,8 +37,12 @@ def array2mat(payload, w, h, data_type, ch_id, frame_index, image_name):
         elif (data_type == ALG_SDK_MIPI_DATA_TYPE_VYUY):
             img_out = cv2.cvtColor(img_in, cv2.COLOR_YUV2RGB_UYVY)
         img_disp = cv2.resize(img_out, (640, 360))
+
+        # display
+        cv2.namedWindow(bytes(image_name).decode("utf-8"), cv2.WINDOW_NORMAL)
         cv2.imshow(bytes(image_name).decode("utf-8"), img_disp)
         
+        # save image
         filename = str("image_")+str("%02d_" % ch_id)+str("%08d_" % frame_index)+str(".bmp")
         c = cv2.waitKey(1)
         if c == 32:
@@ -47,13 +51,58 @@ def array2mat(payload, w, h, data_type, ch_id, frame_index, image_name):
     elif (data_type == ALG_SDK_MIPI_DATA_TYPE_RAW10):
         p_data = np.zeros(shape=(h*w, 1, 1), dtype=np.uint16)
         for i in range(0, int(h*w/4)):
-            p_data[4*i] = (((np.ushort(p_array[5*i]) << 2) & 0x03FC) | np.ushort((p_array[5*i+4] >> 0) & 0x0003));
-            p_data[4*i+1] = (((np.ushort(p_array[5*i+1]) << 2) & 0x03FC) | np.ushort((p_array[5*i+4] >> 2) & 0x0003));
-            p_data[4*i+2] = (((np.ushort(p_array[5*i+2]) << 2) & 0x03FC) | np.ushort((p_array[5*i+4] >> 4) & 0x0003));
-            p_data[4*i+3] = (((np.ushort(p_array[5*i+3]) << 2) & 0x03FC) | np.ushort((p_array[5*i+4] >> 6) & 0x0003));
-        
-        # filename = str("image_")+str("%02d_" % ch_id)+str("%08d_" % frame_index)+str(".raw")
-        # np.save(filename, p_data)
+            p_data[4*i] = (((np.ushort(p_array[5*i]) << 2) & 0x03FC) | np.ushort((p_array[5*i+4] >> 0) & 0x0003))
+            p_data[4*i+1] = (((np.ushort(p_array[5*i+1]) << 2) & 0x03FC) | np.ushort((p_array[5*i+4] >> 2) & 0x0003))
+            p_data[4*i+2] = (((np.ushort(p_array[5*i+2]) << 2) & 0x03FC) | np.ushort((p_array[5*i+4] >> 4) & 0x0003))
+            p_data[4*i+3] = (((np.ushort(p_array[5*i+3]) << 2) & 0x03FC) | np.ushort((p_array[5*i+4] >> 6) & 0x0003))
+
+        # demosaic
+        img_rdt = cv2.convertScaleAbs(p_data, alpha=0.25, beta=0.0)
+        img_in = img_rdt.reshape((h, w, 1))
+        image_rbg = cv2.cvtColor(img_in, cv2.COLOR_BayerBG2RGB)
+
+        # display & save
+        cv2.namedWindow(bytes(image_name).decode("utf-8"), cv2.WINDOW_NORMAL)
+        cv2.imshow(bytes(image_name).decode("utf-8"), image_rbg)
+
+        filename_raw = str("image_")+str("%02d_" % ch_id)+str("%08d_" % frame_index)+str(".raw")
+        filename_bmp = str("image_")+str("%02d_" % ch_id)+str("%08d_" % frame_index)+str(".bmp")
+        c = cv2.waitKey(1)
+        if c == 32:
+            # save raw data
+            with open(filename_raw, "wb") as binary_file:
+                # Write bytes to file
+                binary_file.write(p_data)
+
+            # save bmp data
+            cv2.imwrite(filename_bmp, image_rbg)
+
+    elif (data_type == ALG_SDK_MIPI_DATA_TYPE_RAW12):
+        p_data = np.zeros(shape=(h*w, 1, 1), dtype=np.uint16)
+        for i in range(0, int(h*w/2)):
+            p_data[2*i] = (((np.ushort(p_array[3*i]) << 4) & 0x0FF0) | np.ushort((p_array[3*i+2] >> 0) & 0x000F))
+            p_data[2*i+1] = (((np.ushort(p_array[3*i+1]) << 4) & 0x0FF0) | np.ushort((p_array[3*i+2] >> 4) & 0x000F))
+
+        # demosaic
+        img_rdt = cv2.convertScaleAbs(p_data, alpha=0.0625, beta=0.0)
+        img_in = img_rdt.reshape((h, w, 1))
+        image_rbg = cv2.cvtColor(img_in, cv2.COLOR_BayerBG2RGB)
+
+        # display & save
+        cv2.namedWindow(bytes(image_name).decode("utf-8"), cv2.WINDOW_NORMAL)
+        cv2.imshow(bytes(image_name).decode("utf-8"), image_rbg)
+        filename_raw = str("image_")+str("%02d_" % ch_id)+str("%08d_" % frame_index)+str(".raw")
+        filename_bmp = str("image_")+str("%02d_" % ch_id)+str("%08d_" % frame_index)+str(".bmp")
+
+        c = cv2.waitKey(1)
+        if c == 32:
+            # save raw data
+            with open(filename_raw, "wb") as binary_file:
+                # Write bytes to file
+                binary_file.write(p_data)
+
+            # save bmp data
+            cv2.imwrite(filename_bmp, image_rbg)
 
 def get_channel_id(topic_name):
     topic = bytes(topic_name)
