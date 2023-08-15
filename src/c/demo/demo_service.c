@@ -190,7 +190,7 @@ int main (int argc, char **argv)
                 .ack_mode = 1,
                 .board_id = 0,
             };
-            t.board_id = atoi(argv[2]);
+            t.board_id = atoi(argv[3]);
             FILE *fp = fopen(file_name, "r");
             printf("current path %s\r\n", file_name);
             if(fp == NULL)
@@ -223,6 +223,7 @@ int main (int argc, char **argv)
             uint8_t send_completed = 0;
             while (!send_completed)
             {
+                t.board_id = atoi(argv[3]);
                 if (size >= ALG_SDK_MAX_BIN_SIZE)
                 {
                     memcpy(t.payload,fw+offset,ALG_SDK_MAX_BIN_SIZE);
@@ -308,6 +309,7 @@ int main (int argc, char **argv)
             timeout = 15000;
             while (!send_completed)
             {
+                t.board_id = atoi(argv[4]);
                 if (size >= ALG_SDK_MAX_BIN_SIZE)
                 {
                     memcpy(t.payload,fw+offset,ALG_SDK_MAX_BIN_SIZE);
