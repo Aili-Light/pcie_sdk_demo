@@ -28,8 +28,10 @@ SOFTWARE.
 #include "omp.h"
 #endif
 
-namespace alg_cv {
-    enum color_space_e {
+namespace alg_cv
+{
+    enum color_space_e
+    {
         ALG_CV_YUV2RGBCVT_ERR = 0xFF,
         ALG_CV_YUV2RGBCVT_DEFAULT = 0x0,
         ALG_CV_YUV2RGBCVT_UVY2 = 0x18,
@@ -42,9 +44,25 @@ namespace alg_cv {
         ALG_CV_YUV2RGBCVT_YVYU = 0x1F,
         ALG_CV_Bayer2RGB_RAW10 = 0x2B,
         ALG_CV_Bayer2RGB_RAW12 = 0x2C,
+        ALG_CV_RGB2YUV_YUYV = 0x30,
+        ALG_CV_RGB2YUV_YVYU = 0x31,
+        ALG_CV_RGB2YUV_UYVY = 0x32,
+        ALG_CV_RGB2YUV_VYUY = 0x33,
+        ALG_CV_BayerBG2RGB = 0x40,
+        ALG_CV_BayerGB2RGB = 0x41,
+        ALG_CV_BayerRG2RGB = 0x42,
+        ALG_CV_BayerGR2RGB = 0x43,
+        ALG_CV_RGB2BayerBG = 0x50,
+        ALG_CV_RGB2BayerGB = 0x51,
+        ALG_CV_RGB2BayerRG = 0x52,
+        ALG_CV_RGB2BayerGR = 0x53,
+        ALG_CV_RGB2BayerRCCC = 0x54,
     };
-    void alg_sdk_cvtColor(void* src, void* dst, int w, int h, color_space_e color_space);
+    void alg_sdk_cvtColor(void *src, void *dst, int w, int h, color_space_e color_space);
     color_space_e image_format(int data_type);
+    void rgb2yuv(unsigned char *src, unsigned char *out, int w, int h, color_space_e color_space);
+    void bayer2rgb(unsigned char *src, unsigned char *out, int w, int h, color_space_e color_space);
+    void rgb2bayer(unsigned char *src, unsigned char *out, int w, int h, color_space_e color_space);
 }
 
 #endif
