@@ -72,6 +72,7 @@ namespace alg_cv
         unsigned char *bayer0 = out;
         int t0, t1, t2, t3;
         int pattern_type = 0;
+
         switch (color_space)
         {
         case ALG_CV_RGB2BayerRG:
@@ -79,8 +80,10 @@ namespace alg_cv
         case ALG_CV_RGB2BayerGB:
         case ALG_CV_RGB2BayerGR:
             pattern_type = 0;
+            break;
         case ALG_CV_RGB2BayerRCCC:
             pattern_type = 1;
+            break;
         default:
             break;
         }
@@ -613,11 +616,13 @@ namespace alg_cv
         case ALG_CV_YUV2RGBCVT_YUYV:
         case ALG_CV_YUV2RGBCVT_YVYU:
             cvt_yuv422_rgb888_impl(img_src, img_dst, data_size, color_space);
+            break;
         case ALG_CV_RGB2YUV_YUYV:
         case ALG_CV_RGB2YUV_YVYU:
         case ALG_CV_RGB2YUV_UYVY:
         case ALG_CV_RGB2YUV_VYUY:
             cvt_rgb888_yuv422_impl(img_src, img_dst, data_size, color_space);
+            break;
         default:
             break;
         }
