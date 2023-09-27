@@ -151,6 +151,7 @@ else()
             ${OpenCV_LIBS}
             ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk.so
             ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libalg_cv_cvtColor.so
+            ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libalg_cv_IspPipe.so            
             pthread
             anl
         )
