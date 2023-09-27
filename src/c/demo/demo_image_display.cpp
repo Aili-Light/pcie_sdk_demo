@@ -52,7 +52,9 @@ void array_2_mat(uchar* data, int w, int h, int data_type, int ch_id, uint32_t f
         /* Image Display */
         uchar* buf_rgb = img_rgb8.data;
         /* yuv to rgb conversion */
-        alg_cv::alg_sdk_cvtColor((uchar*)data, (uchar*)buf_rgb, w, h, alg_cv::image_format(data_type));
+        // cv::Mat img = cv::Mat(h, w, CV_8UC2, data);
+        // cv::cvtColor(img, img_rgb8, cv::COLOR_YUV2BGR_YUYV);
+        alg_cv::alg_sdk_cvtColor((uchar*)data, (uchar*)buf_rgb, w, h, alg_cv::ALG_CV_YUV2RGBCVT_YUYV);
         /* Image Display */
 //        cv::resize(img_rgb8, img_rgb8, cv::Size(1280,720));
         cv::namedWindow(image_name, CV_WINDOW_NORMAL);
@@ -62,20 +64,21 @@ void array_2_mat(uchar* data, int w, int h, int data_type, int ch_id, uint32_t f
     {
         /* raw to rgb conversion */
         /* PCIE RAW Data Conversion */
-        ushort* pdata = (ushort*)malloc(sizeof(ushort) * data_size);
+        uchar* pdata = (uchar*)malloc(sizeof(uchar) * data_size);
         for(int i = 0; i < int(data_size / 4); i++)
         {
-            pdata[4*i] = (((((ushort)data[5*i]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 0) & 0x0003));
-            pdata[4*i+1] = (((((ushort)data[5*i+1]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 2) & 0x0003));
-            pdata[4*i+2] = (((((ushort)data[5*i+2]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 4) & 0x0003));
-            pdata[4*i+3] = (((((ushort)data[5*i+3]) << 2) & 0x03FC) | (ushort)((data[5*i+4] >> 6) & 0x0003));
+            pdata[4*i] = ((((data[5*i]) << 2) & 0x03FC) | ((data[5*i+4] >> 0) & 0x0003)) >> 2;
+            pdata[4*i+1] = ((((data[5*i+1]) << 2) & 0x03FC) | ((data[5*i+4] >> 2) & 0x0003)) >> 2;
+            pdata[4*i+2] = ((((data[5*i+2]) << 2) & 0x03FC) | ((data[5*i+4] >> 4) & 0x0003)) >> 2;
+            pdata[4*i+3] = ((((data[5*i+3]) << 2) & 0x03FC) | ((data[5*i+4] >> 6) & 0x0003)) >> 2;
         }
         /* End - PCIE RAW Data Conversion */
         /* Demosaic */
-        cv::Mat img_byer = cv::Mat(h, w, CV_16UC1, pdata);
-        cv::convertScaleAbs(img_byer, img_byer, 0.25, 0);
-        cv::Mat img_rgb8;
-        cv::cvtColor(img_byer, img_rgb8, cv::COLOR_BayerBG2RGB);
+        // cv::Mat img_byer = cv::Mat(h, w, CV_16UC1, pdata);
+        // cv::convertScaleAbs(img_byer, img_byer, 0.25, 0);
+        // cv::cvtColor(img_byer, img_rgb8, cv::COLOR_BayerBG2RGB);
+        uchar* buf_rgb = img_rgb8.data;
+        alg_cv::alg_sdk_cvtColor(pdata, buf_rgb, w, h, alg_cv::ALG_CV_BayerGB2RGB);
         /* Image Display */
 //        cv::resize(img_rgb8, img_rgb8, cv::Size(1280,720));
         cv::namedWindow(image_name, CV_WINDOW_NORMAL);
@@ -86,18 +89,19 @@ void array_2_mat(uchar* data, int w, int h, int data_type, int ch_id, uint32_t f
     {
         /* raw to rgb conversion */
         /* PCIE RAW Data Conversion */
-        ushort* pdata = (ushort*)malloc(sizeof(ushort) * data_size);
-        for(int i = 0; i < int(data_size / 2); i++)
+        uchar* pdata = (uchar*)malloc(sizeof(uchar) * data_size);
+        for (int i = 0; i < int(data_size / 2); i++)
         {
-            pdata[2*i] = (((((ushort)data[3*i]) << 4) & 0x0FF0) | (ushort)((data[3*i+2] >> 0) & 0x000F));
-            pdata[2*i+1] = (((((ushort)data[3*i+1]) << 4) & 0x0FF0) | (ushort)((data[3*i+2] >> 4) & 0x000F));
+            pdata[2 * i] = ((((data[3 * i]) << 4) & 0x0FF0) | ((data[3 * i + 2] >> 0) & 0x000F)) >> 4;
+            pdata[2 * i + 1] = ((((data[3 * i + 1]) << 4) & 0x0FF0) | ((data[3 * i + 2] >> 4) & 0x000F)) >> 4;
         }
         /* End - PCIE RAW Data Conversion */
         /* Demosaic */
-        cv::Mat img_byer = cv::Mat(h, w, CV_16UC1, pdata);
-        cv::convertScaleAbs(img_byer, img_byer, 0.0625, 0);
-        cv::Mat img_rgb8;
-        cv::cvtColor(img_byer, img_rgb8, cv::COLOR_BayerBG2RGB);
+        // cv::Mat img_byer = cv::Mat(h, w, CV_16UC1, pdata);
+        // cv::convertScaleAbs(img_byer, img_byer, 0.0625, 0);
+        // cv::cvtColor(img_byer, img_rgb8, cv::COLOR_BayerBG2RGB);
+        uchar* buf_rgb = img_rgb8.data;
+        alg_cv::alg_sdk_cvtColor(pdata, buf_rgb, w, h, alg_cv::ALG_CV_BayerGB2RGB);
         /* Image Display */
 //        cv::resize(img_rgb8, img_rgb8, cv::Size(1280,720));
         cv::namedWindow(image_name, CV_WINDOW_NORMAL);
@@ -109,16 +113,16 @@ void array_2_mat(uchar* data, int w, int h, int data_type, int ch_id, uint32_t f
     // if(c == 32)
     // {
     //     /* save raw data */
-    //     char filename_2[128] = {};
-    //     sprintf(filename_2, "data/image_%02d_%08d.raw", ch_id, frame_index);
-    //     ofstream storage_file(filename_2,ios::out | ios::binary);
-    //     storage_file.write((char *)data, data_size*2);
-    //     storage_file.close();
+        // char filename_2[128] = {};
+        // sprintf(filename_2, "data/image_%02d_%08d.raw", ch_id, frame_index);
+        // ofstream storage_file(filename_2,ios::out | ios::binary);
+        // storage_file.write((char *)data, data_size*2);
+        // storage_file.close();
 
-    //     /* save image */
-    //     char filename[128] = {};
-    //     sprintf(filename, "data/image_%02d_%08d.bmp", ch_id, frame_index);
-    //     cv::imwrite(filename, img_rgb8);
+        /* save image */
+        // char filename[128] = {};
+        // sprintf(filename, "data/image_%02d_%08d.bmp", ch_id, frame_index);
+        // cv::imwrite(filename, img_rgb8);
     // }
     
 }
@@ -164,14 +168,8 @@ void callback_image_data(void *p)
     pcie_image_data_t* msg = (pcie_image_data_t*)p;
     /* Debug message */
     int ch_id = get_channel_id(msg);
-    // float poc_current = 0.0f;
-    // float poc_voltage = 0.0f;
-    // memcpy(&poc_current, &msg->image_info_meta.debug_info[1], sizeof(uint32_t));
-    // memcpy(&poc_voltage, &msg->image_info_meta.debug_info[0], sizeof(uint32_t));
-    // // printf("[frame = %d], [len %ld], [byte_0 = %d], [byte_end = %d]\n",
-    // //        msg->image_info_meta.frame_index,  msg->image_info_meta.img_size, ((uint8_t*)msg->payload)[0], ((uint8_t*)msg->payload)[msg->image_info_meta.img_size - 1]);
-    // printf("[channel = %d], [frame = %d], [time %ld], [Exp = %f], [AGain = %f], [DGain = %f], [Current = %f], [Voltage = %f]\n", ch_id,
-    // msg->image_info_meta.frame_index,  msg->image_info_meta.timestamp,  msg->image_info_meta.exposure, msg->image_info_meta.again, msg->image_info_meta.dgain, poc_current, poc_voltage);
+    printf("[frame = %d], [len %d], [byte_0 = %d], [byte_end = %d]\n",
+           msg->image_info_meta.frame_index,  msg->image_info_meta.img_size, ((uint8_t*)msg->payload)[0], ((uint8_t*)msg->payload)[msg->image_info_meta.img_size - 1]);
 
     /* check frame rate (every 1 second) */
     frame_rate_monitor(ch_id, msg->image_info_meta.frame_index);

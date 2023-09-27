@@ -146,11 +146,11 @@ else()
         include_directories(${OpenCV_INCLUDE_DIRS})
         add_executable(${PROJECT_NAME}_image_disp
             src/c/demo/demo_image_display.cpp
-            src/c/alg_cvt/alg_cvtColor.cpp
             )
         target_link_libraries(${PROJECT_NAME}_image_disp
             ${OpenCV_LIBS}
             ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk.so
+            ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libalg_cv_cvtColor.so
             pthread
             anl
         )
