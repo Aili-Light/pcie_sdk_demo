@@ -129,7 +129,28 @@ int main (int argc, char **argv)
         return 0;
 
     }
+    else if ((argc == 3) && (strcmp(argv[1], "-reset") == 0))
+    {
+        const char *topic_name = "/service/set/hw_reset";
 
+        {
+            service_set_hw_reset_t t = {
+                .ack_mode = 1,
+            };
+            t.board_id = atoi(argv[2]);
+
+            printf("reset board_id: %d\n", t.board_id);
+            rc = alg_sdk_call_service(topic_name, &t, timeout);
+            if (rc < 0)
+            {
+                printf("Request Service : [%s] Error!\n", topic_name);
+                return 0;
+            }
+
+            printf("[ack : %d]\n", t.ack_code);
+        }
+        return 0;
+    }
     else if ((argc == 3) && (strcmp(argv[1], "-set_config_by_file") == 0))
     {
         char *file_name = argv[2];
