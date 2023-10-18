@@ -561,6 +561,16 @@ extern "C"
         uint8_t channel;
     } service_camera_write_reg_t;
 
+    typedef struct alg_sdk_service_set_hw_reset
+    {
+        /* Request Field */
+        uint8_t ack_mode;
+        uint8_t board_id;
+
+        /* Reply Field */
+        uint8_t ack_code;
+    } service_set_hw_reset_t;
+
     typedef struct alg_sdk_service_stream_control
     {
         /* Request Field */
