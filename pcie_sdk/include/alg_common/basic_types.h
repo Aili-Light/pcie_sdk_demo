@@ -168,6 +168,7 @@ extern "C"
         ALG_SDK_SERVICE_PCIE_CMD_CHANNEL_INFO_GET = 0x14,
         ALG_SDK_SERVICE_PCIE_CMD_I2C_INFO_GET = 0x15,
         ALG_SDK_SERVICE_PCIE_CMD_WRITE_FILE = 0x16,
+        ALG_SDK_SERVICE_PCIE_CMD_HW_RESET = 0x17,
     };
 
     enum
@@ -570,6 +571,18 @@ extern "C"
         /* Reply Field */
         uint8_t ack_code;
     } service_set_hw_reset_t;
+
+    typedef struct alg_sdk_service_ctrl_cam_ch_pwr
+    {
+        /* Request Field */
+        uint8_t ack_mode;
+        uint8_t board_id;
+        uint8_t ch_id;
+        uint8_t pwr_ctrl_sts;
+
+        /* Reply Field */
+        uint8_t ack_code;
+    } service_ctrl_cam_ch_pwr_t;
 
     typedef struct alg_sdk_service_stream_control
     {
