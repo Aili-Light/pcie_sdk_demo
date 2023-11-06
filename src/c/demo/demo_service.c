@@ -210,7 +210,7 @@ int main (int argc, char **argv)
             // }
             /* Debug Info End */
 
-            printf("ch %d, type %d\n", t.ch_id, t.module_type);
+            printf("ch %d, type 0x%x\n", t.ch_id, t.module_type);
             timeout = 10000;
             rc = alg_sdk_call_service(topic_name, &t, timeout);
             if (rc < 0)
@@ -295,7 +295,6 @@ int main (int argc, char **argv)
 
             free(fw);
             fclose(fp);
-
         }
 
         return 0;

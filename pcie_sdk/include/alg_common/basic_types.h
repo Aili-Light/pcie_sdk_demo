@@ -195,6 +195,7 @@ extern "C"
         ALG_SDK_SENSOR_TYPE_OV_OX5B1S,
 
         ALG_SDK_MAX_SENSOR_NUM,
+        ALG_SDK_DOWN_LOAD_CFG_WITH_UPS = 0X9999,
     };
 
     enum
