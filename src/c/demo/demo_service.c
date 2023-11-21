@@ -174,6 +174,43 @@ int main (int argc, char **argv)
         }
         return 0;
     }
+    //./pcie...service -cam_ch_pwr_reset 0  0  2
+    else if ((argc == 5) && (strcmp(argv[1], "-cam_ch_pwr_reset") == 0))
+    {
+        int delay_s = 0;
+        const char *topic_name = "/service/cam/ch_pwr_ctrl";
+        {
+            service_ctrl_cam_ch_pwr_t t = {
+                .ack_mode = 1,
+            };
+            t.board_id = atoi(argv[2]);
+            t.ch_id = atoi(argv[3]);
+            t.pwr_ctrl_sts = 0;
+            rc = alg_sdk_call_service(topic_name, &t, timeout);
+            if (rc < 0)
+            {
+                printf("Request Service : [%s] error!\n", topic_name);
+                return 0;
+            }
+
+            printf("[ack : %d]\n", t.ack_code);
+            delay_s = atoi(argv[4]);
+            sleep(delay_s);
+            t.ack_mode = 1;
+            t.board_id = atoi(argv[2]);
+            t.ch_id = atoi(argv[3]);
+            t.pwr_ctrl_sts = 1;
+            rc = alg_sdk_call_service(topic_name, &t, timeout);
+            if (rc < 0)
+            {
+                printf("Request Service : [%s] error!\n", topic_name);
+                return 0;
+            }
+
+            printf("[ack : %d]\n", t.ack_code);
+        }
+        return 0;
+    }
     else if ((argc == 3) && (strcmp(argv[1], "-set_config_by_file") == 0))
     {
         char *file_name = argv[2];
