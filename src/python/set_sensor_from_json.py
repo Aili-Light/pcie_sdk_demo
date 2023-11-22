@@ -109,7 +109,7 @@ if __name__ == '__main__':
 
             delay_time_s = float(args.delay_time_ms)/1000
             print(' delay_time: %f s'% delay_time_s)
-            time.sleep(delay_time_ms)
+            time.sleep(delay_time_s)
             cam_pwr_cfg.ack_mode = 1
             cam_pwr_cfg.board_id = args.channel_id/4
             cam_pwr_cfg.ch_id = (args.channel_id%4)*2
