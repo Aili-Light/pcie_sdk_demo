@@ -3,8 +3,10 @@ import os
 import sys
 import argparse
 import json
+import time
 import algSDKpy
 from algSDKpy import service_camera_config
+from algSDKpy import service_cam_pwr_reset
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -28,6 +30,18 @@ if __name__ == '__main__':
                         help="Timeout value for request (in milliseconds)",
                         default=5000
                         )
+    parser.add_argument('--use_ups_config',
+                        type=int,
+                        help="Set this value true to apply no power config"
+                        )
+    parser.add_argument('--delay_time_s',
+                        type=int,
+                        help="Control camera channel power reset time"
+                        )
+    parser.add_argument('--all_channels',
+                    action="store_true",
+                    help="Set this value true to apply same settings for all the channels"
+                    )
     args = parser.parse_args()
 
     json_file = args.json_file
@@ -67,9 +81,48 @@ if __name__ == '__main__':
         elif sensor_name == "alg_sony_isx031":
             cfg.module_type = int(b"0x0002", 16)
         elif sensor_name == "alg_sony_isx019":
-            cfg.module_type = int(b"0x0001", 16)        
+            cfg.module_type = int(b"0x0001", 16)
         else:
             cfg.module_type = int(b"0xFFFF", 16)
+
+        if  args.use_ups_config == 1:
+            cfg.module_type = int(b"0x9999", 16)
+            print(' camera use ups mode to download config ')
+            cmd_topic = b"/service/cam/ch_pwr_ctrl"
+
+            cam_pwr_cfg = service_cam_pwr_reset()
+            cam_pwr_cfg.ack_mode = 1
+            cam_pwr_cfg.board_id = args.channel_id/4
+            cam_pwr_cfg.ch_id = (args.channel_id%4)*2
+            cam_pwr_cfg.pwr_ctrl_sts = 0
+
+            ret = algSDKpy.CallServices(cmd_topic, cam_pwr_cfg, timeo)
+            print(' camera power1 off result = %d '% ret)
+
+            cam_pwr_cfg.ack_mode = 1
+            cam_pwr_cfg.board_id = args.channel_id/4
+            cam_pwr_cfg.ch_id = (args.channel_id%4)*2+1
+            cam_pwr_cfg.pwr_ctrl_sts = 0
+
+            ret = algSDKpy.CallServices(cmd_topic, cam_pwr_cfg, timeo)
+            print(' camera power2 off result = %d '% ret)
+
+            time.sleep(args.delay_time_s)
+            cam_pwr_cfg.ack_mode = 1
+            cam_pwr_cfg.board_id = args.channel_id/4
+            cam_pwr_cfg.ch_id = (args.channel_id%4)*2
+            cam_pwr_cfg.pwr_ctrl_sts = 1
+
+            ret = algSDKpy.CallServices(cmd_topic, cam_pwr_cfg, timeo)
+            print(' camera power1 on result = %d '% ret)
+
+            cam_pwr_cfg.ack_mode = 1
+            cam_pwr_cfg.board_id = args.channel_id/4
+            cam_pwr_cfg.ch_id = (args.channel_id%4)*2+1
+            cam_pwr_cfg.pwr_ctrl_sts = 1
+
+            ret = algSDKpy.CallServices(cmd_topic, cam_pwr_cfg, timeo)
+            print(' camera power2 on result = %d '% ret)
 
         cfg.width = sensor_width
         cfg.height = sensor_height

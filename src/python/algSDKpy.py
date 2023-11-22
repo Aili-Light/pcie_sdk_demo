@@ -27,6 +27,13 @@ class service_camera_config(Structure):
     ("channel", c_uint8)
     ]
 
+class service_cam_pwr_reset(Structure):
+    _fields_ = [("ack_mode",c_uint8),
+    ("board_id",c_uint8),
+    ("ch_id",c_uint8),
+    ("pwr_ctrl_sts",c_uint8),
+    ("ack_code", c_uint8),
+    ]
 class service_utc_time(Structure):
     _fields_ = [("year_month",c_uint16),
     ("day_wkday", c_uint8),
