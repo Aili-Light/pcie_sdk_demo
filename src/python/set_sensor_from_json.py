@@ -34,7 +34,7 @@ if __name__ == '__main__':
                         type=int,
                         help="Set this value true to apply no power config"
                         )
-    parser.add_argument('--delay_time_s',
+    parser.add_argument('--delay_time_ms',
                         type=int,
                         help="Control camera channel power reset time"
                         )
@@ -107,7 +107,9 @@ if __name__ == '__main__':
             ret = algSDKpy.CallServices(cmd_topic, cam_pwr_cfg, timeo)
             print(' camera power2 off result = %d '% ret)
 
-            time.sleep(args.delay_time_s)
+            delay_time_s = float(args.delay_time_ms)/1000
+            print(' delay_time: %f s'% delay_time_s)
+            time.sleep(delay_time_ms)
             cam_pwr_cfg.ack_mode = 1
             cam_pwr_cfg.board_id = args.channel_id/4
             cam_pwr_cfg.ch_id = (args.channel_id%4)*2
