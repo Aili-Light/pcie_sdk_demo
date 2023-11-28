@@ -86,8 +86,10 @@ if __name__ == '__main__':
             cfg.module_type = int(b"0xFFFF", 16)
 
         if  args.use_ups_config == 1:
+            print(' use ups mode to download config ')
             cfg.module_type = int(b"0x9999", 16)
-            print(' camera use ups mode to download config ')
+        if  args.delay_time_ms > 0:
+            print(' use delay param to ctrl camera power ')
             cmd_topic = b"/service/cam/ch_pwr_ctrl"
 
             cam_pwr_cfg = service_cam_pwr_reset()
