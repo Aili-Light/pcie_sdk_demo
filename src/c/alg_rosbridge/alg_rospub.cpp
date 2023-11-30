@@ -117,8 +117,6 @@ int AlgRosPubNode::PublishImage(uint32_t seq,
         printf("ROS Pub Error : Buffer is empty!\n");
         return 1;
     }
-
-    printf("data size = %ld\n", img_size);
     uint8_t* buffer = (uint8_t*)_buffer;
 
     sensor_msgs::Image ros_image;
