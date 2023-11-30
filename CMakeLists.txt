@@ -91,27 +91,12 @@ else()
     set(CMAKE_INSTALL_RPATH "\${ORIGIN}/../lib")
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
     
-    if (WITH_ROS)
-        message("-- Build with ROS")
-        add_executable(${PROJECT_NAME}_init src/c/demo/demo_init.c)
-        add_dependencies(${PROJECT_NAME}_init 
-                        ${${PROJECT_NAME}_EXPORTED_TARGETS} 
-                        ${catkin_EXPORTED_TARGETS}
-        )
-        target_link_libraries(${PROJECT_NAME}_init
-            ${PROJECT_LINK_DIR}/linux/libpcie_sdk_ros.so
-            pthread
-            anl
-            ${catkin_LIBRARIES}
-        )
-    else ()
-        add_executable(${PROJECT_NAME}_init src/c/demo/demo_init.c)
-        target_link_libraries(${PROJECT_NAME}_init
-            ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk.so
-            pthread
-            anl
-        )
-    endif ()
+    add_executable(${PROJECT_NAME}_init src/c/demo/demo_init.c)
+    target_link_libraries(${PROJECT_NAME}_init
+        ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk.so
+        pthread
+        anl
+    )
 
     add_executable(${PROJECT_NAME}_client src/c/demo/demo_client.c)
     target_link_libraries(${PROJECT_NAME}_client
@@ -141,6 +126,37 @@ else()
         install (TARGETS ${PROJECT_NAME}_gst_camera RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
     endif ()
 
+    if (WITH_ROS)
+        message("-- Build with ROS")
+        add_definitions(-DWITH_ROS)
+        find_package(catkin REQUIRED COMPONENTS
+            roscpp
+            rospy
+            std_msgs
+            sensor_msgs
+        )
+        include_directories(
+            ${catkin_INCLUDE_DIRS}
+        )
+        aux_source_directory(src/c/alg_rosbridge ROS_BRIDGE_SRC)
+        add_executable(${PROJECT_NAME}_rospub
+            src/c/demo/demo_rospub.cpp
+            ${ROS_BRIDGE_SRC}
+        )
+        target_link_libraries(${PROJECT_NAME}_rospub
+            ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk.so
+            ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libalg_cv_cvtColor.so
+            ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libalg_cv_IspPipe.so    
+            pthread
+            anl
+            ${catkin_LIBRARIES}
+        )
+        set_target_properties(${PROJECT_NAME}_rospub PROPERTIES LINKER_LANGUAGE CXX)
+        install (TARGETS ${PROJECT_NAME}_rospub RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
+        FILE(GLOB ALG_CVT_LIB "${CMAKE_SOURCE_DIR}/pcie_sdk/lib/linux/${CMAKE_SYSTEM_PROCESSOR}/libalg_cv*")
+        install (FILES ${ALG_CVT_LIB} DESTINATION ${CMAKE_INSTALL_DIR}/lib)
+    endif ()
+
     if (BUILD_IMAGE_DISP)
         find_package(OpenCV REQUIRED)
         include_directories(${OpenCV_INCLUDE_DIRS})
@@ -162,6 +178,8 @@ else()
         endif()
         set_target_properties(${PROJECT_NAME}_image_disp PROPERTIES LINKER_LANGUAGE CXX)
         install (TARGETS ${PROJECT_NAME}_image_disp RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
+        FILE(GLOB ALG_CVT_LIB "${CMAKE_SOURCE_DIR}/pcie_sdk/lib/linux/${CMAKE_SYSTEM_PROCESSOR}/libalg_cv*")
+        install (FILES ${ALG_CVT_LIB} DESTINATION ${CMAKE_INSTALL_DIR}/lib)
     endif ()
 
     if (BUILD_GL_DISPLAY)

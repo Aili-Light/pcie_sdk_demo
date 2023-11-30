@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <unistd.h>
 #include "alg_sdk/service.h"
 
 int load_board_fw_update_bin(const char *filename,uint8_t* payload, uint32_t *len)
