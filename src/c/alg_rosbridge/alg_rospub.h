@@ -38,15 +38,15 @@ public:
     bool IsRosOK                        ();
     void Spin                           ();
     void SpinOnce                       ();
-    int  GetImageWidth                  () const;
-    int  GetImageHeight                 () const;
-    int  GetImageFormat                 () const;
-
-public:
-    void SetImageWidth                  (const int);
-    void SetImageHeight                 (const int);
-    void SetImageFormat                 (const int);
-    int  PublishImage                   (uint32_t , std::string , int , int , size_t , int, void* );
+    int  PublishImage                   (uint32_t seq, 
+                                        std::string topic_name, 
+                                        int height, 
+                                        int width, 
+                                        int format, 
+                                        size_t img_size, 
+                                        uint64_t timestamp,
+                                        void* _buffer
+                                        );
 
 private:
     int                                 m_freq;

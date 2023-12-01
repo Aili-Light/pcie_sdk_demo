@@ -74,43 +74,15 @@ void AlgRosPubNode::Spin()
     }
 }
 
-int  AlgRosPubNode::GetImageWidth() const
-{
-    return m_image_width;
-}
-
-int  AlgRosPubNode::GetImageHeight() const
-{
-    return m_image_height;
-}
-
-int  AlgRosPubNode::GetImageFormat() const
-{
-    return m_image_format;
-}
-
-void AlgRosPubNode::SetImageWidth(const int _width)
-{
-    m_image_width = _width;
-}
-
-void AlgRosPubNode::SetImageHeight(const int _height)
-{
-    m_image_height = _height;
-}
-
-void AlgRosPubNode::SetImageFormat(const int _format)
-{
-    m_image_format = _format;
-}
-
 int AlgRosPubNode::PublishImage(uint32_t seq, 
                                 std::string topic_name, 
                                 int height, 
                                 int width, 
-                                size_t img_size, 
                                 int format, 
-                                void* _buffer)
+                                size_t img_size, 
+                                uint64_t timestamp,
+                                void* _buffer
+                                )
 {
     if (!_buffer || img_size==0)
     {
@@ -118,10 +90,12 @@ int AlgRosPubNode::PublishImage(uint32_t seq,
         return 1;
     }
     uint8_t* buffer = (uint8_t*)_buffer;
-
     sensor_msgs::Image ros_image;
+    ros::Time ros_time;
+    ros_time.fromNSec(timestamp*1000); // timestamp is macrosecond
+
     ros_image.header.seq = seq;
-    ros_image.header.stamp = ros::Time::now();
+    ros_image.header.stamp = ros_time;
     ros_image.header.frame_id = topic_name;
 
     if (format == ALG_SDK_VIDEO_FORMAT_YVYU ||

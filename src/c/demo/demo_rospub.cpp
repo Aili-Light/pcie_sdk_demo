@@ -44,9 +44,10 @@ void int_handler(int sig)
     exit(sig);
 }
 
-void array_2_mat(uint8_t *data, int w, int h, int data_type, int ch_id, uint32_t frame_index, const char *image_name)
+void array_2_mat(uint8_t *data, int w, int h, int data_type, int ch_id, uint32_t frame_index, uint64_t timestamp, const char *image_name)
 {
     const uint32_t data_size = w * h;
+    const uint32_t data_size_rgb = data_size * 3;
     uint8_t* buf_rgb = (uint8_t*)&g_buffer_rgb[ch_id];
     uint8_t* buf_rgb_awb= (uint8_t*)&g_buffer_rgb_awb[ch_id];
     AlgRosPubNode* ros_pub = &g_rospub[ch_id];
@@ -56,26 +57,7 @@ void array_2_mat(uint8_t *data, int w, int h, int data_type, int ch_id, uint32_t
         /* Image Display */
         /* yuv to rgb conversion */
         alg_cv::alg_sdk_cvtColor((uint8_t *)data, (uint8_t *)buf_rgb, w, h, alg_cv::ALG_CV_YUV2RGBCVT_YUYV);
-        ros_pub->PublishImage(frame_index, image_name, h, w, data_size*3, ALG_SDK_VIDEO_FORMAT_RGB, buf_rgb);
-    }
-    else if (data_type == ALG_SDK_MIPI_DATA_TYPE_RAW10)
-    {
-        /* raw to rgb conversion */
-        /* PCIE RAW Data Conversion */
-        uint8_t *pdata = (uint8_t *)malloc(sizeof(uint8_t) * data_size);
-        for (int i = 0; i < int(data_size / 4); i++)
-        {
-            pdata[4 * i] = ((((data[5 * i]) << 2) & 0x03FC) | ((data[5 * i + 4] >> 0) & 0x0003)) >> 2;
-            pdata[4 * i + 1] = ((((data[5 * i + 1]) << 2) & 0x03FC) | ((data[5 * i + 4] >> 2) & 0x0003)) >> 2;
-            pdata[4 * i + 2] = ((((data[5 * i + 2]) << 2) & 0x03FC) | ((data[5 * i + 4] >> 4) & 0x0003)) >> 2;
-            pdata[4 * i + 3] = ((((data[5 * i + 3]) << 2) & 0x03FC) | ((data[5 * i + 4] >> 6) & 0x0003)) >> 2;
-        }
-        /* End - PCIE RAW Data Conversion */
-        /* Demosaic */
-        alg_cv::alg_sdk_cvtColor(pdata, buf_rgb, w, h, alg_cv::ALG_CV_BayerGB2RGB);
-        ros_pub->PublishImage(frame_index, image_name, h, w, data_size*3, ALG_SDK_VIDEO_FORMAT_RGB, data);
-
-        free(pdata);
+        ros_pub->PublishImage(frame_index, image_name, h, w, ALG_SDK_VIDEO_FORMAT_RGB, data_size_rgb, timestamp, buf_rgb);
     }
     else if (data_type == ALG_SDK_MIPI_DATA_TYPE_RAW12)
     {
@@ -91,8 +73,7 @@ void array_2_mat(uint8_t *data, int w, int h, int data_type, int ch_id, uint32_t
         /* Demosaic */
         alg_cv::alg_sdk_cvtColor(pdata, buf_rgb, w, h, alg_cv::ALG_CV_BayerGB2RGB);
         alg_cv::alg_sdk_awb(buf_rgb, buf_rgb_awb, w, h, alg_cv::ALG_CV_AWB_DYM_THRESHOLD);
-        ros_pub->PublishImage(frame_index, image_name, h, w, data_size*3, ALG_SDK_VIDEO_FORMAT_RGB, data);
-
+        ros_pub->PublishImage(frame_index, image_name, h, w, ALG_SDK_VIDEO_FORMAT_RGB, data_size_rgb, timestamp, buf_rgb_awb);
         free(pdata);
     }
 }
@@ -147,7 +128,7 @@ void callback_image_data(void *p)
     /* for Image Display (by OpenCV)
         This may cause frame rate drop when CPU has run out of resources.
     */
-    array_2_mat((uint8_t *)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, msg->image_info_meta.data_type, ch_id, msg->image_info_meta.frame_index, msg->common_head.topic_name); // YUV422 type is CV_8U2
+    array_2_mat((uint8_t *)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, msg->image_info_meta.data_type, ch_id, msg->image_info_meta.frame_index, msg->image_info_meta.timestamp, msg->common_head.topic_name); // YUV422 type is CV_8U2
 }
 
 int main(int argc, char **argv)
