@@ -88,13 +88,13 @@ if __name__ == '__main__':
         if  args.use_ups_config == 1:
             print(' use ups mode to download config ')
             cfg.module_type = int(b"0x9999", 16)
-        if  args.delay_time_ms > 0:
+        if  args.delay_time_ms != None:
             print(' use delay param to ctrl camera power ')
             cmd_topic = b"/service/cam/ch_pwr_ctrl"
 
             cam_pwr_cfg = service_cam_pwr_reset()
             cam_pwr_cfg.ack_mode = 1
-            cam_pwr_cfg.board_id = args.channel_id/4
+            cam_pwr_cfg.board_id = int(args.channel_id/4)
             cam_pwr_cfg.ch_id = (args.channel_id%4)*2
             cam_pwr_cfg.pwr_ctrl_sts = 0
 
@@ -102,7 +102,7 @@ if __name__ == '__main__':
             print(' camera power1 off result = %d '% ret)
 
             cam_pwr_cfg.ack_mode = 1
-            cam_pwr_cfg.board_id = args.channel_id/4
+            cam_pwr_cfg.board_id = int(args.channel_id/4)
             cam_pwr_cfg.ch_id = (args.channel_id%4)*2+1
             cam_pwr_cfg.pwr_ctrl_sts = 0
 
@@ -113,7 +113,7 @@ if __name__ == '__main__':
             print(' delay_time: %f s'% delay_time_s)
             time.sleep(delay_time_s)
             cam_pwr_cfg.ack_mode = 1
-            cam_pwr_cfg.board_id = args.channel_id/4
+            cam_pwr_cfg.board_id = int(args.channel_id/4)
             cam_pwr_cfg.ch_id = (args.channel_id%4)*2
             cam_pwr_cfg.pwr_ctrl_sts = 1
 
@@ -121,7 +121,7 @@ if __name__ == '__main__':
             print(' camera power1 on result = %d '% ret)
 
             cam_pwr_cfg.ack_mode = 1
-            cam_pwr_cfg.board_id = args.channel_id/4
+            cam_pwr_cfg.board_id = int(args.channel_id/4)
             cam_pwr_cfg.ch_id = (args.channel_id%4)*2+1
             cam_pwr_cfg.pwr_ctrl_sts = 1
 
