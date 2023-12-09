@@ -9,7 +9,12 @@
 #include <fstream>
 #include "alg_cvt/alg_cvtColor.h"
 #include "alg_isp/alg_isp_pipeline.h"
+
+#ifdef WITH_ROS
 #include "alg_rosbridge/alg_rospub.h"
+#elif WITH_ROS2
+#include "alg_ros2bridge/alg_ros2pub.h"
+#endif
 
 #define ALG_SDK_PAYLOAD_RGB_MAX 3 * 4096 * 4096
 using namespace std;
@@ -20,7 +25,11 @@ static int g_f_count[ALG_SDK_MAX_CHANNEL] = {0};
 static uint32_t g_f_last[ALG_SDK_MAX_CHANNEL] = {0};
 static uint8_t g_buffer_rgb[ALG_SDK_MAX_CHANNEL][ALG_SDK_PAYLOAD_RGB_MAX];
 static uint8_t g_buffer_rgb_awb[ALG_SDK_MAX_CHANNEL][ALG_SDK_PAYLOAD_RGB_MAX];
+#ifdef WITH_ROS
 static AlgRosPubNode g_rospub[ALG_SDK_MAX_CHANNEL];
+#elif WITH_ROS2
+static AlgRos2PubNode g_rospub[ALG_SDK_MAX_CHANNEL];
+#endif
 
 #define ALG_IMG_TYPE_YUV 0x01
 #define ALG_IMG_TYPE_RAW10 0x2B
@@ -39,7 +48,12 @@ void int_handler(int sig)
     // printf("Caught signal : %d\n", sig);
     alg_sdk_stop_client();
 
+#ifdef WITH_ROS
     ros::shutdown();
+#elif WITH_ROS2
+    rclcpp::shutdown();
+#endif
+
     /* terminate program */
     exit(sig);
 }
@@ -50,7 +64,12 @@ void array_2_mat(uint8_t *data, int w, int h, int data_type, int ch_id, uint32_t
     const uint32_t data_size_rgb = data_size * 3;
     uint8_t* buf_rgb = (uint8_t*)&g_buffer_rgb[ch_id];
     uint8_t* buf_rgb_awb= (uint8_t*)&g_buffer_rgb_awb[ch_id];
+
+#ifdef WITH_ROS
     AlgRosPubNode* ros_pub = &g_rospub[ch_id];
+#elif WITH_ROS2
+    AlgRos2PubNode* ros_pub = &g_rospub[ch_id];
+#endif
 
     if (data_type <= ALG_SDK_MIPI_DATA_TYPE_YVYU)
     {
@@ -131,11 +150,15 @@ void callback_image_data(void *p)
     array_2_mat((uint8_t *)msg->payload, msg->image_info_meta.width, msg->image_info_meta.height, msg->image_info_meta.data_type, ch_id, msg->image_info_meta.frame_index, msg->image_info_meta.timestamp, msg->common_head.topic_name); // YUV422 type is CV_8U2
 }
 
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
     signal(SIGINT, int_handler);
+#ifdef WITH_ROS
     ros::init(argc, argv, "alg_sdk_ros_publisher", ros::init_options::NoSigintHandler);
     ros::Time::init();
+#elif WITH_ROS2
+    rclcpp::init(argc, argv);
+#endif
 
     if ((argc == 3) && (strcmp(argv[1], "-c") == 0))
     {
@@ -146,8 +169,13 @@ int main(int argc, char **argv)
         /* initialize ros */ 
         int ch_id = get_channel_id(topic_name);
         printf("Init rospub on ch [%d]\n", ch_id);
+#ifdef WITH_ROS
         AlgRosPubNode* ros_pub = &g_rospub[ch_id];
         ros_pub->Init(30, ch_id);
+#elif WITH_ROS2
+        AlgRos2PubNode* ros_pub = &g_rospub[ch_id];
+        ros_pub->Init(ch_id);
+#endif
 
         /* Check the head of topic name */
         if (strncmp(topic_name, topic_image_head_d, strlen(topic_image_head_d)) == 0)
@@ -183,9 +211,13 @@ int main(int argc, char **argv)
             printf("Client [%02d] subscribe to topic [%s]\n", i, image_topic_names[i]);
 
             printf("Init rospub on ch [%d]\n", i);
+#ifdef WITH_ROS
             AlgRosPubNode* ros_pub = &g_rospub[i];
             ros_pub->Init(30, i);
-
+#elif WITH_ROS2
+            AlgRos2PubNode* ros_pub = &g_rospub[i];
+            ros_pub->Init(i);
+#endif
             rc = alg_sdk_subscribe(image_topic_names[i], callback_image_data);
             if (rc < 0)
             {
@@ -202,5 +234,7 @@ int main(int argc, char **argv)
 
         alg_sdk_client_spin_on();
     }
+
+
     return 0;
 }

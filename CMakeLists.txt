@@ -157,6 +157,41 @@ else()
         install (FILES ${ALG_CVT_LIB} DESTINATION ${CMAKE_INSTALL_DIR}/lib)
     endif ()
 
+    if (WITH_ROS2)
+        message("-- Build with ROS2")
+        add_definitions(-DWITH_ROS2)
+        find_package(ament_cmake REQUIRED)
+        find_package(rclcpp REQUIRED)
+        find_package(rcl_interfaces REQUIRED)
+        find_package(sensor_msgs REQUIRED)
+        
+        include_directories(
+            ${rclcpp_INCLUDE_DIRS}
+            ${rcl_interfaces_INCLUDE_DIRS}
+            ${sensor_msgs_INCLUDE_DIRS}
+        )
+
+        aux_source_directory(src/c/alg_ros2bridge ROS2_BRIDGE_SRC)
+        add_executable(${PROJECT_NAME}_ros2pub
+            src/c/demo/demo_rospub.cpp
+            ${ROS2_BRIDGE_SRC}
+        )
+        target_link_libraries(${PROJECT_NAME}_ros2pub
+            ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk.so
+            ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libalg_cv_cvtColor.so
+            ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libalg_cv_IspPipe.so    
+            pthread
+            anl
+            ${ament_LIBRARIES}
+            ${rclcpp_LIBRARIES}
+            ${sensor_msgs_LIBRARIES}
+        )
+        set_target_properties(${PROJECT_NAME}_ros2pub PROPERTIES LINKER_LANGUAGE CXX)
+        install (TARGETS ${PROJECT_NAME}_ros2pub RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
+        FILE(GLOB ALG_CVT_LIB "${CMAKE_SOURCE_DIR}/pcie_sdk/lib/linux/${CMAKE_SYSTEM_PROCESSOR}/libalg_cv*")
+        install (FILES ${ALG_CVT_LIB} DESTINATION ${CMAKE_INSTALL_DIR}/lib)
+    endif ()
+
     if (BUILD_IMAGE_DISP)
         find_package(OpenCV REQUIRED)
         include_directories(${OpenCV_INCLUDE_DIRS})
