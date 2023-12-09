@@ -54,6 +54,11 @@ void AlgRos2PubNode::SpinOnce()
     rclcpp::spin_some(m_node);
 }
 
+bool AlgRos2PubNode::IsRosOK()
+{
+    return rclcpp::ok();
+}
+
 int AlgRos2PubNode::PublishImage(uint32_t seq, 
                                 std::string topic_name, 
                                 int height, 
@@ -69,10 +74,15 @@ int AlgRos2PubNode::PublishImage(uint32_t seq,
         printf("ROS Pub Error : Buffer is empty!\n");
         return 1;
     }
+
+    if (!IsRosOK())
+    {
+        return 0;
+    }
+
     uint8_t* buffer = (uint8_t*)_buffer;
     sensor_msgs::msg::Image ros_image;
-    rclcpp::Time ros_time;    
-    // ros_time.fromNSec(timestamp*1000); // timestamp is macrosecond
+    rclcpp::Time ros_time(static_cast<uint64_t>(timestamp));    
 
     ros_image.header.stamp = ros_time;
     ros_image.header.frame_id = topic_name;

@@ -35,6 +35,7 @@ public:
     AlgRos2PubNode                      ();
     ~AlgRos2PubNode                     ();
     int  Init                           (const int ch_id);
+    bool IsRosOK                        ();
     void SpinOnce                       ();
     int  PublishImage                   (uint32_t seq, 
                                         std::string topic_name, 

@@ -45,8 +45,7 @@ uint64_t milliseconds(void)
 
 void int_handler(int sig)
 {
-    // printf("Caught signal : %d\n", sig);
-    alg_sdk_stop_client();
+    printf("Caught signal : %d\n", sig);
 
 #ifdef WITH_ROS
     ros::shutdown();
@@ -54,6 +53,7 @@ void int_handler(int sig)
     rclcpp::shutdown();
 #endif
 
+    alg_sdk_stop_client();
     /* terminate program */
     exit(sig);
 }
