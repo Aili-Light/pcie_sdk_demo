@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
         printf("Init rospub on ch [%d]\n", ch_id);
 #ifdef WITH_ROS
         AlgRosPubNode* ros_pub = &g_rospub[ch_id];
-        ros_pub->Init(30, ch_id);
+        ros_pub->Init(ch_id);
 #elif WITH_ROS2
         AlgRos2PubNode* ros_pub = &g_rospub[ch_id];
         ros_pub->Init(ch_id);
@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
             printf("Init rospub on ch [%d]\n", i);
 #ifdef WITH_ROS
             AlgRosPubNode* ros_pub = &g_rospub[i];
-            ros_pub->Init(30, i);
+            ros_pub->Init(i);
 #elif WITH_ROS2
             AlgRos2PubNode* ros_pub = &g_rospub[i];
             ros_pub->Init(i);

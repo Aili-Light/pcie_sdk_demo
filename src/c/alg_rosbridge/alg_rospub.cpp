@@ -30,16 +30,14 @@ AlgRosPubNode::AlgRosPubNode() {}
 
 AlgRosPubNode::~AlgRosPubNode() {}
 
-int AlgRosPubNode::Init(int _freq, int _ch_id)
+int AlgRosPubNode::Init(const int _ch_id)
 {
-    m_freq = _freq;
     m_ch_id = _ch_id;
 
     ros::NodeHandle nh;
     ros::NodeHandle pnh("~");
 
     t_init_ = ros::Time::now();
-    pnh.param<int>("frequency", this->m_freq,1000);
 
     char topic_ch[ALG_SDK_HEAD_COMMON_TOPIC_NAME_LEN] = "";
     char topic_name[ALG_SDK_HEAD_COMMON_TOPIC_NAME_LEN] = "";
@@ -62,16 +60,6 @@ bool AlgRosPubNode::IsRosOK()
 void AlgRosPubNode::SpinOnce()
 {
     ros::spinOnce();
-}
-
-void AlgRosPubNode::Spin()
-{
-    ros::Rate rate(m_freq);
-    while (ros::ok())
-    {
-        rate.sleep();
-        ros::spinOnce();
-    }
 }
 
 int AlgRosPubNode::PublishImage(uint32_t seq, 

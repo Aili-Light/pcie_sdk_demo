@@ -34,9 +34,8 @@ class AlgRosPubNode
 public:
     AlgRosPubNode                       ();
     ~AlgRosPubNode                      ();
-    int  Init                           (int, int);
+    int  Init                           (const int ch_id);
     bool IsRosOK                        ();
-    void Spin                           ();
     void SpinOnce                       ();
     int  PublishImage                   (uint32_t seq, 
                                         std::string topic_name, 
