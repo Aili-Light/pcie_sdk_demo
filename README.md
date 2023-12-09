@@ -93,9 +93,9 @@ Set Trigger
    `python set_trigger_mode.py --channel=xx,yy --mode=2 --delay_time=0 --valid_time=1000 --polarity=0 --freq=30`  
 
 # Publish ROS Image (Ubuntu)
-Build With ROS (Melodic)
+Build With ROS (melodic / noetic)
 ------------------------------------
-1.   Install ROS Melodic.   
+1.   Install ROS melodic.   
 2.   After installation, add ROS libraries to PATH:  
      `source /opt/ros/melodic/setup.bash`  
 3.   Add option `-DWITH_ROS=ON` in cmake:
@@ -119,8 +119,36 @@ Subscribe to ROS Topic
 ------------------------------------
 ROS Topic Name : `/image_data/stream/xx`  
 (xx is channel id starting from 00)  
-To display image, use image_view :   
+To display image of channel 0, use image_view :   
 `rosrun image_view image_view image:=/image_data/stream/00`  
+
+# Publish ROS2 Image (Ubuntu)
+Build With ROS2 (humble)
+------------------------------------
+1.   Install ROS2 humble.   
+2.   After installation, add ROS2 libraries to PATH:  
+     `source /opt/ros/humble/setup.bash`  
+3.   Add option `-DWITH_ROS2=ON` in cmake:
+     `cmake -DWITH_ROS2=ON ..`  
+     `make & make install`  
+
+Run ROS2 Publish
+------------------------------------ 
+1.   Init SDK : 
+     `sudo ./pcie_sdk_demo_init -s`  
+2.   Set Sensor Config :  
+     `python set_sensor_from_json.py --json_file=<path to json file> --channel=xx`  
+3.   Stream on :  
+     `python stream_on_by_channel.py --channel='x,y'`  
+4.   Run Rospub : 
+     `sudo ./pcie_sdk_demo_rospub -all`  
+
+Subscribe to ROS2 Topic 
+------------------------------------
+ROS2 Topic Name : `/image_data/stream/ch-xx`  
+(xx is channel id starting from 00)  
+To display image of channel 0, use rviz2 :   
+`topic=/image_data/stream/ch-00`  
 
 # Support
 contact : jimmy@ailiteam.com
