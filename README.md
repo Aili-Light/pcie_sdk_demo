@@ -145,10 +145,10 @@ Run ROS2 Publish
 
 Subscribe to ROS2 Topic 
 ------------------------------------
-ROS2 Topic Name : `/image_data/stream/ch-xx`  
+ROS2 Topic Name : `/image_data/stream/ch_xx`  
 (xx is channel id starting from 00)  
 To display image of channel 0, use rviz2 :   
-`topic=/image_data/stream/ch-00`  
+`topic=/image_data/stream/ch_00`  
 
 # Support
 contact : jimmy@ailiteam.com
