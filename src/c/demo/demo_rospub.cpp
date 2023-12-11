@@ -126,10 +126,10 @@ void frame_rate_monitor(const int ch_id, const int frame_index)
 int get_channel_id(const char *topic_name)
 {
     const char *ptr_topic = &topic_name[19];
-    char c_ch_id[2];
-    strncpy(c_ch_id, ptr_topic, 2);
+    char c_ch_id[8];
+    strncpy(c_ch_id, ptr_topic, 8);
     int ch_id = atoi(c_ch_id);
-
+    
     return ch_id;
 }
 

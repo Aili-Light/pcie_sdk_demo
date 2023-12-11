@@ -141,7 +141,7 @@ Run ROS2 Publish
 3.   Stream on :  
      `python stream_on_by_channel.py --channel='x,y'`  
 4.   Run Rospub : 
-     `sudo ./pcie_sdk_demo_rospub -all`  
+     `sudo ./pcie_sdk_demo_ros2pub -all`  
 
 Subscribe to ROS2 Topic 
 ------------------------------------
