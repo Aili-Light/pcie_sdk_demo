@@ -97,6 +97,9 @@ SOFTWARE.
 #define  ALG_SDK_PRODUCT_DATE_LENGTH           	15
 #define  ALG_SDK_INTER_PARAMER_MODEL_LENGTH     10
 
+#define  AILI_FILE_NAME_LENTH    32
+#define AILI_FILE_SUPPORT_MAX_NUM   128
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -474,6 +477,12 @@ extern "C"
         uint8_t     ack_code;
     } service_write_file_t;
 
+
+    typedef struct
+    {
+        uint8_t file_dir;
+        char    file_name[AILI_FILE_NAME_LENTH];
+    }aili_file_attribute;
     typedef struct alg_sdk_service_board_channel_info
     {
         uint8_t     ack_mode;
