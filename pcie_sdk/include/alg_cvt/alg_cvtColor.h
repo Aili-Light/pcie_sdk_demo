@@ -16,6 +16,16 @@ extern "C" {
 
 namespace alg_cv
 {
+    enum bayer_pattern_e
+    {
+        ALG_CV_BAYER_PATTERN_UNKNOWN = 0, // Unkonwn pattern
+        ALG_CV_BAYER_PATTERN_RGGB = 1,   // R-Gb-Gr-B Pattern
+        ALG_CV_BAYER_PATTERN_BGGR = 2,   // B-Gb-Gr-R Pattern 
+        ALG_CV_BAYER_PATTERN_GBRG = 3,   // Gb-B-R-Gr Pattern
+        ALG_CV_BAYER_PATTERN_GRBG = 4,   // Gr-R-B-Gb Pattern
+        ALG_CV_BAYER_PATTERN_RCCC = 5,   // R-C-C-C Pattern
+    };
+
     enum color_space_e
     {
         ALG_CV_YUV2RGBCVT_ERR = 0xFF,
@@ -47,6 +57,25 @@ namespace alg_cv
         ALG_CV_YUV2I420_YVYU = 0x61,
         ALG_CV_RGB2YCbCr_RGB = 0x70,
         ALG_CV_RGB2YCbCr_BGR = 0x71,
+        ALG_CV_YUYV2UYVY = 0x80,
+        ALG_CV_YUYV2VYUY = 0x81,
+        ALG_CV_YUYV2YVYU = 0x82,
+        ALG_CV_YUYV2UVY2 = 0x83,
+        ALG_CV_YUYV2VUY2 = 0x84,
+        ALG_CV_YUYV2Y2UV = 0x85,
+        ALG_CV_YUYV2Y2VU = 0x86,
+        ALG_CV_I4202YUV_YUYV = 0x90,
+        ALG_CV_I4202YUV_YVYU = 0x91,
+        ALG_CV_I4202YUV_UYVY = 0x92,
+        ALG_CV_I4202YUV_VYUY = 0x93,
+        ALG_CV_NV12ToYUV_YUYV = 0x94,
+        ALG_CV_NV12ToYUV_YVYU = 0x95,
+        ALG_CV_NV12ToYUV_UYVY = 0x96,
+        ALG_CV_NV12ToYUV_VYUY = 0x97,
+        ALG_CV_NV21ToYUV_YUYV = 0x98,
+        ALG_CV_NV21ToYUV_YVYU = 0x99,
+        ALG_CV_NV21ToYUV_UYVY = 0x9a,
+        ALG_CV_NV21ToYUV_VYUY = 0x9b,
     };
 
     /* return color space type enum
