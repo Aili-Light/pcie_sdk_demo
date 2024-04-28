@@ -92,11 +92,25 @@ void array_2_mat(uint8_t *data, int w, int h, int data_type, int ch_id, uint32_t
         /* Demosaic */
         /* This is a temporary fix for Bayer pattern problem in the surrounding view camera
         */
-        if (ch_id == 0 || ch_id == 4)
+        // if (ch_id == 0 || ch_id == 4)
+        // {
+        //     alg_cv::alg_sdk_cvtColor(pdata, buf_rgb, w, h, alg_cv::ALG_CV_BayerGR2RGB);
+        // }
+        // else if (ch_id == 2 || ch_id == 6)
+        // {
+        //     alg_cv::alg_sdk_cvtColor(pdata, buf_rgb, w, h, alg_cv::ALG_CV_BayerGB2RGB);
+        // }
+        // else
+        // {
+        //     free(pdata);
+        //     return;
+        // }
+        
+        if (ch_id == 0 || ch_id == 3)
         {
             alg_cv::alg_sdk_cvtColor(pdata, buf_rgb, w, h, alg_cv::ALG_CV_BayerGR2RGB);
         }
-        else if (ch_id == 2 || ch_id == 6)
+        else if (ch_id == 1 || ch_id == 2)
         {
             alg_cv::alg_sdk_cvtColor(pdata, buf_rgb, w, h, alg_cv::ALG_CV_BayerGB2RGB);
         }
