@@ -89,23 +89,10 @@ void array_2_mat(uint8_t *data, int w, int h, int data_type, int ch_id, uint32_t
             pdata[2 * i + 1] = ((((data[3 * i + 1]) << 4) & 0x0FF0) | ((data[3 * i + 2] >> 4) & 0x000F)) >> 4;
         }
         /* End - PCIE RAW Data Conversion */
-        /* Demosaic */
-        /* This is a temporary fix for Bayer pattern problem in the surrounding view camera
+        /* Demosaic 
+        *  The channel id must be fixed for each camera
+        *  due to the Bayer patterns are diffrent for each
         */
-        // if (ch_id == 0 || ch_id == 4)
-        // {
-        //     alg_cv::alg_sdk_cvtColor(pdata, buf_rgb, w, h, alg_cv::ALG_CV_BayerGR2RGB);
-        // }
-        // else if (ch_id == 2 || ch_id == 6)
-        // {
-        //     alg_cv::alg_sdk_cvtColor(pdata, buf_rgb, w, h, alg_cv::ALG_CV_BayerGB2RGB);
-        // }
-        // else
-        // {
-        //     free(pdata);
-        //     return;
-        // }
-        
         if (ch_id == 0 || ch_id == 3)
         {
             alg_cv::alg_sdk_cvtColor(pdata, buf_rgb, w, h, alg_cv::ALG_CV_BayerGR2RGB);
@@ -120,6 +107,7 @@ void array_2_mat(uint8_t *data, int w, int h, int data_type, int ch_id, uint32_t
         }
         else
         {
+            printf("Channel ID error! Expect channel id [0-4], but given [%d].\n", ch_id);
             free(pdata);
             return;
         }
