@@ -65,7 +65,7 @@ void array_2_mat(uint8_t *data, int w, int h, int data_type, int ch_id, uint32_t
     const uint32_t data_size_rgb = data_size * 3;
     uint8_t* buf_rgb = (uint8_t*)&g_buffer_rgb[ch_id];
     uint8_t* buf_rgb_awb= (uint8_t*)&g_buffer_rgb_awb[ch_id];
-    uint8_t* buf_gray = (uint8_t*)&g_buffer_gray[ch_id];
+    // uint8_t* buf_gray = (uint8_t*)&g_buffer_gray[ch_id];
 
 #ifdef WITH_ROS
     AlgRosPubNode* ros_pub = &g_rospub[ch_id];
@@ -109,8 +109,8 @@ void array_2_mat(uint8_t *data, int w, int h, int data_type, int ch_id, uint32_t
         }
         else if (ch_id == 4)
         {
-            alg_cv::alg_sdk_cvtColor(pdata, buf_gray, w, h, alg_cv::ALG_CV_BayerRC2GRAY);
-            ros_pub->PublishImage(frame_index, image_name, h, w, ALG_SDK_VIDEO_FORMAT_GRAY8, data_size*2, timestamp, buf_gray);
+            alg_cv::alg_sdk_cvtColor(pdata, buf_rgb, w, h, alg_cv::ALG_CV_BayerRC2GRAY);
+            ros_pub->PublishImage(frame_index, image_name, h, w, ALG_SDK_VIDEO_FORMAT_GRAY8, data_size*2, timestamp, buf_rgb);
         }
         else
         {
