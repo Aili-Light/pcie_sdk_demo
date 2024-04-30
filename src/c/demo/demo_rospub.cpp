@@ -25,7 +25,7 @@ static int g_f_count[ALG_SDK_MAX_CHANNEL] = {0};
 static uint32_t g_f_last[ALG_SDK_MAX_CHANNEL] = {0};
 static uint8_t g_buffer_rgb[ALG_SDK_MAX_CHANNEL][ALG_SDK_PAYLOAD_RGB_MAX];
 static uint8_t g_buffer_rgb_awb[ALG_SDK_MAX_CHANNEL][ALG_SDK_PAYLOAD_RGB_MAX];
-static uint8_t g_buffer_gray[ALG_SDK_MAX_CHANNEL][ALG_SDK_PAYLOAD_RGB_MAX];
+// static uint8_t g_buffer_gray[ALG_SDK_MAX_CHANNEL][ALG_SDK_PAYLOAD_RGB_MAX];
 #ifdef WITH_ROS
 static AlgRosPubNode g_rospub[ALG_SDK_MAX_CHANNEL];
 #elif WITH_ROS2
