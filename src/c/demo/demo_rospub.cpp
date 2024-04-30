@@ -110,7 +110,7 @@ void array_2_mat(uint8_t *data, int w, int h, int data_type, int ch_id, uint32_t
         else if (ch_id == 4)
         {
             alg_cv::alg_sdk_cvtColor(pdata, buf_gray, w, h, alg_cv::ALG_CV_BayerRC2GRAY);
-            ros_pub->PublishImage(frame_index, image_name, h, w, ALG_SDK_VIDEO_FORMAT_GRAY8, data_size_rgb, timestamp, buf_gray);
+            ros_pub->PublishImage(frame_index, image_name, h, w, ALG_SDK_VIDEO_FORMAT_GRAY8, data_size*2, timestamp, buf_gray);
         }
         else
         {
