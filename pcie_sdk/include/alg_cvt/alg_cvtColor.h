@@ -48,6 +48,8 @@ namespace alg_cv
         ALG_CV_BayerGB2RGB = 0x41,
         ALG_CV_BayerRG2RGB = 0x42,
         ALG_CV_BayerGR2RGB = 0x43,
+        ALG_CV_BayerBGR2GRAY = 0x45,
+        ALG_CV_BayerRC2GRAY = 0x46,
         ALG_CV_RGB2BayerBG = 0x50,
         ALG_CV_RGB2BayerGB = 0x51,
         ALG_CV_RGB2BayerRG = 0x52,
