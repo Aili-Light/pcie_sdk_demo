@@ -223,6 +223,7 @@ extern "C"
         ALG_SDK_VIDEO_FORMAT_RGB = 15,   /* RGB packed into 24 bits without padding (R-G-B-R-G-B) */
         ALG_SDK_VIDEO_FORMAT_BGR = 16,   /* RGB packed into 24 bits without padding (B-G-R-B-G-R) */
         ALG_SDK_VIDEO_FORMAT_GRAY8 = 25, /* 8-bit grayscale*/
+        ALG_SDK_VIDEO_FORMAT_GRAY16 = 26, /* 8-bit grayscale*/
         ALG_SDK_VIDEO_FORMAT_RAW10 = 90, /* RAW 10-bit */
         ALG_SDK_VIDEO_FORMAT_RAW12 = 91, /* RAW 10-bit */
         ALG_SDK_VIDEO_FORMAT_Y2UV = 104,  /* Packed YUY-422 format (Y2-U-Y1-V-Y2-U-Y1-V) */
