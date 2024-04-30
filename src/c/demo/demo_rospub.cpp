@@ -25,6 +25,7 @@ static int g_f_count[ALG_SDK_MAX_CHANNEL] = {0};
 static uint32_t g_f_last[ALG_SDK_MAX_CHANNEL] = {0};
 static uint8_t g_buffer_rgb[ALG_SDK_MAX_CHANNEL][ALG_SDK_PAYLOAD_RGB_MAX];
 static uint8_t g_buffer_rgb_awb[ALG_SDK_MAX_CHANNEL][ALG_SDK_PAYLOAD_RGB_MAX];
+static uint8_t g_buffer_gray[ALG_SDK_MAX_CHANNEL][ALG_SDK_PAYLOAD_RGB_MAX];
 #ifdef WITH_ROS
 static AlgRosPubNode g_rospub[ALG_SDK_MAX_CHANNEL];
 #elif WITH_ROS2
@@ -64,6 +65,7 @@ void array_2_mat(uint8_t *data, int w, int h, int data_type, int ch_id, uint32_t
     const uint32_t data_size_rgb = data_size * 3;
     uint8_t* buf_rgb = (uint8_t*)&g_buffer_rgb[ch_id];
     uint8_t* buf_rgb_awb= (uint8_t*)&g_buffer_rgb_awb[ch_id];
+    uint8_t* buf_gray = (uint8_t*)&g_buffer_gray[ch_id];
 
 #ifdef WITH_ROS
     AlgRosPubNode* ros_pub = &g_rospub[ch_id];
@@ -96,14 +98,19 @@ void array_2_mat(uint8_t *data, int w, int h, int data_type, int ch_id, uint32_t
         if (ch_id == 0 || ch_id == 3)
         {
             alg_cv::alg_sdk_cvtColor(pdata, buf_rgb, w, h, alg_cv::ALG_CV_BayerGR2RGB);
+            alg_cv::alg_sdk_awb(buf_rgb, buf_rgb_awb, w, h, alg_cv::ALG_CV_AWB_DYM_THRESHOLD);
+            ros_pub->PublishImage(frame_index, image_name, h, w, ALG_SDK_VIDEO_FORMAT_RGB, data_size_rgb, timestamp, buf_rgb_awb);
         }
         else if (ch_id == 1 || ch_id == 2)
         {
             alg_cv::alg_sdk_cvtColor(pdata, buf_rgb, w, h, alg_cv::ALG_CV_BayerGB2RGB);
+            alg_cv::alg_sdk_awb(buf_rgb, buf_rgb_awb, w, h, alg_cv::ALG_CV_AWB_DYM_THRESHOLD);
+            ros_pub->PublishImage(frame_index, image_name, h, w, ALG_SDK_VIDEO_FORMAT_RGB, data_size_rgb, timestamp, buf_rgb_awb);
         }
         else if (ch_id == 4)
         {
-            alg_cv::alg_sdk_cvtColor(pdata, buf_rgb, w, h, alg_cv::ALG_CV_BayerGR2RGB);
+            alg_cv::alg_sdk_cvtColor(pdata, buf_gray, w, h, alg_cv::ALG_CV_BayerRC2GRAY);
+            ros_pub->PublishImage(frame_index, image_name, h, w, ALG_SDK_VIDEO_FORMAT_GRAY8, data_size_rgb, timestamp, buf_gray);
         }
         else
         {
@@ -111,8 +118,6 @@ void array_2_mat(uint8_t *data, int w, int h, int data_type, int ch_id, uint32_t
             free(pdata);
             return;
         }
-        alg_cv::alg_sdk_awb(buf_rgb, buf_rgb_awb, w, h, alg_cv::ALG_CV_AWB_DYM_THRESHOLD);
-        ros_pub->PublishImage(frame_index, image_name, h, w, ALG_SDK_VIDEO_FORMAT_RGB, data_size_rgb, timestamp, buf_rgb_awb);
         free(pdata);
     }
 }

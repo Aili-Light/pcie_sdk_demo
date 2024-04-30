@@ -141,6 +141,22 @@ int AlgRosPubNode::PublishImage(uint32_t seq,
         /* Update ROS */
         SpinOnce();
     }
+    else if(format == ALG_SDK_VIDEO_FORMAT_GRAY8)
+    {
+        ros_image.height = height;
+        ros_image.width = width;
+        ros_image.step = width;
+        ros_image.is_bigendian = false;  
+        ros_image.encoding = "mono8";
+        ros_image.data.resize(img_size);
+        memcpy(ros_image.data.data(), buffer, img_size);
+        // printf("----b0[%d], bend[%d]\n", ((uint8_t*)buffer)[0],
+        //  ((uint8_t*)buffer)[img_size-1]);
+        // printf("vector size : %ld\n", ros_image.data.size());
+        m_img_pub.publish(ros_image);
+        /* Update ROS */
+        SpinOnce();
+    }
     else
     {
         printf( "ROS Publisher -- unknown data type (%d)\n", format);
