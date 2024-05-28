@@ -111,6 +111,36 @@ class service_debug_control(Structure):
     ("ack_debug_flag", c_uint8)
     ]
 
+class cam_emb_param(Structure):
+    _pack_ = 1
+    _fields_ = [("valid",c_uint8),
+    ("non_image_h_size",c_uint16),
+    ("non_image_front_v_size", c_uint16),
+    ("non_image_rear_v_size", c_uint16)
+    ]
+
+# class cam_emb_info(Structure):
+#     _fields_ = [("emb_param",cam_emb_param*4)
+#     ]
+
+class service_get_cam_emb_info(Structure):
+    _pack_ = 1
+    _fields_ = [("ack_mode",c_uint8),
+    ("dev_index",c_uint8),
+    ("channel",c_uint8),
+    ("ack_code", c_uint8),
+    ("emb_param", cam_emb_param*4)
+    ]
+
+class service_set_cam_emb_info(Structure):
+    _pack_ = 1
+    _fields_ = [("ack_mode",c_uint8),
+    ("dev_index",c_uint8),
+    ("channel",c_uint8),
+    ("emb_param", cam_emb_param*4),
+    ("ack_code", c_uint8)
+    ]
+
 
 callbackFunc_t = ctypes.CFUNCTYPE(c_void_p, c_void_p)
 if os.name == 'nt' :

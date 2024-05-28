@@ -97,7 +97,7 @@ SOFTWARE.
 #define  ALG_SDK_PLOT_NUMBER_LENGTH            	10
 #define  ALG_SDK_PRODUCT_DATE_LENGTH           	15
 #define  ALG_SDK_INTER_PARAMER_MODEL_LENGTH     10
-
+#define NON_IMAGE_VDMA_MAX_NUM                                   4
 #define  AILI_FILE_NAME_LENTH    32
 #define AILI_FILE_SUPPORT_MAX_NUM   128
 
@@ -174,6 +174,8 @@ extern "C"
         ALG_SDK_SERVICE_PCIE_CMD_WRITE_FILE = 0x16,
         ALG_SDK_SERVICE_PCIE_CMD_HW_RESET = 0x17,
         ALG_SDK_SERVICE_PCIE_CMD_CTRL_CAM_CH_PWR = 0x18,
+        ALG_SDK_SERVICE_PCIE_CMD_CAMERA_EMB_INFO_GET = 0x19,
+        ALG_SDK_SERVICE_PCIE_CMD_CAMERA_EMB_INFO_SET = 0x1A,
     };
 
     enum
@@ -223,6 +225,8 @@ extern "C"
         ALG_SDK_VIDEO_FORMAT_BGRA = 12,  /* RGB packed into 32 bits without padding (B-G-R-A-B-G-R-A) */
         ALG_SDK_VIDEO_FORMAT_RGB = 15,   /* RGB packed into 24 bits without padding (R-G-B-R-G-B) */
         ALG_SDK_VIDEO_FORMAT_BGR = 16,   /* RGB packed into 24 bits without padding (B-G-R-B-G-R) */
+        ALG_SDK_VIDEO_FORMAT_GRAY8 = 25, /* 8-bit grayscale*/
+        ALG_SDK_VIDEO_FORMAT_GRAY16 = 26, /* 8-bit grayscale*/
         ALG_SDK_VIDEO_FORMAT_RAW10 = 90, /* RAW 10-bit */
         ALG_SDK_VIDEO_FORMAT_RAW12 = 91, /* RAW 10-bit */
         ALG_SDK_VIDEO_FORMAT_Y2UV = 104,  /* Packed YUY-422 format (Y2-U-Y1-V-Y2-U-Y1-V) */
@@ -733,6 +737,45 @@ extern "C"
         uint16_t size;
         uint16_t count;
     } host_rpc_push_file_t;
+#pragma pack()
+
+#pragma pack(1)
+typedef struct
+{
+    uint8_t valid;
+    uint16_t non_image_h_size;
+    uint16_t non_image_front_v_size;
+    uint16_t non_image_rear_v_size;
+}aili_camera_emb_param_t;
+
+typedef struct
+{
+    aili_camera_emb_param_t emb_param[NON_IMAGE_VDMA_MAX_NUM];
+}aili_camera_emb_info_t;
+
+typedef struct alg_sdk_service_get_cam_emb_info
+{
+    /* Request Field */
+    uint8_t ack_mode;
+    uint8_t dev_index;
+    uint8_t  channel;
+
+     /* Reply Field */
+    uint8_t ack_code;
+    aili_camera_emb_info_t emb_info;
+} service_cam_get_emb_info_t;
+
+typedef struct alg_sdk_service_set_cam_emb_info
+{
+    /* Request Field */
+    uint8_t ack_mode;
+    uint8_t dev_index;
+    uint8_t  channel;
+    aili_camera_emb_info_t emb_info;
+
+     /* Reply Field */
+    uint8_t ack_code;
+} service_cam_set_emb_info_t;
 #pragma pack()
 
 #ifdef __cplusplus
