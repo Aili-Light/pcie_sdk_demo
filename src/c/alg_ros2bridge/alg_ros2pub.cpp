@@ -142,9 +142,25 @@ int AlgRos2PubNode::PublishImage(uint32_t seq,
         SpinOnce();
         /* Update ROS */
     }
+    else if(format == ALG_SDK_VIDEO_FORMAT_GRAY8)
+    {
+        ros_image.height = height;
+        ros_image.width = width;
+        ros_image.step = width;
+        ros_image.is_bigendian = false;  
+        ros_image.encoding = "mono8";
+        ros_image.data.resize(img_size);
+        memcpy(ros_image.data.data(), buffer, img_size);
+        // printf("----b0[%d], bend[%d]\n", ((uint8_t*)buffer)[0],
+        //  ((uint8_t*)buffer)[img_size-1]);
+        // printf("vector size : %ld\n", ros_image.data.size());
+        m_img_pub.publish(ros_image);
+        /* Update ROS */
+        SpinOnce();
+    }
     else
     {
-        printf( "ROS Publisher -- unknown data type (%d)\n", format);
+        printf( "ROS2 Publisher -- unknown data type (%d)\n", format);
         printf( "                        supported data type are:\n");
         printf( "                            * 4 (YVYU)\n");		
         printf( "                            * 5 (UYVY)\n");		
@@ -152,6 +168,7 @@ int AlgRos2PubNode::PublishImage(uint32_t seq,
         printf( "                            * 19 (YVYU)\n");		
         printf( "                            * 15 (RGB)\n");		
         printf( "                            * 16 (BRG)\n");		
+        printf( "                            * 25 (GRAY)\n");		
         return 1; 
     }
 

@@ -166,7 +166,8 @@ int AlgRosPubNode::PublishImage(uint32_t seq,
         printf( "                            * 64 (VYUY)\n");		
         printf( "                            * 19 (YVYU)\n");		
         printf( "                            * 15 (RGB)\n");		
-        printf( "                            * 16 (BRG)\n");		
+        printf( "                            * 16 (BRG)\n");	
+        printf( "                            * 25 (GRAY)\n");		
         return 1; 
     }
 
