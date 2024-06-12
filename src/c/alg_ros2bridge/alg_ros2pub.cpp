@@ -154,7 +154,7 @@ int AlgRos2PubNode::PublishImage(uint32_t seq,
         // printf("----b0[%d], bend[%d]\n", ((uint8_t*)buffer)[0],
         //  ((uint8_t*)buffer)[img_size-1]);
         // printf("vector size : %ld\n", ros_image.data.size());
-        m_img_pub.publish(ros_image);
+        m_img_pub->publish(ros_image);
         /* Update ROS */
         SpinOnce();
     }
