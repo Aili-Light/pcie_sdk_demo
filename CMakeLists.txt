@@ -1,32 +1,11 @@
 cmake_minimum_required(VERSION 3.5)
 
 project(pcie_sdk_demo)
-find_package(OpenMP)
-if(OpenMP_CXX_FOUND)
-    add_definitions(-DWITH_OPENMP)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif()
+set(CMAKE_CXX_STANDARD 11)
 
 message(STATUS "Processor name is ${CMAKE_SYSTEM_PROCESSOR}")
 include_directories(${CMAKE_SOURCE_DIR}/pcie_sdk/include ${CMAKE_SOURCE_DIR}/src/c)
 set(PROJECT_LINK_DIR ${CMAKE_SOURCE_DIR}/pcie_sdk/lib)
-
-if (WITH_GSTREAMER)
-    find_package(PkgConfig REQUIRED)
-    pkg_search_module(GST_LIBS REQUIRED gstreamer-1.0 gobject-2.0 glib-2.0)
-    MESSAGE(STATUS "GST_LIBS_INCLUDE_DIRS:   ${GST_LIBS_INCLUDE_DIRS}")
-    include_directories(${GST_LIBS_INCLUDE_DIRS})
-
-    if (WITH_CUDA)
-        add_definitions(-DWITH_CUDA)
-        include_directories(${CUDA_INCLUDE_DIRS})
-        set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cuda")
-        find_package(CUDA REQUIRED)
-        message("-- CUDA version: ${CUDA_VERSION}")
-        set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -O3)
-    endif()
-endif ()
 
 if (MINGW32)
     link_directories(${PROJECT_LINK_DIR})
@@ -49,23 +28,6 @@ if (MINGW32)
         ${PROJECT_LINK_DIR}/mingw32/libpcie_sdk.dll
         pthread
     )
-
-    if (WITH_GSTREAMER)
-        if (WITH_CUDA)
-            include_directories(${CUDA_INCLUDE_DIRS})
-        endif()
-        add_executable(${PROJECT_NAME}_gst_camera 
-            src/c/demo/demo_gst_camera.cpp
-            src/c/alg_camera/gst_camera.cpp
-        )
-        target_link_libraries(${PROJECT_NAME}_gst_camera
-            ${PROJECT_LINK_DIR}/mingw32/libpcie_sdk_stream.dll
-            ${PROJECT_LINK_DIR}/mingw32/libpcie_sdk_cuda.dll
-            pthread
-        )
-        set_target_properties(${PROJECT_NAME}_gst_camera PROPERTIES LINKER_LANGUAGE CXX)
-        install (TARGETS ${PROJECT_NAME}_gst_camera RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
-    endif ()
 
     if (BUILD_IMAGE_DISP)
         find_package(OpenCV REQUIRED)
@@ -111,20 +73,6 @@ else()
         pthread
         anl
     )
-
-    if (WITH_GSTREAMER)
-        add_executable(${PROJECT_NAME}_gst_camera 
-                    src/c/demo/demo_gst_camera.cpp
-                    src/c/alg_camera/gst_camera.cpp
-        )
-        target_link_libraries(${PROJECT_NAME}_gst_camera
-            ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk_stream.so
-            pthread
-            anl
-        )
-        set_target_properties(${PROJECT_NAME}_gst_camera PROPERTIES LINKER_LANGUAGE CXX)
-        install (TARGETS ${PROJECT_NAME}_gst_camera RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
-    endif ()
 
     if (WITH_ROS)
         message("-- Build with ROS")
@@ -197,7 +145,7 @@ else()
         include_directories(${OpenCV_INCLUDE_DIRS})
         add_executable(${PROJECT_NAME}_image_disp
             src/c/demo/demo_image_display.cpp
-            )
+        )
         target_link_libraries(${PROJECT_NAME}_image_disp
             ${OpenCV_LIBS}
             ${PROJECT_LINK_DIR}/linux/${CMAKE_SYSTEM_PROCESSOR}/libpcie_sdk.so
@@ -207,9 +155,10 @@ else()
             anl
         )
         if(OpenMP_CXX_FOUND)
-            target_link_libraries(${PROJECT_NAME}_image_disp
-                OpenMP::OpenMP_CXX
-            )
+            add_definitions(-DWITH_OPENMP)
+            set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+            target_link_libraries(${PROJECT_NAME}_image_disp OpenMP::OpenMP_CXX)
         endif()
         set_target_properties(${PROJECT_NAME}_image_disp PROPERTIES LINKER_LANGUAGE CXX)
         install (TARGETS ${PROJECT_NAME}_image_disp RUNTIME DESTINATION ${CMAKE_INSTALL_DIR}/bin)
