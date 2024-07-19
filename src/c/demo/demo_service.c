@@ -98,6 +98,35 @@ int load_sensor_config(const char* filename, uint8_t* payload, uint16_t* len)
     }
 }
 
+int hex_string_to_Buff(char *str,unsigned char *OutputBuff)
+{
+	char *p = NULL;
+	char High = 0;
+	char Low = 0;
+	int i = 0;
+	int Len = 0;
+	int count = 0;
+	p = str;
+	Len = strlen(p);
+
+	while(count < (Len/2))
+    {
+        High = ((*p > '9') && ((*p <= 'F') || (*p <= 'f')))?*p - 48 - 7 : *p - 48;
+		Low = (*(++ p) > '9' && ((*p <= 'F') || (*p <= 'f')))? *p - 48 - 7 : *p - 48;
+        OutputBuff[count] = ((High & 0x0f) << 4 | (Low & 0x0f));
+        p ++;
+        count ++;
+    }
+	//判断字符串长度是否为奇数
+	if(0 != Len%2)
+	{
+		OutputBuff[count++] = ((*p >'9')&&(*p<='F')||(*p<='f'))?*p-48-7:*p-48;
+	}
+
+	return Len/2 + Len%2;
+}
+
+
 int main (int argc, char **argv)
 {
     int rc;
@@ -561,6 +590,59 @@ int main (int argc, char **argv)
             return 0;
         }
         /* End */
+    }
+    else if ((argc == 7) && (strcmp(argv[1], "-i2c_xfer") == 0))
+    {
+        const char *topic_name = "/service/camera/i2c_xfer";
+
+        service_camera_i2c_xfer_t t1 = {
+            .ack_mode = 1,
+            .ch_id = 0,
+            .device_addr = 0x80
+        };
+        uint8_t board_id = 0;
+        uint8_t ch_id = 0;
+        board_id = strtol(argv[2],NULL,16);
+        ch_id = strtol(argv[3],NULL,16);
+        t1.ch_id = board_id*8 + ch_id;
+        t1.device_addr = strtol(argv[4],NULL,16);
+
+        uint16_t read_size = strtol(argv[6],NULL,10);
+        t1.length_r = read_size;
+        t1.length_w = hex_string_to_Buff(argv[5],t1.payload);
+        // t1.length_w = 5000;
+        // for(int i =0 ;i<5000;i++)
+        // {
+        //     t1.payload[i] = i%0xff;
+        // }
+        rc = alg_sdk_call_service(topic_name, &t1, timeout);
+        if (rc < 0)
+        {
+            printf( "Request Service : [%s] Error!\n", topic_name);
+            return 0;
+        }
+
+        printf("[ack : %d]\n", t1.ack_code);
+        if(0 != t1.ack_code)
+        {
+            printf("[Error]:IIC Write Failed! Check Dev_addr or Reg is exit?\r\n");
+            return 0;
+        }
+
+        if(read_size)
+        {
+            printf("i2c xfer recv length :%d   ",t1.ack_length);
+            printf("read data :");
+            for(int i =0;i<t1.ack_length;i++)
+            {
+                printf("%02x ",t1.payload[i]);
+            }
+            printf("\n\r ");
+        }
+        else
+        {
+            printf("i2c xfer send length :%d ",t1.ack_length);
+        }
     }
     else if ((argc == 3) && (strcmp(argv[1], "-get_board_info") == 0))
     {
