@@ -676,6 +676,33 @@ int main (int argc, char **argv)
         printf("board_channel_num: %d\r\n",t.board_channel_num);
         /* End */
     }
+    else if ((argc == 3) && (strcmp(argv[1], "-get_poc_info") == 0))
+    {
+
+        /* Example : Read IIC */
+        const char *topic_name = "/service/board/get_poc_info";
+
+        service_poc_info_get_t t = {
+            .ack_mode = 1,
+            .board_id = 0,
+        };
+
+        t.board_id = atoi(argv[2]);
+        rc = alg_sdk_call_service(topic_name, &t, timeout);
+        if (rc < 0)
+        {
+            printf( "Request Service : [%s] Error!\n", topic_name);
+            return 0;
+        }
+
+        printf("[ack : %d]\n", t.ack_code);
+        printf("time: %lu\r\n",t.timestamp);
+        float* v = t.vol;
+        printf("vol: %f %f %f %f %f %f %f %f \r\n",v[0],v[1],v[2],v[3],v[4],v[5],v[6],v[7]);
+        float* c = t.cur;
+        printf("cur: %f %f %f %f %f %f %f %f \r\n",c[0],c[1],c[2],c[3],c[4],c[5],c[6],c[7]);
+        /* End */
+    }
     else if ((argc == 4) && (strcmp(argv[1], "-get_camera_info") == 0))
     {
 

@@ -547,6 +547,20 @@ extern "C"
         uint8_t     ack_code;
         alg_sdk_module_product_info_t   camera_info;
     } service_camera_info_get_t;
+
+    typedef struct alg_sdk_service_poc_info
+    {
+        /* Request Field */
+        uint8_t     ack_mode;
+        uint8_t     board_id;
+
+        /* Reply Field */
+        uint8_t     ack_code;
+        float    vol[ALG_SDK_CHANNEL_PER_DEV];
+        float    cur[ALG_SDK_CHANNEL_PER_DEV];
+        uint64_t timestamp;
+    } service_poc_info_get_t;
+
 #pragma pack(pop)
     typedef struct alg_sdk_service_camera_read_reg
     {
