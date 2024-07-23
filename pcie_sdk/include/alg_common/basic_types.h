@@ -64,6 +64,7 @@ SOFTWARE.
 #define ALG_SDK_AMP_PROTOCAL_HEAD 0x5A
 #define ALG_SDK_SERVICE_SENSOR_CONFIG_MAX_LINE 8192
 #define ALG_SDK_AMP_PROTOCAL_PAYLOAD_SIZE 65519
+#define ALG_SDK_I2C_XFER_PAYLOAD_SIZE 65519
 #define ALG_SDK_SERVICE_SEND_BUFF_MAX_SIZE 65536
 #define ALG_SDK_MAX_CHANNEL 16
 #define ALG_SDK_MAX_DESERDES 8
@@ -163,6 +164,7 @@ extern "C"
     {
         ALG_SDK_SERVICE_PCIE_CMD_WRITE_REG = 0x02,
         ALG_SDK_SERVICE_PCIE_CMD_REAG_REG = 0x03,
+        ALG_SDK_SERVICE_PCIE_CMD_I2C_XFER = 0x04,
         ALG_SDK_SERVICE_PCIE_CMD_STREAM_CTL = 0x0e,
         ALG_SDK_SERVICE_PCIE_CMD_SENSOR_CONFIG = 0x10,
         ALG_SDK_SERVICE_PCIE_CMD_SET_TRIGGER = 0x0f,
@@ -577,6 +579,21 @@ extern "C"
         uint8_t ack_code;
         uint8_t channel;
     } service_camera_write_reg_t;
+
+    typedef struct alg_sdk_service_camera_i2c_xfer
+    {
+        /* Request Field */
+        uint8_t ack_mode;
+        uint8_t ch_id;
+        uint16_t device_addr;
+        uint16_t length_w;                                          // want write length
+        uint16_t length_r;                                          // want read length
+        uint8_t payload[ALG_SDK_I2C_XFER_PAYLOAD_SIZE];             // read and write use this same payload
+
+        /* Reply Field */
+        uint8_t ack_code;
+        uint16_t ack_length;
+    } service_camera_i2c_xfer_t;
 
     typedef struct alg_sdk_service_set_hw_reset
     {
