@@ -49,6 +49,18 @@ int main (int argc, char **argv)
         alg_sdk_spin_on();
 
     }
+    else if ((argc == 3) && (strcmp (argv[1], "-s") == 0) && (strcmp (argv[2], "--test") == 0))
+    {
+        int rc;
+        char *appsrc[] = {"--test","--publish"};
+        rc = alg_sdk_init_v2(2, &appsrc[0]);
+        if(rc < 0)
+        {
+            printf("Init SDK Failed\n");
+            exit(0);
+        }
+        alg_sdk_spin_on();
+    }
     else
     {
         int rc;
