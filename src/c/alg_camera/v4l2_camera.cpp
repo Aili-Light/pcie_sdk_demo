@@ -330,7 +330,7 @@ void save_picture(const char *filename, unsigned char *file_data, unsigned int l
         fp = fopen(filename, "wb");
     else
         fp = fopen(filename, "ab");
-    if (fp < 0)
+    if (NULL == fp)
     {
         printf("Open frame data file failed\n\n");
         return;

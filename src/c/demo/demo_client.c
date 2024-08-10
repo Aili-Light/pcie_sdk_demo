@@ -50,7 +50,7 @@ void save_image_raw(const char *filename, void *image_ptr, uint32_t image_size)
     FILE *fp;
     fp = fopen(filename, "wb");
     
-    if (fp < 0)
+    if (NULL == 0)
     {
         return;
     }
