@@ -64,6 +64,22 @@ void array_2_mat(uint8_t *data, int w, int h, int data_type, int ch_id, uint32_t
     const uint32_t data_size_rgb = data_size * 3;
     uint8_t* buf_rgb = (uint8_t*)&g_buffer_rgb[ch_id];
     uint8_t* buf_rgb_awb= (uint8_t*)&g_buffer_rgb_awb[ch_id];
+    struct encode_table_t
+    {
+        uint32_t alg_sdk_mipi_data_type;
+        alg_cv::color_space_e alg_cv_data_type;
+    };
+    const struct encode_table_t encode_table[] =
+    {
+        {ALG_SDK_MIPI_DATA_TYPE_UVY2, alg_cv:: ALG_CV_YUV2RGBCVT_UVY2},
+        {ALG_SDK_MIPI_DATA_TYPE_VUY2, alg_cv:: ALG_CV_YUV2RGBCVT_VUY2},
+        {ALG_SDK_MIPI_DATA_TYPE_Y2UV, alg_cv:: ALG_CV_YUV2RGBCVT_Y2UV},
+        {ALG_SDK_MIPI_DATA_TYPE_Y2VU, alg_cv:: ALG_CV_YUV2RGBCVT_Y2VU},
+        {ALG_SDK_MIPI_DATA_TYPE_UYVY, alg_cv:: ALG_CV_YUV2RGBCVT_UYVY},
+        {ALG_SDK_MIPI_DATA_TYPE_VYUY, alg_cv:: ALG_CV_YUV2RGBCVT_VYUY},
+        {ALG_SDK_MIPI_DATA_TYPE_YUYV, alg_cv:: ALG_CV_YUV2RGBCVT_YUYV},
+        {ALG_SDK_MIPI_DATA_TYPE_YVYU, alg_cv:: ALG_CV_YUV2RGBCVT_YVYU},
+    };
 
 #ifdef WITH_ROS
     AlgRosPubNode* ros_pub = &g_rospub[ch_id];
@@ -71,14 +87,18 @@ void array_2_mat(uint8_t *data, int w, int h, int data_type, int ch_id, uint32_t
     AlgRos2PubNode* ros_pub = &g_rospub[ch_id];
 #endif
 
-    if (data_type <= ALG_SDK_MIPI_DATA_TYPE_YVYU)
+    for(int i=0; i < ( sizeof(encode_table) / sizeof(encode_table[0]) ) ; i++ )
     {
-        /* Image Display */
-        /* yuv to rgb conversion */
-        alg_cv::alg_sdk_cvtColor((uint8_t *)data, (uint8_t *)buf_rgb, w, h, alg_cv::ALG_CV_YUV2RGBCVT_YUYV);
-        ros_pub->PublishImage(frame_index, image_name, h, w, ALG_SDK_VIDEO_FORMAT_RGB, data_size_rgb, timestamp, buf_rgb);
+        if( encode_table[i].alg_sdk_mipi_data_type == data_type)
+        {
+            /* Image Display */
+            /* yuv to rgb conversion */
+            alg_cv::alg_sdk_cvtColor((uint8_t *)data, (uint8_t *)buf_rgb, w, h, encode_table[i].alg_cv_data_type);
+            ros_pub->PublishImage(frame_index, image_name, h, w, ALG_SDK_VIDEO_FORMAT_RGB, data_size_rgb, timestamp, buf_rgb);
+            break;
+        }
     }
-    else if (data_type == ALG_SDK_MIPI_DATA_TYPE_RAW12)
+    if (data_type == ALG_SDK_MIPI_DATA_TYPE_RAW12)
     {
         /* raw to rgb conversion */
         /* PCIE RAW Data Conversion */
